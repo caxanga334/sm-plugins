@@ -8,6 +8,8 @@
 
 // ===variables===
 
+float flSavedPosVec[3][MAXPLAYERS];
+
 public Plugin myinfo = {
 	name = "Gamers ala Pro",
 	author = "caxanga334",
@@ -17,8 +19,15 @@ public Plugin myinfo = {
 }
 
 public void OnPluginStart() {
+	LoadTranslations("common.phrases.txt");
+	
 	RegAdminCmd( "sm_add_attribute", Command_AddAttrb, ADMFLAG_CHEATS, "Adds attribute to a player.");
 	RegAdminCmd( "sm_regen", Command_Regen, ADMFLAG_CHEATS, "Regenerates ammo and health." );
+	RegAdminCmd( "sm_save", Command_SavePos, ADMFLAG_CHEATS, "Saves your position." );
+	RegAdminCmd( "sm_gotosaved", Command_GoToPos, ADMFLAG_CHEATS, "Go to your saved position." );
+	RegAdminCmd( "sm_teletoorigin", Command_TeleToPos, ADMFLAG_CHEATS, "Teleports the target client to the specified origin." );
+	RegAdminCmd( "sm_getclientinfo", Command_GetClientInfo, ADMFLAG_CHEATS, "Prints information about the target client." );
+	RegConsoleCmd( "sm_printorigin", Command_PrintOrigin, "Prints your origin." );
 }
 
 public Action Command_AddAttrb(int client, int nArgs)
@@ -77,3 +86,136 @@ public Action Command_Regen(int client, int args)
 	return Plugin_Handled;
 }
 	
+public Action Command_SavePos(int client, int args)
+{
+	float posVec[3];
+
+	if( IsPlayerAlive(client) )
+	{
+		GetClientAbsOrigin(client, posVec);
+		// transfer to global var.
+		flSavedPosVec[0][client] = posVec[0];
+		flSavedPosVec[1][client] = posVec[1];
+		flSavedPosVec[2][client] = posVec[2];
+		ShowActivity2(client, "[SM] ", "%N saved his position.", client);
+		LogAction(client, -1, "\"%L\" saved his position.", client);
+	}
+	
+	return Plugin_Handled;
+}
+
+public Action Command_GoToPos(int client, int args)
+{
+	float posVec[3];
+
+	if( IsPlayerAlive(client) )
+	{
+		posVec[0] = flSavedPosVec[0][client];
+		posVec[1] = flSavedPosVec[1][client];
+		posVec[2] = flSavedPosVec[2][client];
+		TeleportEntity(client, posVec, NULL_VECTOR, NULL_VECTOR);
+		ShowActivity2(client, "[SM] ", "%N teleported to his saved position.", client);
+		LogAction(client, -1, "\"%L\" teleported to his saved position.", client);
+	}
+	
+	return Plugin_Handled;
+}
+
+public Action Command_PrintOrigin(int client, int args)
+{
+	float EyeVec[3], OriginVec[3];
+	
+	GetClientEyePosition(client, EyeVec);
+	GetClientAbsOrigin(client, OriginVec);
+	
+	ReplyToCommand(client, "Eye Position: %f, %f, %f", EyeVec[0],EyeVec[1],EyeVec[2]);
+	ReplyToCommand(client, "ABS Origin: %f, %f, %f", OriginVec[0],OriginVec[1],OriginVec[2]);
+
+	return Plugin_Handled;
+}
+
+public Action Command_TeleToPos(int client, int nArgs)
+{
+	if( nArgs < 4 )
+	{
+		ReplyToCommand(client, "Usage: sm_teletoorigin <target> <x> <y> <z>");
+		return Plugin_Handled;
+	}
+	
+	char Arg1[MAX_NAME_LENGTH], Arg2[32], Arg3[32], Arg4[32];
+	float TargetVec[3];
+	
+	GetCmdArg(1, Arg1, sizeof(Arg1));
+	GetCmdArg(2, Arg2, sizeof(Arg2));
+	GetCmdArg(3, Arg3, sizeof(Arg3));
+	GetCmdArg(4, Arg4, sizeof(Arg4));
+	TargetVec[0] = StringToFloat(Arg2);
+	TargetVec[1] = StringToFloat(Arg3);
+	TargetVec[2] = StringToFloat(Arg4);
+
+	char target_name[MAX_TARGET_LENGTH];
+	int target_list[MAXPLAYERS], target_count;
+	bool tn_is_ml;
+	
+	if((target_count = ProcessTargetString(Arg1, client, target_list, MAXPLAYERS, COMMAND_FILTER_ALIVE, target_name, sizeof(target_name), tn_is_ml)) <= 0)
+	{
+		ReplyToTargetError(client, target_count);
+		return Plugin_Handled;
+	}
+
+	for(int i = 0; i < target_count; i++)
+	{
+		TeleportEntity(target_list[i], TargetVec, NULL_VECTOR, NULL_VECTOR);
+		LogAction(client, target_list[i], "\"%L\" teleported \"%L\" to (%f,%f,%f)", client, target_list[i], TargetVec[0],TargetVec[1],TargetVec[2] );
+	}
+	
+	if (tn_is_ml)
+	{
+		ShowActivity2(client, "[SM] ", "Teleported \"%t\" to (%f,%f,%f)", target_name,TargetVec[0],TargetVec[1],TargetVec[2]);
+	}
+	else
+	{
+		ShowActivity2(client, "[SM] ", "Teleported \"%s\" to (%f,%f,%f)", target_name,TargetVec[0],TargetVec[1],TargetVec[2]);
+	}
+
+	return Plugin_Handled;
+}
+
+public Action Command_GetClientInfo(int client, int nArgs)
+{
+	if( nArgs < 1 )
+	{
+		ReplyToCommand(client, "Usage: sm_getclientinfo <target>");
+		return Plugin_Handled;
+	}
+	
+	char Arg1[MAX_NAME_LENGTH];
+	float EyeVec[3], OriginVec[3];
+	int iHealth;
+	
+	GetCmdArg(1, Arg1, sizeof(Arg1));
+
+	char target_name[MAX_TARGET_LENGTH];
+	int target_list[MAXPLAYERS], target_count;
+	bool tn_is_ml;
+	
+	if((target_count = ProcessTargetString(Arg1, client, target_list, MAXPLAYERS, COMMAND_FILTER_NO_MULTI, target_name, sizeof(target_name), tn_is_ml)) <= 0)
+	{
+		ReplyToTargetError(client, target_count);
+		return Plugin_Handled;
+	}
+
+	for(int i = 0; i < target_count; i++)
+	{
+		iHealth = GetClientHealth(target_list[i]);
+		GetClientEyePosition(target_list[i], EyeVec);
+		GetClientAbsOrigin(target_list[i], OriginVec);
+		
+	}
+	
+	ReplyToCommand(client, "Target: %s | Health: %i", target_name, iHealth);
+	ReplyToCommand(client, "Eye Position: %f, %f, %f", EyeVec[0],EyeVec[1],EyeVec[2]);
+	ReplyToCommand(client, "ABS Origin: %f, %f, %f", OriginVec[0],OriginVec[1],OriginVec[2]);
+
+	return Plugin_Handled;
+}
