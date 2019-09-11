@@ -114,7 +114,7 @@ public Action Command_GoToPos(int client, int args)
 		posVec[1] = flSavedPosVec[1][client];
 		posVec[2] = flSavedPosVec[2][client];
 		TeleportEntity(client, posVec, NULL_VECTOR, NULL_VECTOR);
-		ShowActivity2(client, "[SM] ", "%N teleported to his saved position.", client);
+		ShowActivity2(client, "[SM] ", "teleported to his saved position.");
 		LogAction(client, -1, "\"%L\" teleported to his saved position.", client);
 	}
 	
