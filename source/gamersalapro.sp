@@ -10,6 +10,10 @@
 
 float flSavedPosVec[3][MAXPLAYERS];
 
+// regen toggle
+Handle T_Regen[MAXPLAYERS+1];
+bool g_bToggleRegen[MAXPLAYERS+1];
+
 public Plugin myinfo = {
 	name = "Gamers ala Pro",
 	author = "caxanga334",
@@ -23,11 +27,22 @@ public void OnPluginStart() {
 	
 	RegAdminCmd( "sm_add_attribute", Command_AddAttrb, ADMFLAG_CHEATS, "Adds attribute to a player.");
 	RegAdminCmd( "sm_regen", Command_Regen, ADMFLAG_CHEATS, "Regenerates ammo and health." );
+	RegAdminCmd( "sm_regentoggle", Command_RegenToggle, ADMFLAG_CHEATS, "Toggles constant regeneration of ammo and health." );
 	RegAdminCmd( "sm_save", Command_SavePos, ADMFLAG_CHEATS, "Saves your position." );
 	RegAdminCmd( "sm_gotosaved", Command_GoToPos, ADMFLAG_CHEATS, "Go to your saved position." );
 	RegAdminCmd( "sm_teletoorigin", Command_TeleToPos, ADMFLAG_CHEATS, "Teleports the target client to the specified origin." );
 	RegAdminCmd( "sm_getclientinfo", Command_GetClientInfo, ADMFLAG_CHEATS, "Prints information about the target client." );
 	RegConsoleCmd( "sm_printorigin", Command_PrintOrigin, "Prints your origin." );
+}
+
+public void OnClientDisconnect(int client)
+{
+	if( g_bToggleRegen[client] )
+	{
+		g_bToggleRegen[client] = false;
+		KillTimer(T_Regen[client]);
+		T_Regen[client] = null;
+	}
 }
 
 public Action Command_AddAttrb(int client, int nArgs)
@@ -81,6 +96,25 @@ public Action Command_Regen(int client, int args)
 	if( IsPlayerAlive(client) )
 	{
 		TF2_RegeneratePlayer(client);
+	}
+	
+	return Plugin_Handled;
+}
+
+public Action Command_RegenToggle(int client, int args)
+{
+	if( !g_bToggleRegen[client] )
+	{
+		T_Regen[client] = CreateTimer(0.1, Timer_Regenerate, client, TIMER_REPEAT);
+		g_bToggleRegen[client] = true;
+		ReplyToCommand(client, "Regen Enabled.");
+	}
+	else
+	{
+		KillTimer(T_Regen[client]);
+		T_Regen[client] = null;
+		g_bToggleRegen[client] = false;
+		ReplyToCommand(client, "Regen Disabled.");
 	}
 	
 	return Plugin_Handled;
@@ -218,4 +252,14 @@ public Action Command_GetClientInfo(int client, int nArgs)
 	ReplyToCommand(client, "ABS Origin: %f, %f, %f", OriginVec[0],OriginVec[1],OriginVec[2]);
 
 	return Plugin_Handled;
+}
+
+// timers
+public Action Timer_Regenerate(Handle timer, any client)
+{
+	if( IsPlayerAlive(client) )
+		TF2_RegeneratePlayer(client);
+		
+	
+	return Plugin_Continue
 }
