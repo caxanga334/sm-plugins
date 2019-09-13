@@ -28,6 +28,7 @@ public void OnPluginStart() {
 	RegAdminCmd( "sm_add_attribute", Command_AddAttrb, ADMFLAG_CHEATS, "Adds attribute to a player.");
 	RegAdminCmd( "sm_regen", Command_Regen, ADMFLAG_CHEATS, "Regenerates ammo and health." );
 	RegAdminCmd( "sm_regentoggle", Command_RegenToggle, ADMFLAG_CHEATS, "Toggles constant regeneration of ammo and health." );
+	RegAdminCmd( "sm_fullcharge", Command_FullCharge, ADMFLAG_CHEATS, "Sets full charge." );
 	RegAdminCmd( "sm_save", Command_SavePos, ADMFLAG_CHEATS, "Saves your position." );
 	RegAdminCmd( "sm_gotosaved", Command_GoToPos, ADMFLAG_CHEATS, "Go to your saved position." );
 	RegAdminCmd( "sm_teletoorigin", Command_TeleToPos, ADMFLAG_CHEATS, "Teleports the target client to the specified origin." );
@@ -251,6 +252,30 @@ public Action Command_GetClientInfo(int client, int nArgs)
 	ReplyToCommand(client, "Eye Position: %f, %f, %f", EyeVec[0],EyeVec[1],EyeVec[2]);
 	ReplyToCommand(client, "ABS Origin: %f, %f, %f", OriginVec[0],OriginVec[1],OriginVec[2]);
 
+	return Plugin_Handled;
+}
+
+public Action Command_FullCharge(int client, int args)
+{
+	if( IsPlayerAlive(client) )
+	{
+		TFClassType TFClass = TF2_GetPlayerClass(client);
+	
+		SetEntPropFloat( client, Prop_Send, "m_flRageMeter", 100.0 );
+		
+		switch( TFClass )
+		{
+			case TFClass_Medic:
+			{
+				int iEnt = GetPlayerWeaponSlot(client, TFWeaponSlot_Secondary);
+				if( IsValidEntity(iEnt) )
+					SetEntPropFloat( iEnt, Prop_Send, "m_flChargeLevel", 1.0 );
+			}
+			case TFClass_Spy: SetEntPropFloat( client, Prop_Send, "m_flCloakMeter", 100.0 );
+		}
+	}
+	
+	ReplyToCommand(client, "Setting full charge.");
 	return Plugin_Handled;
 }
 
