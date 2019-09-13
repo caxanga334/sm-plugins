@@ -3,6 +3,7 @@
 #include <tf2>
 #include <tf2_stocks>
 #include <tf2attributes>
+#include <navmesh>
 
 #pragma newdecls required // enforce new SM 1.7 syntax
 
@@ -32,6 +33,8 @@ public void OnPluginStart() {
 	RegAdminCmd( "sm_save", Command_SavePos, ADMFLAG_CHEATS, "Saves your position." );
 	RegAdminCmd( "sm_gotosaved", Command_GoToPos, ADMFLAG_CHEATS, "Go to your saved position." );
 	RegAdminCmd( "sm_teletoorigin", Command_TeleToPos, ADMFLAG_CHEATS, "Teleports the target client to the specified origin." );
+	RegAdminCmd( "sm_nav_gotoplayer", Command_GotoPlayerNav, ADMFLAG_CHEATS, "Teleports to the target player via Nav Mesh" );
+	RegAdminCmd( "sm_nav_gotorandom", Command_Nav_Telernd, ADMFLAG_CHEATS, "Teleports yourself to a random place in the map via Nav Mesh" );
 	RegAdminCmd( "sm_getclientinfo", Command_GetClientInfo, ADMFLAG_CHEATS, "Prints information about the target client." );
 	RegConsoleCmd( "sm_printorigin", Command_PrintOrigin, "Prints your origin." );
 }
@@ -276,6 +279,75 @@ public Action Command_FullCharge(int client, int args)
 	}
 	
 	ReplyToCommand(client, "Setting full charge.");
+	return Plugin_Handled;
+}
+
+public Action Command_GotoPlayerNav(int client, int nArgs)
+{
+	if( nArgs < 1 )
+	{
+		ReplyToCommand(client, "Usage: sm_gotoplayernav <target>");
+		return Plugin_Handled;
+	}
+	
+	if( !NavMesh_Exists() )
+	{
+		ReplyToCommand(client, "ERROR: This map doesn't have a navigation mesh");
+		return Plugin_Handled;
+	}
+	
+	char Arg1[MAX_NAME_LENGTH];
+	CNavArea NavArea;
+	GetCmdArg(1, Arg1, sizeof(Arg1));
+
+	char target_name[MAX_TARGET_LENGTH];
+	int target_list[MAXPLAYERS], target_count;
+	bool tn_is_ml;
+	
+	if((target_count = ProcessTargetString(Arg1, client, target_list, MAXPLAYERS, COMMAND_FILTER_ALIVE|COMMAND_FILTER_NO_MULTI, target_name, sizeof(target_name), tn_is_ml)) <= 0)
+	{
+		ReplyToTargetError(client, target_count);
+		return Plugin_Handled;
+	}
+
+	for(int i = 0; i < target_count; i++)
+	{
+		float TargetPos[3], TargetAngles[3];
+		float NavPos[3];
+		GetClientAbsOrigin(target_list[i], TargetPos);
+		GetClientAbsAngles(target_list[i], TargetAngles);
+		NavArea = NavMesh_GetNearestArea(TargetPos, false, 1000.0, false, true);
+		NavArea.GetCenter(NavPos);
+		NavPos[2] += 25;
+		TeleportEntity(client, NavPos, TargetAngles, NULL_VECTOR);
+		LogAction(client, target_list[i], "\"%L\" teleported to \"%L\"", client, target_list[i] );
+	}
+	
+	if (tn_is_ml)
+	{
+		ShowActivity2(client, "[SM] ", "Teleported to %t.", target_name);
+	}
+	else
+	{
+		ShowActivity2(client, "[SM] ", "Teleported to %s.", target_name);
+	}
+
+	return Plugin_Handled;
+}
+
+public Action Command_Nav_Telernd(int client, int args)
+{
+	CNavArea NavArea;
+	HidingSpot HideSpot = NavMesh_GetRandomHidingSpot();
+	float NavPos[3];
+	
+	NavArea = HideSpot.GetArea();
+	NavArea.GetCenter(NavPos);
+	NavPos[2] += 25; 
+	TeleportEntity(client, NavPos, NULL_VECTOR, NULL_VECTOR);
+	ShowActivity2(client, "[SM] ", "Teleported to a random nav area.");
+	LogAction(client, -1, "\"%L\" teleported to a random nav area.", client);
+	
 	return Plugin_Handled;
 }
 
