@@ -1,0 +1,23 @@
+"Phrases"
+{
+	"Tele Enabled"
+	{
+		"en" "Spawn Teleporter enabled."
+		"pt" "Spawn Teleporter ativado."
+	}
+	"Tele Disabled"
+	{
+		"en" "Spawn Teleporter disabled."
+		"pt" "Spawn Teleporter desativado."
+	}
+	"Spawn Tele"
+	{
+		"en" "You will respawn on any available teleporter."
+		"pt" "Você ira dar respawn em qualquer teletransportator disponível."
+	}
+	"Spawn Normal"
+	{
+		"en" "You will spawn normally."
+		"pt" "Você irá dar respawn normalmente."
+	}
+}
