@@ -22,8 +22,9 @@ public void OnClientPutInServer(int client) {
 	GetClientName(client, playername, sizeof(playername));
 	GetClientAuthId(client, AuthId_Engine, playerauth, sizeof(playerauth));
 	GeoipCountry(clientip, clientcountry, sizeof(clientcountry));
-
-	CPrintToChatAll("{snow}Player %s ({green}%s{snow}) connected from {green}%s", playername, playerauth, clientcountry); 
+	
+	if ( !IsFakeClient(client) )
+		CPrintToChatAll("{snow}Player {green}%s{snow} ({green}%s{snow}) connected from {green}%s", playername, playerauth, clientcountry);
 }
 
 public void OnClientDisconnect(int client) {
@@ -32,5 +33,6 @@ public void OnClientDisconnect(int client) {
 	GetClientName(client, playername, sizeof(playername));
 	GetClientAuthId(client, AuthId_Engine, playerauth, sizeof(playerauth));
 
-	CPrintToChatAll("{snow}Player %s ({green}%s{snow}) disconnected.", playername, playerauth);
+	if ( !IsFakeClient(client) )
+		CPrintToChatAll("{snow}Player {green}%s{snow} ({green}%s{snow}) disconnected.", playername, playerauth);
 }
