@@ -16,15 +16,7 @@ public Plugin myinfo = {
 }
 
 public void OnClientPutInServer(int client) {
-
-	char clientip[20], clientcountry[64], playername[MAX_NAME_LENGTH], playerauth[64];
-	GetClientIP(client, clientip, sizeof(clientip));
-	GetClientName(client, playername, sizeof(playername));
-	GetClientAuthId(client, AuthId_Engine, playerauth, sizeof(playerauth));
-	GeoipCountry(clientip, clientcountry, sizeof(clientcountry));
-	
-	if ( !IsFakeClient(client) )
-		CPrintToChatAll("{snow}Player {green}%s{snow} ({green}%s{snow}) connected from {green}%s", playername, playerauth, clientcountry);
+	AnnounceConnect(client)
 }
 
 public void OnClientDisconnect(int client) {
@@ -35,4 +27,33 @@ public void OnClientDisconnect(int client) {
 
 	if ( !IsFakeClient(client) )
 		CPrintToChatAll("{snow}Player {green}%s{snow} ({green}%s{snow}) disconnected.", playername, playerauth);
+}
+
+void AnnounceConnect(int client)
+{
+	if( IsFakeClient(client) )
+		return;
+
+	char clientip[20], clientcountry[64], clientregion[64], clientcity[64], playername[MAX_NAME_LENGTH], playerauth[64];
+	GetClientIP(client, clientip, sizeof(clientip));
+	GetClientName(client, playername, sizeof(playername));
+	GetClientAuthId(client, AuthId_Engine, playerauth, sizeof(playerauth));
+	GeoipCountry(clientip, clientcountry, sizeof(clientcountry));
+	GeoipRegion(clientip, clientregion, sizeof(clientregion));
+	GeoipCity(clientip, clientcity, sizeof(clientcity));
+		
+	for(int i = 1;i <= MaxClients; i++)
+	{
+		if( IsValidClient(i) )
+		{
+			if( CheckCommandAccess(i, "gpca_admin", ADMFLAG_BAN) )
+			{
+				CPrintToChat(i,"{snow}Player {green}%s{snow} ({green}%s | %s{snow}) connected from {green}%s, %s, %s", playername, playerauth, clientip, clientcountry, clientregion, clientcity);
+			}
+			else
+			{
+				CPrintToChat(i,"{snow}Player {green}%s{snow} ({green}%s{snow}) connected from {green}%s", playername, playerauth, clientcountry);
+			}
+		}
+	}
 }
