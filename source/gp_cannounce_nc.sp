@@ -47,11 +47,11 @@ void AnnounceConnect(int client)
 		{
 			if( CheckCommandAccess(i, "gpca_admin", ADMFLAG_BAN) )
 			{
-				CPrintToChat(i,"Player %s (%s | %s) connected from %s, %s, %s", playername, playerauth, clientip, clientcountry, clientregion, clientcity);
+				PrintToChat(i,"Player %s (%s | %s) connected from %s, %s, %s", playername, playerauth, clientip, clientcountry, clientregion, clientcity);
 			}
 			else
 			{
-				CPrintToChat(i,"Player %s (%s) connected from %s", playername, playerauth, clientcountry);
+				PrintToChat(i,"Player %s (%s) connected from %s", playername, playerauth, clientcountry);
 			}
 		}
 	}
