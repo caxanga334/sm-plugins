@@ -14,7 +14,7 @@ public Plugin myinfo = {
 	url = "https://github.com/caxanga334/"
 }
 
-public void OnClientPutInServer(int client) {
+public void OnClientPostAdminCheck(int client) {
 	AnnounceConnect(client)
 }
 

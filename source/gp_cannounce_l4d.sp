@@ -1,12 +1,11 @@
 #include <sourcemod>
 #include <geoip>
 #include <caxanga334>
-#include <morecolors>
 
 #pragma newdecls required // enforce new SM 1.7 syntax
 
 // ===variables===
-
+// no color edition
 public Plugin myinfo = {
 	name = "Gamers ala Pro Connect Announce",
 	author = "caxanga334",
@@ -19,6 +18,13 @@ public void OnClientPostAdminCheck(int client) {
 	AnnounceConnect(client)
 }
 
+public void OnClientAuthorized(int client, const char[] auth) {
+	char plrauth[64], plrname[MAX_NAME_LENGTH];
+	GetClientAuthId(client, AuthId_Engine, plrauth, sizeof(plrauth));
+	GetClientName(client, plrname, sizeof(plrname));
+	PrintToChatAll("New connection: \x04%s \x01(\x05%S\x01)", plrname, plrauth);
+}
+
 public void OnClientDisconnect(int client) {
 
 	char playerauth[64], playername[MAX_NAME_LENGTH];
@@ -26,7 +32,7 @@ public void OnClientDisconnect(int client) {
 	GetClientAuthId(client, AuthId_Engine, playerauth, sizeof(playerauth));
 
 	if ( !IsFakeClient(client) )
-		CPrintToChatAll("{snow}Player {green}%s{snow} ({green}%s{snow}) disconnected.", playername, playerauth);
+		PrintToChatAll("Player %s(\x04%s\x01) disconnected.", playername, playerauth);
 }
 
 void AnnounceConnect(int client)
@@ -48,11 +54,11 @@ void AnnounceConnect(int client)
 		{
 			if( CheckCommandAccess(i, "gpca_admin", ADMFLAG_BAN) )
 			{
-				CPrintToChat(i,"{snow}Player {green}%s{snow} ({green}%s | %s{snow}) connected from {green}%s, %s, %s", playername, playerauth, clientip, clientcountry, clientregion, clientcity);
+				PrintToChat(i,"Player %s (%s | %s) connected from %s, %s, %s", playername, playerauth, clientip, clientcountry, clientregion, clientcity);
 			}
 			else
 			{
-				CPrintToChat(i,"{snow}Player {green}%s{snow} ({green}%s{snow}) connected from {green}%s", playername, playerauth, clientcountry);
+				PrintToChat(i,"Player %s (%s) connected from %s", playername, playerauth, clientcountry);
 			}
 		}
 	}
