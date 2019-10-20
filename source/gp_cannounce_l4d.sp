@@ -22,7 +22,8 @@ public void OnClientAuthorized(int client, const char[] auth) {
 	char plrauth[64], plrname[MAX_NAME_LENGTH];
 	GetClientAuthId(client, AuthId_Engine, plrauth, sizeof(plrauth));
 	GetClientName(client, plrname, sizeof(plrname));
-	PrintToChatAll("New connection: \x04%s \x01(\x05%S\x01)", plrname, plrauth);
+	if ( !IsFakeClient(client) )
+		PrintToChatAll("New connection: \x04%s \x01(\x05%s\x01)", plrname, plrauth);
 }
 
 public void OnClientDisconnect(int client) {
