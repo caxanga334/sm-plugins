@@ -1,4 +1,5 @@
 #include <sourcemod>
+#include <clientprefs>
 #pragma newdecls required // enforce new SM 1.7 syntax
 #pragma semicolon 1
 
@@ -6,6 +7,8 @@
 char g_strCfgPath[PLATFORM_MAX_PATH];
 ArrayList g_strSteamID;
 ArrayList g_strRole;
+bool g_bHidden[MAXPLAYERS + 1];
+Handle g_hHiddenCookie;
 
 public Plugin myinfo = {
 	name = "Online Staff",
@@ -17,7 +20,10 @@ public Plugin myinfo = {
 
 public void OnPluginStart()
 {
+	g_hHiddenCookie = RegClientCookie("online_staff_hidden", "Online Staff Hidden Status", CookieAccess_Private);
+
 	RegConsoleCmd("sm_online", command_online, "Lists online staff members");
+	RegAdminCmd("sm_online_reload", command_reload, ADMFLAG_ROOT, "Reloads the staff list");
 
 	InitArrays();
 	LoadKVFile();
@@ -29,10 +35,55 @@ public void OnMapStart()
 	LoadKVFile();
 }
 
+public void OnClientPutInServer(int client)
+{
+	char buffer[4];
+	int iBool;
+	
+	if( AreClientCookiesCached(client) )
+	{
+		GetClientCookie(client, g_hHiddenCookie, buffer, sizeof(buffer));
+		iBool = StringToInt(buffer);
+		switch( iBool )
+		{
+			case 0: g_bHidden[client] = false;
+			case 1: g_bHidden[client] = true;
+			default: LogError("iBool value was out of bounds! ( %i )", iBool);
+		}
+		PrintToConsole(client, "[Staff List] Hidden status loaded from cookie. ( %s )", g_bHidden[client] ? "Enabled" : "Disabled");
+	}
+}
+
+public Action command_reload(int client, int args)
+{
+	ResetArrays();
+	LoadKVFile();
+	ReplyToCommand(client, "Staff List reload: OK");
+	return Plugin_Handled;
+}
+
 public Action command_online(int client, int args)
 {
 	int iStaff = 0, x;
 	char buffer[255], buffer2[255];
+	
+	if(args == 1 && IsClientInGame(client))
+	{
+		GetCmdArg(1, buffer, sizeof(buffer));
+		if(StrEqual(buffer, "hide", false))
+		{
+			GetClientAuthId(client, AuthId_Steam2, buffer, sizeof(buffer));
+			x = g_strSteamID.FindString(buffer);
+			if(x != -1) // don't toggle for non-staff
+			{
+				g_bHidden[client] = !g_bHidden[client];
+				ReplyToCommand(client, "[Staff List] Hidden mode is %s.", g_bHidden[client] ? "enabled" : "disabled");
+				buffer2 = g_bHidden[client] ? "1" : "0";
+				SetClientCookie(client, g_hHiddenCookie, buffer2);
+				return Plugin_Handled;
+			}
+		}
+	}
 	
 	ReplyToCommand(client, "Online Staff Members:");
 	for(int i = 1;i < MaxClients;i++)
@@ -41,7 +92,7 @@ public Action command_online(int client, int args)
 		{
 			GetClientAuthId(i, AuthId_Steam2, buffer, sizeof(buffer));
 			x = g_strSteamID.FindString(buffer);
-			if(x != -1)
+			if(x != -1 && !g_bHidden[i])
 			{
 				iStaff++;
 				g_strSteamID.GetString(x, buffer, sizeof(buffer));
