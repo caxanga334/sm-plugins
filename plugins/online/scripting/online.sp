@@ -37,20 +37,25 @@ public void OnMapStart()
 
 public void OnClientPutInServer(int client)
 {
-	char buffer[4];
-	int iBool;
+	char buffer[4], buffer2[255];
+	int iBool, x;
 	
-	if( AreClientCookiesCached(client) )
+	if( AreClientCookiesCached(client) && IsClientAuthorized(client) )
 	{
-		GetClientCookie(client, g_hHiddenCookie, buffer, sizeof(buffer));
-		iBool = StringToInt(buffer);
-		switch( iBool )
+		GetClientAuthId(client, AuthId_Steam2, buffer2, sizeof(buffer2));
+		x = g_strSteamID.FindString(buffer2);
+		if(x != -1) // Don't load hidden status for non-staff
 		{
-			case 0: g_bHidden[client] = false;
-			case 1: g_bHidden[client] = true;
-			default: LogError("iBool value was out of bounds! ( %i )", iBool);
+			GetClientCookie(client, g_hHiddenCookie, buffer, sizeof(buffer));
+			iBool = StringToInt(buffer);
+			switch( iBool )
+			{
+				case 0: g_bHidden[client] = false;
+				case 1: g_bHidden[client] = true;
+				default: LogError("iBool value was out of bounds! ( %i )", iBool);
+			}
+			PrintToConsole(client, "[Staff List] Hidden status loaded from cookie. ( %s )", g_bHidden[client] ? "Enabled" : "Disabled");
 		}
-		PrintToConsole(client, "[Staff List] Hidden status loaded from cookie. ( %s )", g_bHidden[client] ? "Enabled" : "Disabled");
 	}
 }
 
