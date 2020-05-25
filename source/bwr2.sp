@@ -3,7 +3,7 @@
 #include <tf2_stocks>
 #include <tf2>
 #include <tf2attributes>
-#include <morecolors>
+#include <multicolors>
 //#tryinclude <bwr2>
 #define REQUIRE_EXTENSIONS
 #define AUTOLOAD_EXTENSIONS

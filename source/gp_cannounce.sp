@@ -1,7 +1,7 @@
 #include <sourcemod>
 #include <geoip>
 #include <caxanga334>
-#include <morecolors>
+#include <multicolors>
 
 #pragma newdecls required // enforce new SM 1.7 syntax
 
