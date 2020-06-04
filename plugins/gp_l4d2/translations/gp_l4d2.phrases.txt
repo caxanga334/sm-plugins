@@ -1,0 +1,9 @@
+"Phrases"
+{
+	"player_healed"
+	{
+		"#format" "{1:s},{2:s}"
+		"en" "New player {1} ({2}) is connecting."
+		"pt" "Novo jogador {1} ({2}) está conectando."
+	}
+}

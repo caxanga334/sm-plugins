@@ -10,13 +10,13 @@
 	{
 		"#format" "{1:s},{2:s},{3:s}" // name, auth id, country
 		"en" "Player {1} ({2}) connected from {3}."
-		"pt" "Jogador {1} ({2}) conectou da {3}."
+		"pt" "Jogador {1} ({2}) conectou do {3}."
 	}
 	"player_full_admin"
 	{
 		"#format" "{1:s},{2:s},{3:s},{4:s},{5:s},{6:s}" // name, auth id, IP address, country, region, city
 		"en" "Player {1} ({2} | {3}) connected from {4},{5},{6}."
-		"pt" "Jogador {1} ({2} | {3}) conectou da {4},{5},{6}."
+		"pt" "Jogador {1} ({2} | {3}) conectou do {4},{5},{6}."
 	}
 	"player_disc"
 	{
