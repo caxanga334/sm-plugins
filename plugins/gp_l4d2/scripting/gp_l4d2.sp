@@ -138,6 +138,11 @@ public Action Event_PlayerHurtConcise(Event event, const char[] name, bool dontB
 		return Plugin_Continue;
 	}
 	
+	if( iAttacker == iVictim ) // Ignore damage to self
+	{
+		return Plugin_Continue;
+	}
+	
 	if(g_flLastFFTime[iAttacker] > GetEngineTime())
 	{
 		g_iTotalFFDamage[iAttacker] += iDamage;
