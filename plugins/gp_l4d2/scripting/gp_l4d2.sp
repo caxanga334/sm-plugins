@@ -402,12 +402,14 @@ int L4D_GetPlayerTempHealth(int client)
 
 bool L4D_IsSurvivorIncapacitated(int client)
 {
-	return view_as<bool>(GetEntProp(client, Prop_Send, "m_isIncapacitated", 1));
+	if( GetEntProp(client, Prop_Send, "m_isIncapacitated", 1) == 1) { return true; }
+	return false;
 }
 
 bool L4D_IsSurvivorGoingToDie(int client)
 {
-	return view_as<bool>(GetEntProp(client, Prop_Send,"m_isGoingToDie", 1));
+	if( GetEntProp(client, Prop_Send, "m_isGoingToDie", 1) == 1) { return true; }
+	return false;
 }
 
 bool IsValidClient(int client)
