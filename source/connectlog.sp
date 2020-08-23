@@ -1,6 +1,7 @@
-#include <sourcemod>
-
 #pragma newdecls required // enforce new SM 1.7 syntax
+#pragma semicolon 1
+
+#include <sourcemod>
 
 // ===variables===
 char g_sLogPath[PLATFORM_MAX_PATH];
@@ -15,13 +16,14 @@ public Plugin myinfo = {
 
 stock void CreateLogFile() { // creates the log file in the system
 	char cTime[64];
-	FormatTime(cTime, sizeof(cTime), "%Y%m%d"); // add date to file name
+	FormatTime(cTime, sizeof(cTime), "%Y-%m-%d"); // add date to file name
 	// Path used for logging.
 	BuildPath(Path_SM, g_sLogPath, sizeof(g_sLogPath), "logs/connections_%s.log", cTime);
 }
 
 public void OnPluginStart() {
 	CreateLogFile();
+	CreateTimer(15.0, Timer_CheckTime, _, TIMER_REPEAT);
 }
 
 public void OnMapStart() {
@@ -41,8 +43,8 @@ public void OnClientConnected(int client) {
 public void OnClientAuthorized(int client, const char[] auth) {
 	char sName[MAX_NAME_LENGTH];
 	char sAuth[MAX_NAME_LENGTH];
-	GetClientName(client, sName, sizeof(sName))
-	GetClientAuthId(client, AuthId_Engine, sAuth, sizeof(sAuth))
+	GetClientName(client, sName, sizeof(sName));
+	GetClientAuthId(client, AuthId_Engine, sAuth, sizeof(sAuth));
 	if (!IsFakeClient(client)) {
 		LogToFileEx(g_sLogPath,
 			"[Connection Log] Client %s Authorized (%s).",
@@ -55,9 +57,9 @@ public void OnClientDisconnect(int client) {
 	char sName[MAX_NAME_LENGTH];
 	char sClientIP[64];
 	char sAuth[MAX_NAME_LENGTH];
-	GetClientName(client, sName, sizeof(sName))
+	GetClientName(client, sName, sizeof(sName));
 	GetClientIP(client, sClientIP, sizeof(sClientIP), false);
-	GetClientAuthId(client, AuthId_Engine, sAuth, sizeof(sAuth))
+	GetClientAuthId(client, AuthId_Engine, sAuth, sizeof(sAuth));
 	if (!IsFakeClient(client)) {
 		LogToFileEx(g_sLogPath,
 			"[Connection Log] Client %s disconnected (%s - %s).",
@@ -65,4 +67,10 @@ public void OnClientDisconnect(int client) {
 			sClientIP,
 			sAuth);
 	}
+}
+
+public Action Timer_CheckTime(Handle timer)
+{
+	CreateLogFile();
+	return Plugin_Continue;
 }
