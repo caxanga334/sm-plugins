@@ -24,6 +24,7 @@ stock void CreateLogFile() { // creates the log file in the system
 public void OnPluginStart() {
 	CreateLogFile();
 	CreateTimer(15.0, Timer_CheckTime, _, TIMER_REPEAT);
+	HookEvent("player_disconnect", Event_PlayerDisc, EventHookMode_Pre);
 }
 
 public void OnMapStart() {
@@ -53,7 +54,35 @@ public void OnClientAuthorized(int client, const char[] auth) {
 	}
 }
 
-public void OnClientDisconnect(int client) {
+public Action Event_PlayerDisc(Event event, const char[] name, bool dontBroadcast)
+{
+	char plname[MAX_NAME_LENGTH], auth[64], reason[256], sClientIP[64];
+	int client = GetClientOfUserId(event.GetInt("userid"));
+	
+	if( client < 0 || client > MaxClients )
+		return Plugin_Continue;
+	
+	GetClientIP(client, sClientIP, sizeof(sClientIP), false);
+	
+	event.GetString("name", plname, sizeof(plname), "");
+	event.GetString("networkid", auth, sizeof(auth), "");
+	event.GetString("reason", reason, sizeof(reason), "");
+	
+	if(!StrEqual(auth, "BOT", true))
+	{
+		LogToFileEx(g_sLogPath,
+			"[Connection Log] Client %s disconnected (%s - %s). Reason: %s",
+			plname,
+			sClientIP,
+			auth,
+			reason);
+		return Plugin_Handled;
+	}
+		
+	return Plugin_Continue;
+}
+
+/* public void OnClientDisconnect(int client) {
 	char sName[MAX_NAME_LENGTH];
 	char sClientIP[64];
 	char sAuth[MAX_NAME_LENGTH];
@@ -67,7 +96,7 @@ public void OnClientDisconnect(int client) {
 			sClientIP,
 			sAuth);
 	}
-}
+} */
 
 public Action Timer_CheckTime(Handle timer)
 {
