@@ -59,7 +59,7 @@ public Action Event_PlayerDisc(Event event, const char[] name, bool dontBroadcas
 	char plname[MAX_NAME_LENGTH], auth[64], reason[256], sClientIP[64];
 	int client = GetClientOfUserId(event.GetInt("userid"));
 	
-	if( client < 0 || client > MaxClients )
+	if( client < 1 || client > MaxClients )
 		return Plugin_Continue;
 	
 	GetClientIP(client, sClientIP, sizeof(sClientIP), false);

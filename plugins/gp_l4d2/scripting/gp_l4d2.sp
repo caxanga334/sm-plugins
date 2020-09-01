@@ -244,6 +244,9 @@ public Action Event_PlayerIncap(Event event, const char[] name, bool dontBroadca
 		
 	if( GetClientTeam(victim) != GetClientTeam(attacker) )
 		return Plugin_Continue;
+		
+	if( IsFakeClient(attacker) )
+		return Plugin_Continue;
 	
 	LogToFileEx(g_sLogPath, "[INFO] Player \"%L\" was incapacitated by \"%L\" with weapon \"%s\"", victim, attacker, weapon);
 	
