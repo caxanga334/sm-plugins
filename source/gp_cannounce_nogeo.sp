@@ -32,7 +32,7 @@ public Action Event_PlayerDisc(Event event, const char[] name, bool dontBroadcas
 	
 	if(!StrEqual(auth, "BOT", true))
 	{
-		PrintToChatAll("{snow}Player {green}%s{snow} ({green}%s{snow}) disconnected. Reason: %s ", plname, auth, reason);
+		CPrintToChatAll("{snow}Player {green}%s{snow} ({green}%s{snow}) disconnected. Reason: %s ", plname, auth, reason);
 		return Plugin_Continue;
 	}
 		
