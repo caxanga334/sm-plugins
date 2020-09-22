@@ -61,7 +61,7 @@ public void OnClientPutInServer(int client)
 	}
 }
 
-public void OnClientDisconnect_Post(int client)
+public void OnClientDisconnect(int client)
 {
 	if(g_flLastMessageTime < GetGameTime() && !IsFakeClient(client))
 	{
