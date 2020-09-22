@@ -13,7 +13,6 @@ stock bool IsValidClient(int client)
 {
 	if( client < 1 || client > MaxClients ) return false;
 	if( !IsValidEntity(client) ) return false;
-	if( !IsClientConnected(client) ) return false;
 	return IsClientInGame(client);
 }
 
