@@ -9,6 +9,8 @@
 
 // === GLOBAL VARIABLES ===
 
+int g_iLastPlayers; // How many players were in the server the last time we announced it
+
 // timers
 float g_flLastMessageTime;
 
@@ -49,6 +51,7 @@ public void OnPluginStart()
 
 public void OnMapStart()
 {
+	g_iLastPlayers = 0;
 	g_flLastMessageTime = GetGameTime() + 20.0;
 }
 
@@ -88,9 +91,14 @@ public Action cmd_serverstatusforce(int client, int args)
 // sends message 1 frame later
 void FrameSendPlrCountMsg()
 {
-	if(GetNumPlayersInGame() >= g_cMinPlayers.IntValue)
+	int iInGame = GetNumPlayersInGame();
+	if(iInGame >= g_cMinPlayers.IntValue)
 	{
-		PlayerCountMessage();
+		if(iInGame != g_iLastPlayers)
+		{
+			PlayerCountMessage();
+			g_iLastPlayers = iInGame;
+		}
 	}
 }
 

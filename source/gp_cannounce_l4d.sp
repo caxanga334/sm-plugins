@@ -5,6 +5,7 @@
 #pragma newdecls required // enforce new SM 1.7 syntax
 
 // ===variables===
+ConVar g_cAdminFullMsg = null;
 
 public Plugin myinfo = {
 	name = "[L4D] GP Connect Announce",
@@ -18,6 +19,8 @@ public void OnPluginStart()
 {
 	LoadTranslations("gp_cannounce.phrases");
 	HookEvent("player_disconnect", Event_PlayerDisc, EventHookMode_Pre);
+	
+	g_cAdminFullMsg = CreateConVar("sm_ca_adminfull", "0", "Show detailed connect messages to admin?", FCVAR_NONE, true, 0.0, true, 1.0);
 }
 
 public void OnClientPostAdminCheck(int client) {
@@ -73,19 +76,27 @@ void AnnounceConnect(int client)
 	GeoipCountry(clientip, clientcountry, sizeof(clientcountry));
 	GeoipRegion(clientip, clientregion, sizeof(clientregion));
 	GeoipCity(clientip, clientcity, sizeof(clientcity));
-		
-	for(int i = 1;i <= MaxClients; i++)
+
+
+	if(g_cAdminFullMsg.BoolValue)
 	{
-		if( IsValidClient(i) )
+		for(int i = 1;i <= MaxClients; i++)
 		{
-			if( CheckCommandAccess(i, "gpca_admin", ADMFLAG_BAN) )
+			if( IsValidClient(i) )
 			{
-				PrintToChat(i,"%t", "player_full_admin", playername, playerauth, clientip, clientcountry, clientregion, clientcity);
+				if( CheckCommandAccess(i, "gpca_admin", ADMFLAG_BAN) )
+				{
+					PrintToChat(i,"%t", "player_full_admin", playername, playerauth, clientip, clientcountry, clientregion, clientcity);
+				}
+				else
+				{
+					PrintToChat(i,"%t", "player_full", playername, playerauth, clientcountry);
+				}
 			}
-			else
-			{
-				PrintToChat(i,"%t", "player_full", playername, playerauth, clientcountry);
-			}
-		}
+		}		
+	}
+	else
+	{
+		PrintToChatAll("%t", "player_full", playername, playerauth, clientcountry);
 	}
 }
