@@ -172,7 +172,7 @@ public Action command_requestcredits(int client, int args)
 	}
 	
 	TF2_SetClientCredits(client, TF2_GetClientCredits(client) + iGiveAmount);
-	ShowActivity2(client, "[SM] ", "%N received %i credits.", client, iGiveAmount);
+	ReplyToCommand(client, "You received %i credits.", iGiveAmount);
 	LogAction(client, client, "Player \"%L\" received %i credits.", client, iGiveAmount, iBluPlayers, g_iNumWaveFails);
 	g_nCredits[client].iRequests += 1;
 	
