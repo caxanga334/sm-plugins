@@ -1,6 +1,7 @@
 #include <sourcemod>
 #include <tf2>
 #include <tf2_stocks>
+#include <multicolors>
 
 #pragma newdecls required // enforce new SM 1.7 syntax
 #pragma semicolon 1
@@ -12,6 +13,7 @@ char g_strMissionName[64]; // The current mission name
 int g_iNumWaveFails; // How many waves RED failed
 int g_iCurrentWave;
 UserMsg g_uRefund;
+float g_flAnnounceTimer;
 
 // ConVars
 ConVar cv_BaseCredits = null;
@@ -89,6 +91,7 @@ public void OnMapStart()
 		
 	g_iNumWaveFails = 0;
 	g_iCurrentWave = 0;
+	g_flAnnounceTimer = GetGameTime();
 }
 
 public void TF2_OnWaitingForPlayersStart()
@@ -218,6 +221,7 @@ public Action EventWaveFailed(Event event, const char[] name, bool dontBroadcast
 	g_iNumWaveFails++;
 	ResetRequestCountAll();
 	CreateTimer(2.5, Timer_CheckCredits);
+	CreateTimer(5.0, Timer_AnnounceFeature);
 }
 
 // ==== TIMERS ====
@@ -245,6 +249,17 @@ public Action Timer_CheckCredits(Handle timer)
 public Action Timer_FixWaveLost(Handle timer)
 {
 	g_iNumWaveFails = 0;
+	return Plugin_Stop;
+}
+
+// Announces the plugin command
+public Action Timer_AnnounceFeature(Handle timer)
+{
+	if(g_flAnnounceTimer < GetGameTime()) {
+		CPrintToChatAll("{cyan}Type {green}/rcredits{cyan} to receive credits.");
+		g_flAnnounceTimer = GetGameTime() + 10.0;
+	}
+	
 	return Plugin_Stop;
 }
  
