@@ -74,6 +74,10 @@ public void OnPluginStart()
 
 	RegConsoleCmd("sm_requestcredits", command_requestcredits, "Request MvM Currency");
 	RegConsoleCmd("sm_rcredits", command_requestcredits, "Request MvM Currency");
+	RegConsoleCmd("sm_requestcredit", command_requestcredits, "Request MvM Currency");
+	RegConsoleCmd("sm_rcredit", command_requestcredits, "Request MvM Currency");
+	RegConsoleCmd("sm_credits", command_requestcredits, "Request MvM Currency");
+	RegConsoleCmd("sm_credit", command_requestcredits, "Request MvM Currency");
 	
 	HookEvent( "mvm_begin_wave", EventWaveStart );
 	HookEvent( "mvm_wave_complete", EventWaveEnd );
