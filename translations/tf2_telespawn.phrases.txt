@@ -5,23 +5,27 @@
 		"en" "Spawn Teleporter enabled."
 		"pt" "Spawn Teleporter ativado."
 		"ru" "Возрождение в телепорте включено."
+		"da" "Spawn Teleporter aktiveret."
 	}
 	"Tele Disabled"
 	{
 		"en" "Spawn Teleporter disabled."
 		"pt" "Spawn Teleporter desativado."
 		"ru" "Возрождение в телепорте отключено."
+		"da" "Spawn Teleporter deaktiveret."
 	}
 	"Spawn Tele"
 	{
 		"en" "You will respawn on any available teleporter."
 		"pt" "Você ira dar respawn em qualquer teletransportator disponível."
-        "ru" "Вы возродитесь в любом доступном телепорте."
+        	"ru" "Вы возродитесь в любом доступном телепорте."
+		"da" "Du vil respawne på en ledig teleporter."
 	}
 	"Spawn Normal"
 	{
 		"en" "You will spawn normally."
 		"pt" "Você irá dar respawn normalmente."
 		"ru" "Вы возродитесь как обычно."
+		"da" "Du vil spawne normalt."
 	}
 }
