@@ -6,7 +6,7 @@
 #pragma newdecls required // enforce new SM 1.7 syntax
 #pragma semicolon 1
 
-#define PLUGIN_VERSION "1.1.0"
+#define PLUGIN_VERSION "1.1.1"
 
 // variables
 char g_strMissionName[128]; // The current mission name
@@ -392,30 +392,37 @@ void ComputeDifficulty()
 	if(strcmp(g_strMissionName, g_strMapName, false) == 0) // Case 1: Mission name is the same as map name, probably normal
 	{
 		g_Difficulty = MD_Normal;
+		//PrintToServer("Detected Difficulty: Normal");
 	}
-	else if(StrContains(g_strMissionName, "_intermediate", false) || StrContains(g_strMissionName, "_int_", false))
+	else if(StrContains(g_strMissionName, "_intermediate", false) != -1 || StrContains(g_strMissionName, "_int_", false) != -1)
 	{
 		g_Difficulty = MD_Intermediate;
+		//PrintToServer("Detected Difficulty: Intermediate");
 	}
-	else if(StrContains(g_strMissionName, "_advanced", false) || StrContains(g_strMissionName, "_adv_", false))
+	else if(StrContains(g_strMissionName, "_advanced", false) != -1 || StrContains(g_strMissionName, "_adv_", false) != -1)
 	{
 		g_Difficulty = MD_Advanced;
+		//PrintToServer("Detected Difficulty: Advanced");
 	}
-	else if(StrContains(g_strMissionName, "_expert", false) || StrContains(g_strMissionName, "_exp_", false))
+	else if(StrContains(g_strMissionName, "_expert", false) != -1 || StrContains(g_strMissionName, "_exp_", false) != -1)
 	{
 		g_Difficulty = MD_Expert;
+		//PrintToServer("Detected Difficulty: Expert");
 	}
-	else if(StrContains(g_strMissionName, "_ironman", false))
+	else if(StrContains(g_strMissionName, "_ironman", false) != -1)
 	{
 		g_Difficulty = MD_Advanced;
+		//PrintToServer("Detected Difficulty: Advanced (ironman)");
 	}
-	else if(StrContains(g_strMissionName, "_666", false))
+	else if(StrContains(g_strMissionName, "_666", false) != -1)
 	{
 		g_Difficulty = MD_Expert;
+		//PrintToServer("Detected Difficulty: Expert (666)");
 	}
 	else
 	{
 		g_Difficulty = MD_Unknown;
+		//PrintToServer("Detected Difficulty: Unknown");
 	}
 }
 
