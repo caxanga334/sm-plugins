@@ -6,14 +6,16 @@
 #pragma newdecls required // enforce new SM 1.7 syntax
 #pragma semicolon 1
 
-#define PLUGIN_VERSION "1.0.1"
+#define PLUGIN_VERSION "1.1.0"
 
 // variables
-char g_strMissionName[64]; // The current mission name
+char g_strMissionName[128]; // The current mission name
+char g_strMapName[128]; // The current map name
 int g_iNumWaveFails; // How many waves RED failed
 int g_iCurrentWave;
 UserMsg g_uRefund;
 float g_flAnnounceTimer;
+eMissionDifficulty g_Difficulty; // Current mission difficulty
 
 // ConVars
 ConVar cv_BaseCredits = null;
@@ -24,6 +26,20 @@ ConVar cv_CreditsPerWaveLost = null;
 ConVar cv_CreditsBonusPerWaveWon = null;
 ConVar cv_MaxRequest = null;
 ConVar cv_MaxRedPlayers = null;
+ConVar cv_Multiplier_Normal = null;
+ConVar cv_Multiplier_Intermediate = null;
+ConVar cv_Multiplier_Advanced = null;
+ConVar cv_Multiplier_Expert = null;
+
+enum eMissionDifficulty
+{
+	MD_Normal = 0,
+	MD_Intermediate,
+	MD_Advanced,
+	MD_Expert,
+	MD_Unknown,
+	MD_Max
+};
 
 enum MvMStatsType
 {
@@ -80,6 +96,10 @@ public void OnPluginStart()
 	cv_MaxRequest = CreateConVar("sm_mvmcredits_maxrequests", "1", "How many credits requests a single player can make.", FCVAR_NONE, true, 0.0, false);
 	cv_MaxRedPlayers = CreateConVar("sm_mvmcredits_maxredplayers", "6", "If the number of RED players is equal or greater than the value set here, deny credit requests.", FCVAR_NONE, true, 0.0, true, 10.0);
 	cv_CreditsBonusPerWaveWon = CreateConVar("sm_mvmcredits_wavewon_bonus", "100", "How many credits a player receives per wave won", FCVAR_NONE, true, 0.0, true, 10000.0);
+	cv_Multiplier_Normal = CreateConVar("sm_mvmcredits_multiplier_normal", "1.0", "Multiplier for normal difficulty missions", FCVAR_NONE, true, 0.01, true, 5.0);
+	cv_Multiplier_Intermediate = CreateConVar("sm_mvmcredits_multiplier_intermediate", "1.3", "Multiplier for nintermediate difficulty missions", FCVAR_NONE, true, 0.01, true, 5.0);
+	cv_Multiplier_Advanced = CreateConVar("sm_mvmcredits_multiplier_advanced", "1.6", "Multiplier for advanced difficulty missions", FCVAR_NONE, true, 0.01, true, 5.0);
+	cv_Multiplier_Expert = CreateConVar("sm_mvmcredits_multiplier_expert", "2.0", "Multiplier for expert difficulty missions", FCVAR_NONE, true, 0.01, true, 5.0);
 	AutoExecConfig(true, "plugin.mvmcredits");
 
 	RegConsoleCmd("sm_requestcredits", command_requestcredits, "Request MvM Currency");
@@ -102,9 +122,17 @@ public void OnMapStart()
 {
 	if(!IsMvM(true))
 		SetFailState("This plugin is for Mann vs Machine only.");
+
+	char buffer[128];
+	GetCurrentMap(g_strMapName, sizeof(g_strMapName));
+	if(GetMapDisplayName(g_strMapName, buffer, sizeof(buffer)))
+	{
+		strcopy(g_strMapName, sizeof(g_strMapName), buffer);
+	}
 		
 	g_iNumWaveFails = 0;
 	g_iCurrentWave = 0;
+	g_Difficulty = MD_Normal;
 	g_flAnnounceTimer = GetGameTime();
 }
 
@@ -236,6 +264,7 @@ int ComputeCredits(int client)
 		credits += GetClientBonusCredits(client);
 	}
 	
+	ApplyDifficultyMultiplier(credits);
 	return credits;
 }
 
@@ -313,6 +342,7 @@ public Action Timer_CheckCredits(Handle timer)
 public Action Timer_MissionChanged(Handle timer)
 {
 	g_iNumWaveFails = 0;
+	ComputeDifficulty();
 	return Plugin_Stop;
 }
 
@@ -350,6 +380,75 @@ void ResetBonusToAll()
 	{
 		g_nCredits[i].Bonus = 0;
 	}
+}
+
+/**
+ * Tries to determine the difficulty of the current mission
+ *
+ * @return     no return
+ */
+void ComputeDifficulty()
+{
+	if(strcmp(g_strMissionName, g_strMapName, false) == 0) // Case 1: Mission name is the same as map name, probably normal
+	{
+		g_Difficulty = MD_Normal;
+	}
+	else if(StrContains(g_strMissionName, "_intermediate", false) || StrContains(g_strMissionName, "_int_", false))
+	{
+		g_Difficulty = MD_Intermediate;
+	}
+	else if(StrContains(g_strMissionName, "_advanced", false) || StrContains(g_strMissionName, "_adv_", false))
+	{
+		g_Difficulty = MD_Advanced;
+	}
+	else if(StrContains(g_strMissionName, "_expert", false) || StrContains(g_strMissionName, "_exp_", false))
+	{
+		g_Difficulty = MD_Expert;
+	}
+	else if(StrContains(g_strMissionName, "_ironman", false))
+	{
+		g_Difficulty = MD_Advanced;
+	}
+	else if(StrContains(g_strMissionName, "_666", false))
+	{
+		g_Difficulty = MD_Expert;
+	}
+	else
+	{
+		g_Difficulty = MD_Unknown;
+	}
+}
+
+/**
+ * Applies the difficulty multiplier
+ *
+ * @param credits		Credits to apply the multiplier (REFERENCE)
+ * @return     no return
+ */
+void ApplyDifficultyMultiplier(int &credits)
+{
+	float flcredits = float(credits);
+	switch(g_Difficulty)
+	{
+		case MD_Normal, MD_Unknown:
+		{
+			flcredits = flcredits * cv_Multiplier_Normal.FloatValue;
+		}
+		case MD_Intermediate:
+		{
+			flcredits = flcredits * cv_Multiplier_Intermediate.FloatValue;
+		}
+		case MD_Advanced:
+		{
+			flcredits = flcredits * cv_Multiplier_Advanced.FloatValue;
+		}
+		case MD_Expert:
+		{
+			flcredits = flcredits * cv_Multiplier_Expert.FloatValue;
+		}
+	}
+
+	credits = RoundToNearest(flcredits);
 }
 
 stock void TF2_SetClientCredits(int client, int amount = 0)
