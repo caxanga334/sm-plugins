@@ -6,7 +6,7 @@
 #pragma newdecls required // enforce new SM 1.7 syntax
 #pragma semicolon 1
 
-#define PLUGIN_VERSION "1.1.1"
+#define PLUGIN_VERSION "1.2.0"
 
 // variables
 char g_strMissionName[128]; // The current mission name
@@ -16,6 +16,7 @@ int g_iCurrentWave;
 UserMsg g_uRefund;
 float g_flAnnounceTimer;
 eMissionDifficulty g_Difficulty; // Current mission difficulty
+bool g_bMissionWasChangedOrRestarted;
 
 // ConVars
 ConVar cv_BaseCredits = null;
@@ -70,7 +71,7 @@ public Plugin myinfo = {
 	url = "https://github.com/caxanga334/sm-plugins"
 }
 
-stock APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
+public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
 	EngineVersion ev = GetEngineVersion();
 	
@@ -116,12 +117,16 @@ public void OnPluginStart()
 	g_uRefund = GetUserMessageId("MVMResetPlayerUpgradeSpending");
 	if(g_uRefund == INVALID_MESSAGE_ID) { LogError("Failed to hook MVMResetPlayerUpgradeSpending user message."); }
 	HookUserMessage(g_uRefund, Msg_Refund);
+
+	AddGameLogHook(Hook_Log);
 }
 
 public void OnMapStart()
 {
 	if(!IsMvM(true))
 		SetFailState("This plugin is for Mann vs Machine only.");
+
+	g_bMissionWasChangedOrRestarted = false;
 
 	char buffer[128];
 	GetCurrentMap(g_strMapName, sizeof(g_strMapName));
@@ -206,6 +211,21 @@ public Action Msg_Refund(UserMsg msg_id, BfRead msg, const int[] players, int pl
 {
 	int client = BfReadByte(msg); //client that used the respec
 	RequestFrame(FrameOnClientRefund, client);
+	return Plugin_Continue;
+}
+
+public Action Hook_Log(const char[] message)
+{
+	if (StrContains(message, "Vote succeeded", false) != -1) // vote pass log
+	{
+		if (StrContains(message, "ChangeMission", false) != -1 || StrContains(message, "RestartGame", false) != -1)
+		{
+			g_bMissionWasChangedOrRestarted = true;
+			g_iNumWaveFails = 0;
+		}
+	}
+
+	return Plugin_Continue;
 }
 
 void FrameOnClientRefund(int client)
@@ -273,7 +293,7 @@ int GetClientBonusCredits(int client)
 	return g_nCredits[client].Bonus;
 }
 
-int SetClientBonusCredits(int client, int value = 0)
+void SetClientBonusCredits(int client, int value = 0)
 {
 	g_nCredits[client].Bonus = value;
 }
@@ -294,6 +314,8 @@ bool IsBonusAvailable(int client)
 public Action EventWaveStart(Event event, const char[] name, bool dontBroadcast)
 {
 	g_iCurrentWave = TF2_GetCurrentMvMWave();
+	g_bMissionWasChangedOrRestarted = false;
+	return Plugin_Continue;
 }
 
 // Wave ended ( victory )
@@ -304,16 +326,23 @@ public Action EventWaveEnd(Event event, const char[] name, bool dontBroadcast)
 		g_iNumWaveFails = 0;
 	
 	AddBonusToAll(cv_CreditsBonusPerWaveWon.IntValue);
+	return Plugin_Continue;
 }
 
 // Wave lost
 public Action EventWaveFailed(Event event, const char[] name, bool dontBroadcast)
 {
-	g_iNumWaveFails++;
+	// If the mission was restarted or changed by vote, wait until the next wave start event to increase the wave failed count
+	if (!g_bMissionWasChangedOrRestarted)
+	{
+		g_iNumWaveFails++;
+	}
+
 	ResetRequestCountAll();
 	ResetBonusToAll();
 	CreateTimer(2.5, Timer_CheckCredits);
 	CreateTimer(5.0, Timer_AnnounceFeature);
+	return Plugin_Continue;
 }
 
 // ==== TIMERS ====
