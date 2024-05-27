@@ -96,7 +96,7 @@ jobs:
           path: smlib
           ref: transitional_syntax
 
-      - name: Fetch SMLIB
+      - name: Fetch MultiColors
         uses: actions/checkout@v4.1.1
         with:
           repository: Bara/Multi-Colors
