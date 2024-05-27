@@ -15,7 +15,7 @@
 #pragma newdecls required
 #pragma semicolon 1
 
-#define PLUGIN_VERSION "1.0.2"
+#define PLUGIN_VERSION "1.0.3"
 
 bool g_started; // Has the server started?
 bool g_hasip;
@@ -139,6 +139,8 @@ public void OnConfigsExecuted()
 
 	c_webhook_primary_url.GetString(g_primarywebhook, sizeof(g_primarywebhook));
 	c_webhook_admin.GetString(g_adminwebhook, sizeof(g_adminwebhook));
+
+	CreateTimer(0.2, Timer_ValidateURL, .flags = TIMER_FLAG_NO_MAPCHANGE);
 }
 
 public void OnMapStart()
@@ -222,6 +224,22 @@ public Action Timer_SDR_BuildIP(Handle timer)
 	return Plugin_Stop;
 }
 #endif
+
+// Checks if we have a valid discord webhook url
+public Action Timer_ValidateURL(Handle timer)
+{
+	if (StrContains(g_primarywebhook, "discord.com/api/webhooks/") == -1)
+	{
+		SetFailState("Primary Webhook URL not set! The plugin cannot function without it. Set it at \"cfg/sourcemod/plugin.serverstatus.cfg\".");
+	}
+
+	if (StrContains(g_adminwebhook, "discord.com/api/webhooks/") == -1)
+	{
+		LogMessage("Admin webhook not set or misconfigured. Admin messages unavailable.");
+	}
+
+	return Plugin_Stop;
+}
 
 public void OnWebHookExecuted(HTTPResponse response, any value, const char[] error)
 {

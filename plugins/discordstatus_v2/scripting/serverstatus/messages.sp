@@ -6,6 +6,16 @@
  * 
  */
 
+stock bool IsWebhookURLValid(const char[] url)
+{
+	if (StrContains(url, "discord.com/api/webhooks/") == -1)
+	{
+		return false;
+	}
+
+	return true;
+}
+
 stock void AddSpacer(Embed &embed)
 {
 	EmbedField fieldspacer = new EmbedField("\n_ _", "\n_ _", false);
@@ -270,6 +280,12 @@ void SendMessage_OnCallAdminReport(int client, int target, const char[] reason)
 	char tmp[128];
 	char name1[MAX_NAME_LENGTH];
 	char name2[MAX_NAME_LENGTH];
+
+	if (!IsWebhookURLValid(g_adminwebhook))
+	{
+		return; // Call Admin is optional
+	}
+
 	GetServerName(servername, sizeof(servername));
 	Format(servername, sizeof(servername), "[CallAdmin] %s", servername);
 
@@ -348,6 +364,12 @@ void SendMessage_OnCallAdminReportHandled(int client, int id)
 	char servername[96];
 	char tmp[128];
 	char name1[MAX_NAME_LENGTH];
+
+	if (!IsWebhookURLValid(g_adminwebhook))
+	{
+		return; // Call Admin is optional
+	}
+
 	GetServerName(servername, sizeof(servername));
 	Format(servername, sizeof(servername), "[CallAdmin] %s", servername);
 
