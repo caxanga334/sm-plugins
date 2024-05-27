@@ -37,7 +37,7 @@ The following libraries are **required** for the plugin to compile.
 * [Discord Webhook API](https://github.com/Sarrus1/DiscordWebhookAPI)
 * [AutoExecConfig](https://github.com/Impact123/AutoExecConfig)
   
-The following libraries are **optinal** for compiling the plugin.
+The following libraries are **optional** for compiling the plugin.
 
 * [SteamPawn](https://github.com/nosoop/SM-SteamPawn)
 * [SourceTV Manager](https://github.com/peace-maker/sourcetvmanager)
