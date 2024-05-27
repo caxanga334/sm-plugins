@@ -96,11 +96,18 @@ jobs:
           path: smlib
           ref: transitional_syntax
 
+      - name: Fetch SMLIB
+        uses: actions/checkout@v4.1.1
+        with:
+          repository: Bara/Multi-Colors
+          path: multicolors
+
       - name: Move Fetched Includes to Shared Includes Path
         run: |
           rsync -rv ${{ github.workspace }}/ripext/pawn/scripting/include/* ${{ env.TPINCLUDES_PATH }}/
           rsync -rv ${{ github.workspace }}/left4dhooks/sourcemod/scripting/include/* ${{ env.TPINCLUDES_PATH }}/
           rsync -rv ${{ github.workspace }}/smlib/scripting/include/* ${{ env.TPINCLUDES_PATH }}/
+          rsync -rv ${{ github.workspace }}/multicolors/addons/sourcemod/scripting/include/* ${{ env.TPINCLUDES_PATH }}/
           ls -lah ${{ env.TPINCLUDES_PATH }}/
 
       - name: Move Plugin Source Files to Build Directory
