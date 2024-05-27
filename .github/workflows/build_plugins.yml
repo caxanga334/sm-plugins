@@ -23,11 +23,13 @@ jobs:
             os_version: ubuntu-latest
             identifier: 'Sourcemod Stable'
             sm-version: '1.11.x'
+            package-name: 'sm-stable'
 
           - buildjobs: sourcemod-1.12
             os_version: ubuntu-latest
             identifier: 'Sourcemod Dev'
             sm-version: '1.12.x'
+            package-name: 'sm-dev'
 
     steps:
       - name: Set environment variables
@@ -116,5 +118,20 @@ jobs:
           echo "===OUT FILES==="
           ls -lah *.smx
           
+      - name: Move Compiled Plugins to Package Directory
+        run: |
+          rsync -rv ${{ env.BUILD_PATH }}/*.smx ${{ env.BINARY_PATH }}/
+
+      - name: Fetch Short SHA
+        uses: benjlevesque/short-sha@v3.0
+        id: short-sha
+
+      - name: Upload Compiled Plugins Artifact
+        uses: actions/upload-artifact@v4.3.3
+        with:
+          name: plugins-${{ matrix.package-name }}-${{ steps.short-sha.outputs.sha }}
+          path: |
+            build/package/*
+      
 
     
