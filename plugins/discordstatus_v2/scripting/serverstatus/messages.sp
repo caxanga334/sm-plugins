@@ -6,7 +6,7 @@
  * 
  */
 
-void AddSpacer(Embed &embed)
+stock void AddSpacer(Embed &embed)
 {
 	EmbedField fieldspacer = new EmbedField("\n_ _", "\n_ _", false);
 	embed.AddField(fieldspacer);
@@ -126,6 +126,8 @@ void SendMessage_OnServerStart()
 	delete webhook;
 }
 
+#if defined _l4dh_included
+
 /**
  * Sends a message informing that the server has started
  */
@@ -193,6 +195,8 @@ void SendMessage_L4D_OnRoundStart()
 	delete webhook;
 }
 
+#endif
+
 /**
  * Sends a message informing that the round has started (L4D)
  */
@@ -231,6 +235,8 @@ void SendMessage_TF2_OnMvMWaveStart(int wave, int max)
 	delete webhook;
 }
 
+#if defined _stvmngr_included
+
 void SendMessage_OnSTVRecordingStart(const char[] filename)
 {
 	char servername[96];
@@ -253,6 +259,10 @@ void SendMessage_OnSTVRecordingStart(const char[] filename)
 
 	delete webhook;
 }
+
+#endif
+
+#if defined _calladmin_included
 
 void SendMessage_OnCallAdminReport(int client, int target, const char[] reason)
 {
@@ -310,6 +320,8 @@ void SendMessage_OnCallAdminReport(int client, int target, const char[] reason)
 	EmbedField field3 = new EmbedField("Reason", reason, false);
 	embed1.AddField(field3);
 
+#if defined _stvmngr_included
+
 	if (g_sourcetvmanager && SourceTV_IsRecording())
 	{
 		SourceTV_GetDemoFileName(tmp, sizeof(tmp));
@@ -321,6 +333,8 @@ void SendMessage_OnCallAdminReport(int client, int target, const char[] reason)
 		EmbedField field5 = new EmbedField("Tick", tmp, true);
 		embed1.AddField(field5);
 	}
+
+#endif
 
 	webhook.AddEmbed(embed1); 
 
@@ -358,6 +372,8 @@ void SendMessage_OnCallAdminReportHandled(int client, int id)
 	EmbedField field1 = new EmbedField("Admin", name1, false);
 	embed1.AddField(field1);
 
+#if defined _stvmngr_included
+
 	if (g_sourcetvmanager && SourceTV_IsRecording())
 	{
 		SourceTV_GetDemoFileName(tmp, sizeof(tmp));
@@ -370,9 +386,13 @@ void SendMessage_OnCallAdminReportHandled(int client, int id)
 		embed1.AddField(field3);
 	}
 
+#endif
+
 	webhook.AddEmbed(embed1); 
 
 	webhook.Execute(g_adminwebhook, OnWebHookExecuted);
 
 	delete webhook;
 }
+
+#endif

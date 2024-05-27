@@ -1,10 +1,13 @@
 
-bool IsValidClientIndex(int client)
+// mark as stock to suppress "symbol is never used" errors, this function is used but depending on the available includes
+// the functions that make use of it might not get compiled 
+stock bool IsValidClientIndex(int client)
 {
 	return client > 0 && client <= MaxClients;
 }
 
-void GetClientSteamID(int client, char[] buffer, int size, AuthIdType type = AuthId_Engine)
+// see above for the stock reason
+stock void GetClientSteamID(int client, char[] buffer, int size, AuthIdType type = AuthId_Engine)
 {
 	if (!GetClientAuthId(client, type, buffer, size, true))
 	{
@@ -36,6 +39,8 @@ void GetMapName(char[] name, int size)
 
 int GetServerMaxSlots()
 {
+#if defined _l4dh_included
+
 	if(g_engine == Engine_Left4Dead || g_engine == Engine_Left4Dead2)
 	{
 		switch(L4D_GetGameModeType())
@@ -50,6 +55,8 @@ int GetServerMaxSlots()
 			}
 		}
 	}
+
+#endif
 
 	int slots = MaxClients;
 	ConVar cVisible = FindConVar("sv_visiblemaxplayers");

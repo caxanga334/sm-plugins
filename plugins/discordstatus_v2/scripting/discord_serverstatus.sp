@@ -1,26 +1,31 @@
 #include <sourcemod>
+#include <sdktools>
 #include <ripext>
 #include <steamworks>
 #include <discordWebhookAPI>
 #include <autoexecconfig>
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
-#include <left4dhooks>
-#include <sourcetvmanager>
-#include <calladmin>
+#tryinclude <left4dhooks>
+#tryinclude <sourcetvmanager>
+#tryinclude <calladmin>
 #tryinclude <steampawn>
 #tryinclude <smlib/server>
 
 #pragma newdecls required
 #pragma semicolon 1
 
-#define PLUGIN_VERSION "1.0.1"
+#define PLUGIN_VERSION "1.0.2"
 
 bool g_started; // Has the server started?
 bool g_hasip;
 bool g_hasfullyjoined[MAXPLAYERS + 1];
-bool g_hasconfigs;
+#if defined _l4dh_included
+bool g_hasconfigs; // This is only used in L4D for now
+#endif
+#if defined _stvmngr_included
 bool g_sourcetvmanager = false; // Is the SourceTV manager extension installed?
+#endif
 #if defined __steampawn_included
 bool g_steampawn = false; // Is SteamPawn plugin installed?
 #endif
@@ -37,7 +42,9 @@ ConVar c_remove2;
 ConVar c_dns;
 ConVar c_announcestart;
 ConVar c_announceIP;
+#if defined _calladmin_included
 ConVar c_calladmin_mention;
+#endif
 
 #include "serverstatus/utils.sp"
 #include "serverstatus/messages.sp"
@@ -80,7 +87,9 @@ public void OnPluginStart()
 	c_dns = AutoExecConfig_CreateConVar("sm_serverstatus_dns", "", "Send the server IP as a domain name (eg: tf2.example.com) instead", FCVAR_NONE);
 	c_announcestart = AutoExecConfig_CreateConVar("sm_serverstatus_alert_start", "1", "Sends a message when the server starts", FCVAR_NONE, true, 0.0, true, 1.0);
 	c_announceIP = AutoExecConfig_CreateConVar("sm_serverstatus_show_server_ip", "1", "Shows the server IP address on the server start message?", FCVAR_NONE, true, 0.0, true, 1.0);
+#if defined _calladmin_included
 	c_calladmin_mention = AutoExecConfig_CreateConVar("gp_discord_calladmin_mention", "@here", "Role to mention when sending CallAdmin messages. \nTo mention a specific role, use <@&ROLE_ID_HERE>", FCVAR_NONE);
+#endif
 
 	c_webhook_primary_url.AddChangeHook(OnPrimaryURLChanged);
 	c_webhook_admin.AddChangeHook(OnAdminURLChanged);
@@ -89,14 +98,17 @@ public void OnPluginStart()
 	AutoExecConfig_CleanFile();
 
 	g_started = false;
+#if defined _l4dh_included
 	g_hasconfigs = false;
+#endif
 }
 
 public void OnAllPluginsLoaded()
 {
-	// OnLibraryAdded doesn't fire, extensions load too early to notify plugins?
+#if defined _stvmngr_included
+	// Note: OnLibraryAdded/Removed is not called for extensions
 	g_sourcetvmanager = LibraryExists("sourcetvmanager");
-	// LogMessage("Discord server status fully loaded! \n        SourceTV Manager: %s", g_sourcetvmanager ? "Available" : "Unavailable");
+#endif
 }
 
 public void OnLibraryAdded(const char[] name)
@@ -121,7 +133,9 @@ public void OnLibraryRemoved(const char[] name)
 
 public void OnConfigsExecuted()
 {
+#if defined _l4dh_included
 	g_hasconfigs = true;
+#endif
 
 	c_webhook_primary_url.GetString(g_primarywebhook, sizeof(g_primarywebhook));
 	c_webhook_admin.GetString(g_adminwebhook, sizeof(g_adminwebhook));
@@ -130,8 +144,10 @@ public void OnConfigsExecuted()
 public void OnMapStart()
 {
 	g_delay = 0.0;
+#if defined _l4dh_included
 	g_delay_l4d_gamemode = 0.0;
 	g_delay_l4d_generic = 0.0;
+#endif
 
 #if defined __steampawn_included
 	if (!g_hasip)

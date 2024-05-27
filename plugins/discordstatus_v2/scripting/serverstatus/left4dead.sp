@@ -1,5 +1,7 @@
 // Left 4 Dead/2 Specific notifications
 
+#if defined _l4dh_included
+
 float g_delay_l4d_gamemode; // Prevent spam
 float g_delay_l4d_generic; // generic timer for l4d2
 
@@ -20,3 +22,5 @@ public void L4D_OnFirstSurvivorLeftSafeArea_Post(int client)
         SendMessage_L4D_OnRoundStart();
     }
 }
+
+#endif
