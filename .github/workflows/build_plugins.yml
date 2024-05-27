@@ -65,7 +65,7 @@ jobs:
           version: ${{ matrix.sm-version }}
 
       - name: Fetch Third-Party Includes (WGET)
-        working-directory: ${{ env.INCLUDES_PATH }}
+        working-directory: ${{ env.TPINCLUDES_PATH }}
         run: |
           wget https://raw.githubusercontent.com/KyleSanderson/SteamWorks/master/Pawn/includes/SteamWorks.inc -O steamworks.inc
           wget https://raw.githubusercontent.com/Sarrus1/DiscordWebhookAPI/master/include/discordWebhookAPI.inc -O discordWebhookAPI.inc
