@@ -1,0 +1,120 @@
+name: Compile Plugins
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    name: Compile plugin for ${{ matrix.identifier }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        buildjobs:
+          - sourcemod-1.11
+          - sourcemod-1.12
+
+        include:
+
+          - buildjobs: sourcemod-1.11
+            os_version: ubuntu-latest
+            identifier: 'Sourcemod Stable'
+            sm-version: '1.11.x'
+
+          - buildjobs: sourcemod-1.12
+            os_version: ubuntu-latest
+            identifier: 'Sourcemod Dev'
+            sm-version: '1.12.x'
+
+    steps:
+      - name: Set environment variables
+        run: |
+          echo "SOURCEFILES_PATH=$GITHUB_WORKSPACE/sourcefiles" >> $GITHUB_ENV
+          echo "TPINCLUDES_PATH=$GITHUB_WORKSPACE/thirdparty/includes" >> $GITHUB_ENV
+          echo "BUILD_PATH=$GITHUB_WORKSPACE/build/source" >> $GITHUB_ENV
+          echo "PACKAGE_PATH=$GITHUB_WORKSPACE/build/package" >> $GITHUB_ENV
+          echo "CONFIGS_PATH=$GITHUB_WORKSPACE/build/package/addons/sourcemod/configs" >> $GITHUB_ENV
+          echo "SMDATA_PATH=$GITHUB_WORKSPACE/build/package/addons/sourcemod/data" >> $GITHUB_ENV
+          echo "GAMEDATA_PATH=$GITHUB_WORKSPACE/build/package/addons/sourcemod/gamedata" >> $GITHUB_ENV
+          echo "BINARY_PATH=$GITHUB_WORKSPACE/build/package/addons/sourcemod/plugins" >> $GITHUB_ENV
+          echo "LOC_PATH=$GITHUB_WORKSPACE/build/package/addons/sourcemod/translations" >> $GITHUB_ENV
+
+      - name: Create Folders
+        run: |
+          echo "Creating folders..."
+          mkdir -p ${{ env.TPINCLUDES_PATH }}
+          mkdir -p ${{ env.BUILD_PATH }}
+          mkdir -p ${{ env.CONFIGS_PATH }}
+          mkdir -p ${{ env.SMDATA_PATH }}
+          mkdir -p ${{ env.GAMEDATA_PATH }}
+          mkdir -p ${{ env.BINARY_PATH }}
+          mkdir -p ${{ env.LOC_PATH }}
+
+      - name: Fetch Plugins Sources
+        uses: actions/checkout@v4.1.1
+        with:
+          path: sourcefiles
+
+      - name: Setup SourcePawn Compiler for ${{ matrix.identifier }} ( ${{ matrix.sm-version }} )
+        id: setup_sp
+        uses: rumblefrog/setup-sp@master
+        with:
+          version: ${{ matrix.sm-version }}
+
+      - name: Fetch Third-Party Includes (WGET)
+        working-directory: ${{ env.INCLUDES_PATH }}
+        run: |
+          wget https://raw.githubusercontent.com/KyleSanderson/SteamWorks/master/Pawn/includes/SteamWorks.inc -O steamworks.inc
+          wget https://raw.githubusercontent.com/Sarrus1/DiscordWebhookAPI/master/include/discordWebhookAPI.inc -O discordWebhookAPI.inc
+          wget https://raw.githubusercontent.com/Impact123/AutoExecConfig/development/autoexecconfig.inc -O autoexecconfig.inc
+          wget https://raw.githubusercontent.com/peace-maker/sourcetvmanager/master/sourcetvmanager.inc -O sourcetvmanager.inc
+          wget https://raw.githubusercontent.com/nosoop/SM-SteamPawn/main/scripting/include/steampawn.inc -O steampawn.inc
+          wget https://raw.githubusercontent.com/Impact123/CallAdmin/development/gameserver/scripting/include/calladmin.inc -O calladmin.inc
+          ls -lah
+
+      - name: Fetch REST in SourcePawn
+        uses: actions/checkout@v4.1.1
+        with:
+          repository: ErikMinekus/sm-ripext
+          path: ripext
+
+      - name: Fetch Left 4 DHooks Direct
+        uses: actions/checkout@v4.1.1
+        with:
+          repository: SilvDev/Left4DHooks
+          path: left4dhooks
+  
+      - name: Fetch SMLIB
+        uses: actions/checkout@v4.1.1
+        with:
+          repository: bcserv/smlib
+          path: smlib
+          ref: transitional_syntax
+
+      - name: Move Fetched Includes to Shared Includes Path
+        run: |
+          rsync -rv ${{ github.workspace }}/ripext/pawn/scripting/include/* ${{ env.TPINCLUDES_PATH }}/
+          rsync -rv ${{ github.workspace }}/left4dhooks/sourcemod/scripting/include/* ${{ env.TPINCLUDES_PATH }}/
+          rsync -rv ${{ github.workspace }}/smlib/scripting/include/* ${{ env.TPINCLUDES_PATH }}/
+          ls -lah ${{ env.TPINCLUDES_PATH }}/
+
+      - name: Move Plugin Source Files to Build Directory
+        run: |
+          rsync -rv ${{ github.workspace }}/sourcefiles/plugins/discordstatus_v2/scripting/* ${{ env.BUILD_PATH }}/
+
+
+      - name: Compile Plugins
+        working-directory: ${{ env.BUILD_PATH }}
+        run: |
+          for file in *.sp; do
+            echo -e "\nCompiling $file..."
+            spcomp -O2 -v2 -i ${{ env.TPINCLUDES_PATH }}/ $file
+          done
+          echo "===OUT FILES==="
+          ls -lah *.smx
+          
+
+    
