@@ -5,8 +5,8 @@
 
 EngineVersion g_Engine;
 
-#include <autorecorder/logic.sp>
-#include <autorecorder/console.sp>
+#include "autorecorder/logic.sp"
+#include "autorecorder/console.sp"
 
 #define PLUGIN_VERSION "1.3.0"
 
