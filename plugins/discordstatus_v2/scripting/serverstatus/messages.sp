@@ -1,26 +1,5 @@
-/**
- * 
- * --- Adds space between two embed fields
- * EmbedField fieldspacer = new EmbedField("\n_ _", "\n_ _", false);
- * embed1.AddField(fieldspacer);
- * 
- */
 
-stock bool IsWebhookURLValid(const char[] url)
-{
-	if (StrContains(url, "discord.com/api/webhooks/") == -1)
-	{
-		return false;
-	}
-
-	return true;
-}
-
-stock void AddSpacer(Embed &embed)
-{
-	EmbedField fieldspacer = new EmbedField("\n_ _", "\n_ _", false);
-	embed.AddField(fieldspacer);
-}
+#include "webhook_util.sp"
 
 void SendMessage_OnClientJoin(int client)
 {
@@ -33,8 +12,7 @@ void SendMessage_OnClientJoin(int client)
 	GetMapName(mapname, sizeof(mapname));
 
 
-	Webhook webhook = new Webhook("");
-	webhook.SetUsername("Server Status");
+	Webhook webhook = Init_Webhook();
 
 	Embed embed1 = new Embed(servername, "Client joined the server!");
 	embed1.SetTimeStampNow();
@@ -77,8 +55,7 @@ void SendMessage_OnClientLeave()
 	GetMapName(mapname, sizeof(mapname));
 
 
-	Webhook webhook = new Webhook("");
-	webhook.SetUsername("Server Status");
+	Webhook webhook = Init_Webhook();
 
 	Embed embed1 = new Embed(servername, "Client left the server!");
 	embed1.SetTimeStampNow();
@@ -109,8 +86,7 @@ void SendMessage_OnServerStart()
 	GetServerName(servername, sizeof(servername));
 	GetMapName(mapname, sizeof(mapname));
 
-	Webhook webhook = new Webhook("");
-	webhook.SetUsername("Server Status");
+	Webhook webhook = Init_Webhook();
 	
 	char buffer[128];
 	Embed embed1 = new Embed(servername, "Server started!");
@@ -158,8 +134,7 @@ void SendMessage_L4D_OnGameMode(int gamemode)
 		default: return;
 	}
 
-	Webhook webhook = new Webhook("");
-	webhook.SetUsername("Server Status");
+	Webhook webhook = Init_Webhook();
 
 	Embed embed1 = new Embed(servername, "Game mode changed.");
 	embed1.SetTimeStampNow();
@@ -188,8 +163,7 @@ void SendMessage_L4D_OnRoundStart()
 	GetServerName(servername, sizeof(servername));
 	GetMapName(mapname, sizeof(mapname));
 
-	Webhook webhook = new Webhook("");
-	webhook.SetUsername("Server Status");
+	Webhook webhook = Init_Webhook();
 
 	Embed embed1 = new Embed(servername, "Round Started");
 	embed1.SetTimeStampNow();
@@ -222,8 +196,7 @@ void SendMessage_TF2_OnMvMWaveStart(int wave, int max)
 	TF2MvM_GetMissionName(missioname, sizeof(missioname));
 	FormatEx(waveinfo, sizeof(waveinfo), "%i of %i waves", wave, max);
 
-	Webhook webhook = new Webhook("");
-	webhook.SetUsername("Server Status");
+	Webhook webhook = Init_Webhook();
 
 	Embed embed1 = new Embed(servername, "Mann vs Machine Wave Started");
 	embed1.SetTimeStampNow();
@@ -253,8 +226,7 @@ void SendMessage_OnSTVRecordingStart(const char[] filename)
 	GetServerName(servername, sizeof(servername));
 	Format(servername, sizeof(servername), "[SourceTV] %s", servername);
 
-	Webhook webhook = new Webhook("");
-	webhook.SetUsername("Server Status");
+	Webhook webhook = Init_Webhook();
 
 	Embed embed1 = new Embed(servername, "Demo recording started");
 	embed1.SetTimeStampNow();
@@ -317,8 +289,7 @@ void SendMessage_OnCallAdminReport(int client, int target, const char[] reason)
 		mention = "@here";
 	}
 
-	Webhook webhook = new Webhook(mention);
-	webhook.SetUsername("Call Admin");
+	Webhook webhook = Init_Webhook(.username = "Call Admin");
 
 	FormatEx(tmp, sizeof(tmp), "Player reported - Report ID %i", CallAdmin_GetReportID());
 	Embed embed1 = new Embed(servername, tmp);
@@ -383,8 +354,7 @@ void SendMessage_OnCallAdminReportHandled(int client, int id)
 		FormatEx(name1, sizeof(name1), "SERVER");
 	}
 
-	Webhook webhook = new Webhook("");
-	webhook.SetUsername("Call Admin");
+	Webhook webhook = Init_Webhook(.username = "Call Admin");
 
 	FormatEx(tmp, sizeof(tmp), "Reported Handled - %i", id);
 	Embed embed1 = new Embed(servername, tmp);

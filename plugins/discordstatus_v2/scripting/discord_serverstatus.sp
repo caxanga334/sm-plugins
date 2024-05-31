@@ -36,6 +36,7 @@ float g_delay;
 EngineVersion g_engine;
 ConVar c_webhook_primary_url;
 ConVar c_webhook_admin;
+ConVar c_webhook_avatar_url;
 ConVar c_delay;
 ConVar c_remove1;
 ConVar c_remove2;
@@ -81,6 +82,7 @@ public void OnPluginStart()
 	AutoExecConfig_CreateConVar("sm_serverstatus_version", PLUGIN_VERSION, "Plugin version", FCVAR_DONTRECORD|FCVAR_NOTIFY);
 	c_webhook_primary_url = AutoExecConfig_CreateConVar("sm_serverstatus_webhook_primary_url", "", "Primary webhook URL.", FCVAR_PROTECTED);
 	c_webhook_admin = AutoExecConfig_CreateConVar("sm_serverstatus_webhook_admin_url", "", "Webhook for admin messages.", FCVAR_PROTECTED);
+	c_webhook_avatar_url = AutoExecConfig_CreateConVar("sm_serverstatus_webhook_avatar_url", "", "Avatar URL for the webhook.", FCVAR_PROTECTED);
 	c_delay = AutoExecConfig_CreateConVar("sm_serverstatus_delay", "20.0", "Delay between webhook messages to prevent spam.", FCVAR_NONE, true, 1.0, false);
 	c_remove1 = AutoExecConfig_CreateConVar("sm_serverstatus_remove", "", "Remove this part from servername", FCVAR_NONE);
 	c_remove2 = AutoExecConfig_CreateConVar("sm_serverstatus_remove2", "", "Remove this part from servername", FCVAR_NONE);
@@ -93,6 +95,7 @@ public void OnPluginStart()
 
 	c_webhook_primary_url.AddChangeHook(OnPrimaryURLChanged);
 	c_webhook_admin.AddChangeHook(OnAdminURLChanged);
+	c_webhook_avatar_url.AddChangeHook(OnDefaultWebHookAvatarChanged);
 
 	AutoExecConfig_ExecuteFile();
 	AutoExecConfig_CleanFile();
