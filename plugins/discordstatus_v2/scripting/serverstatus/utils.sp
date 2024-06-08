@@ -18,9 +18,9 @@ stock void GetClientSteamID(int client, char[] buffer, int size, AuthIdType type
 void GetServerName(char[] name, int size)
 {
 	FindConVar("hostname").GetString(name, size);
-	char replace1[32];
+	char replace1[128];
 	c_remove1.GetString(replace1, sizeof(replace1));
-	char replace2[32];
+	char replace2[128];
 	c_remove2.GetString(replace2, sizeof(replace2));
 
 	if(strlen(replace1) > 1) { ReplaceString(name, size, replace1, "", false); }
