@@ -28,6 +28,18 @@ Status messages includes:
 
 **SourceTV Manager** allows the plugin to send demo recording status notification and the current demo filename and tick.
 
+# Usage
+
+You need to set the webhooks URL and which messages you want to be enabled at `addons/sourcemod/configs/discordstatus.cfg`.
+
+A config file will be auto generated at `cfg/sourcemod/plugin.serverstatus.cfg` with some global settings.
+
+# Commands
+
+| Command |                     Description                     | Default Admin Flag |
+|:-------:|:---------------------------------------------------:|:------------------:|
+| sm_seed | Sends a seed request message to discord if enabled. |    None (Public)   |
+
 # Compiling
 
 The following libraries are **required** for the plugin to compile.

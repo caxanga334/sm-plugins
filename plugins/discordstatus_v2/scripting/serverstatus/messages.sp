@@ -479,4 +479,76 @@ void SendMessage_OnCallAdminReportHandled(int client, int id)
 	delete webhook;
 }
 
+void SendMessage_OnSeedRequest(int requestingClient)
+{
+	char mapname[64];
+	char servername[64];
+	GetServerName(servername, sizeof(servername));
+	GetMapName(mapname, sizeof(mapname));
+
+	char contents[128];
+
+	if (cfg_Seed.hasmention)
+	{
+		strcopy(contents, sizeof(contents), cfg_Seed.mention);
+	}
+	else
+	{
+		contents = "";
+	}
+
+	Webhook webhook = Config_CreateWebHook(contents, "Seed Request", cfg_Seed.key);
+	
+	char buffer[512];
+	Embed embed1 = new Embed(servername, "Seed request for this server!");
+	embed1.SetTimeStampNow();
+	embed1.SetColor(32768);
+
+	char steamid[MAX_AUTHID_LENGTH];
+
+	if (!GetClientAuthId(requestingClient, AuthId_SteamID64, steamid, sizeof(steamid)))
+	{
+		steamid = "";
+	}
+
+	FormatEx(buffer, sizeof(buffer), "%N (%s)", requestingClient, steamid);
+
+	EmbedField fieldclient = new EmbedField("Requester", buffer, false);
+	embed1.AddField(fieldclient);
+
+	if (cfg_Seed.sendIP && g_hasip)
+	{
+		int svport = 0;
+		GetServerHostPort(svport);
+		FormatEx(buffer, sizeof(buffer), "%s:%i", g_ipaddr, svport);
+
+		EmbedField fieldAddress = new EmbedField("IP Address", buffer, false);
+		embed1.AddField(fieldAddress);
+	}
+
+	EmbedField fieldmap = new EmbedField("Map", mapname, false);
+	embed1.AddField(fieldmap);
+
+	// TO-DO: Add more info for other games
+	if (g_engine == Engine_Left4Dead2)
+	{
+		ConVar mp_gamemode = FindConVar("mp_gamemode");
+
+		if (mp_gamemode != null)
+		{
+			mp_gamemode.GetString(buffer, sizeof(buffer));
+
+			EmbedField fieldGM = new EmbedField("Game Mode", buffer, false);
+			embed1.AddField(fieldGM);
+		}
+	}
+
+	webhook.AddEmbed(embed1); 
+
+	Config_GetWebHookURL("Seed", cfg_Seed.key, s_webhook_url, sizeof(s_webhook_url));
+	webhook.Execute(s_webhook_url, OnWebHookExecuted);
+
+	delete webhook;
+}
+
 #endif

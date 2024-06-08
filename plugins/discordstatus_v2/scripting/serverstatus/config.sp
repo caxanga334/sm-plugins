@@ -16,9 +16,19 @@ enum struct ServerStartConfig
 {
 	bool enabled;
 	char key[64];
-	bool sendIP;
 	char mention[128];
 	bool hasmention;
+	bool sendIP;
+}
+
+enum struct SeedConfig
+{
+	bool enabled;
+	char key[64];
+	char mention[128];
+	bool hasmention;
+	bool sendIP;
+	float cooldown;
 }
 
 BaseConfig cfg_JoinLeave;
@@ -26,6 +36,7 @@ ServerStartConfig cfg_ServerStart;
 BaseConfig cfg_GameEvents;
 BaseConfig cfg_CallAdmin;
 BaseConfig cfg_SourceTV;
+SeedConfig cfg_Seed;
 
 bool Config_IsWebhookURLValid(const char[] url)
 {
@@ -96,6 +107,12 @@ void Config_Init()
 	cfg_SourceTV.key = "";
 	cfg_SourceTV.hasmention = false;
 	cfg_SourceTV.mention = "";
+
+	cfg_Seed.enabled = false;
+	cfg_Seed.key = "";
+	cfg_Seed.hasmention = false;
+	cfg_Seed.mention = "";
+	cfg_Seed.sendIP = false;
 }
 
 void Config_Load()
@@ -294,15 +311,37 @@ void Config_Load()
 		}
 
 #endif
+
+		if (kv.JumpToKey("Seed"))
+		{
+			kv.GetString("Enabled", value, sizeof(value));
+			cfg_Seed.enabled = ConfigUtil_StringToBoolean(value);
+			kv.GetString("SendIP", value, sizeof(value));
+			cfg_Seed.sendIP = ConfigUtil_StringToBoolean(value);
+			kv.GetString("WebHookKey", cfg_Seed.key, sizeof(cfg_Seed.key));
+			kv.GetString("Mention", value, sizeof(value), "null");
+
+			if (strcmp(value, "null") != 0)
+			{
+				cfg_Seed.hasmention = true;
+				strcopy(cfg_Seed.mention, sizeof(cfg_Seed.mention), value);
+			}
+
+			cfg_Seed.cooldown = kv.GetFloat("Cooldown", 900.0);
+
+			kv.GoBack();
+		}
+
 		kv.GoBack();
 	}
 
 	LogMessage("Discord Server Status plugin configuration fully loaded.");
-	LogMessage("JoinLeave: %s ServerStart: %s GameEvents: %s CallAdmin: %s SourceTV: %s", cfg_JoinLeave.enabled ? "Enabled" : "Disabled",
+	LogMessage("JoinLeave: %s ServerStart: %s GameEvents: %s CallAdmin: %s SourceTV: %s Server Seed: %s", cfg_JoinLeave.enabled ? "Enabled" : "Disabled",
 		cfg_ServerStart.enabled ? "Enabled" : "Disabled",
 		cfg_GameEvents.enabled ? "Enabled" : "Disabled",
 		cfg_CallAdmin.enabled ? "Enabled" : "Disabled",
-		cfg_SourceTV.enabled ? "Enabled" : "Disabled");
+		cfg_SourceTV.enabled ? "Enabled" : "Disabled",
+		cfg_Seed.enabled ? "Enabled" : "Disabled");
 
 	delete kv;
 }

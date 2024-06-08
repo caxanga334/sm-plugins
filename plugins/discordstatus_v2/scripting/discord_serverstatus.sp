@@ -15,7 +15,7 @@
 #pragma newdecls required
 #pragma semicolon 1
 
-#define PLUGIN_VERSION "1.1.1"
+#define PLUGIN_VERSION "1.1.2"
 
 bool g_started; // Has the server started?
 bool g_hasip;
@@ -31,6 +31,7 @@ bool g_steampawn = false; // Is SteamPawn plugin installed?
 #endif
 char g_ipaddr[128];
 float g_delay;
+float g_seed_cooldown;
 EngineVersion g_engine;
 ConVar c_dns;
 ConVar c_delay;
@@ -79,6 +80,8 @@ public void OnPluginStart()
 	AutoExecConfig_ExecuteFile();
 	AutoExecConfig_CleanFile();
 
+	RegAdminCmd("sm_seed", ConCmd_Seed, 0, "Sends a seed request for this server.");
+
 	g_started = false;
 #if defined _l4dh_included
 	g_hasconfigs = false;
@@ -125,6 +128,7 @@ public void OnConfigsExecuted()
 public void OnMapStart()
 {
 	g_delay = 0.0;
+	g_seed_cooldown = 0.0;
 #if defined _l4dh_included
 	g_delay_l4d_gamemode = 0.0;
 	g_delay_l4d_generic = 0.0;
@@ -179,6 +183,39 @@ public void OnClientDisconnect(int client)
 			}
 		}
 	}
+}
+
+Action ConCmd_Seed(int client, int args)
+{
+	if (!client)
+	{
+		ReplyToCommand(client, "This command is only available in-game!");
+		return Plugin_Handled;
+	}
+
+	if (!cfg_Seed.enabled)
+	{
+		ReplyToCommand(client, "Seed is disabled on this server.");
+		return Plugin_Handled;
+	}
+
+	float now = GetGameTime();
+
+	if (g_seed_cooldown > now)
+	{
+		ReplyToCommand(client, "A seed request was sent recently, please wait %i seconds.", RoundToCeil(g_seed_cooldown - now));
+		return Plugin_Handled;
+	}
+
+	if (!g_hasip)
+	{
+		g_hasip = BuildServerIPAddr(g_ipaddr, sizeof(g_ipaddr));
+	}
+
+	g_seed_cooldown = now + cfg_Seed.cooldown;
+	LogMessage("%L sent a seed request.", client);
+	SendMessage_OnSeedRequest(client);
+	return Plugin_Handled;
 }
 
 public Action Timer_OnClientJoin(Handle timer, any data)
