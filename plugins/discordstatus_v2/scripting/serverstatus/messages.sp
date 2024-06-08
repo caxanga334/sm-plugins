@@ -25,7 +25,7 @@ void SendMessage_OnClientJoin(int client)
 		contents = "";
 	}
 
-	Webhook webhook = Init_Webhook(contents);
+	Webhook webhook = Config_CreateWebHook(contents, _, cfg_JoinLeave.key);
 
 	Embed embed1 = new Embed(servername, "Client joined the server!");
 	embed1.SetTimeStampNow();
@@ -79,7 +79,7 @@ void SendMessage_OnClientLeave()
 		contents = "";
 	}
 
-	Webhook webhook = Init_Webhook(contents);
+	Webhook webhook = Config_CreateWebHook(contents, _, cfg_JoinLeave.key);
 
 	Embed embed1 = new Embed(servername, "Client left the server!");
 	embed1.SetTimeStampNow();
@@ -122,7 +122,7 @@ void SendMessage_OnServerStart()
 		contents = "";
 	}
 
-	Webhook webhook = Init_Webhook(contents);
+	Webhook webhook = Config_CreateWebHook(contents, _, cfg_ServerStart.key);
 	
 	char buffer[128];
 	Embed embed1 = new Embed(servername, "Server started!");
@@ -183,7 +183,7 @@ void SendMessage_L4D_OnGameMode(int gamemode)
 		contents = "";
 	}
 
-	Webhook webhook = Init_Webhook(contents);
+	Webhook webhook = Config_CreateWebHook(contents, _, cfg_GameEvents.key);
 
 	Embed embed1 = new Embed(servername, "Game mode changed.");
 	embed1.SetTimeStampNow();
@@ -224,7 +224,7 @@ void SendMessage_L4D_OnRoundStart()
 		contents = "";
 	}
 
-	Webhook webhook = Init_Webhook(contents);
+	Webhook webhook = Config_CreateWebHook(contents, _, cfg_GameEvents.key);
 
 	Embed embed1 = new Embed(servername, "Round Started");
 	embed1.SetTimeStampNow();
@@ -269,7 +269,7 @@ void SendMessage_TF2_OnMvMWaveStart(int wave, int max)
 		contents = "";
 	}
 
-	Webhook webhook = Init_Webhook(contents);
+	Webhook webhook = Config_CreateWebHook(contents, _, cfg_GameEvents.key);
 
 	Embed embed1 = new Embed(servername, "Mann vs Machine Wave Started");
 	embed1.SetTimeStampNow();
@@ -311,7 +311,7 @@ void SendMessage_OnSTVRecordingStart(const char[] filename)
 		contents = "";
 	}
 
-	Webhook webhook = Init_Webhook(contents);
+	Webhook webhook = Config_CreateWebHook(contents, _, cfg_SourceTV.key);
 
 	Embed embed1 = new Embed(servername, "Demo recording started");
 	embed1.SetTimeStampNow();
@@ -373,7 +373,7 @@ void SendMessage_OnCallAdminReport(int client, int target, const char[] reason)
 		contents = "";
 	}
 
-	Webhook webhook = Init_Webhook(contents, "Call Admin");
+	Webhook webhook = Config_CreateWebHook(contents, "Call Admin", cfg_CallAdmin.key);
 
 	FormatEx(tmp, sizeof(tmp), "Player reported - Report ID %i", CallAdmin_GetReportID());
 	Embed embed1 = new Embed(servername, tmp);
@@ -445,7 +445,7 @@ void SendMessage_OnCallAdminReportHandled(int client, int id)
 		contents = "";
 	}
 
-	Webhook webhook = Init_Webhook(contents, "Call Admin");
+	Webhook webhook = Config_CreateWebHook(contents, "Call Admin", cfg_CallAdmin.key);
 
 	FormatEx(tmp, sizeof(tmp), "Reported Handled - %i", id);
 	Embed embed1 = new Embed(servername, tmp);

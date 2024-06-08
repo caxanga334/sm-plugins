@@ -1,6 +1,8 @@
 // Server Status config loader
 
 static StringMap g_webhookURLs = null;
+static StringMap g_webhookNames = null;
+static StringMap g_webhookAvatars = null;
 
 enum struct BaseConfig
 {
@@ -103,10 +105,16 @@ void Config_Load()
 	if (g_webhookURLs != null)
 	{
 		delete g_webhookURLs;
+		delete g_webhookNames;
+		delete g_webhookAvatars;
 		g_webhookURLs = null;
+		g_webhookNames = null;
+		g_webhookAvatars = null;
 	}
 
 	g_webhookURLs = new StringMap();
+	g_webhookNames = new StringMap();
+	g_webhookAvatars = new StringMap();
 
 	char file[PLATFORM_MAX_PATH];
 	KeyValues kv = new KeyValues("DiscordStatus");
@@ -156,6 +164,38 @@ void Config_Load()
 			kv.GoBack();
 		}
 
+		kv.GoBack();
+	}
+
+	if (kv.JumpToKey("WebHookConfig"))
+	{
+		StringMapSnapshot snapshot = g_webhookURLs.Snapshot();
+
+		for (int i = 0; i < snapshot.Length; i++)
+		{
+			snapshot.GetKey(i, key, sizeof(key));
+
+			if (kv.JumpToKey(key))
+			{
+				kv.GetString("Name", value, sizeof(value));
+
+				if (strlen(value) > 3)
+				{
+					g_webhookNames.SetString(key, value);
+				}
+				
+				kv.GetString("Avatar", value, sizeof(value));
+
+				if (StrContains(value, "http", false) != -1)
+				{
+					g_webhookAvatars.SetString(key, value);
+				}
+
+				kv.GoBack();
+			}
+		}
+
+		delete snapshot;
 		kv.GoBack();
 	}
 
@@ -265,4 +305,27 @@ void Config_Load()
 		cfg_SourceTV.enabled ? "Enabled" : "Disabled");
 
 	delete kv;
+}
+
+Webhook Config_CreateWebHook(const char[] contents = "", const char[] defaultusername = "Server Status", const char[] key)
+{
+	char buffer[1024];
+
+	Webhook wh = new Webhook(contents);
+
+	if (g_webhookNames.GetString(key, buffer, sizeof(buffer)))
+	{
+		wh.SetUsername(buffer);
+	}
+	else
+	{
+		wh.SetUsername(defaultusername);
+	}
+
+	if (g_webhookAvatars.GetString(key, buffer, sizeof(buffer)))
+	{
+		wh.SetAvatarURL(buffer);
+	}
+
+	return wh;
 }
