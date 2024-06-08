@@ -1,0 +1,268 @@
+// Server Status config loader
+
+static StringMap g_webhookURLs = null;
+
+enum struct BaseConfig
+{
+	bool enabled;
+	char key[64];
+	char mention[128];
+	bool hasmention;
+}
+
+enum struct ServerStartConfig
+{
+	bool enabled;
+	char key[64];
+	bool sendIP;
+	char mention[128];
+	bool hasmention;
+}
+
+BaseConfig cfg_JoinLeave;
+ServerStartConfig cfg_ServerStart;
+BaseConfig cfg_GameEvents;
+BaseConfig cfg_CallAdmin;
+BaseConfig cfg_SourceTV;
+
+bool Config_IsWebhookURLValid(const char[] url)
+{
+	if (StrContains(url, "discord.com/api/webhooks/") == -1)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+void Config_GetWebHookURL(const char[] requester, const char[] key, char[] out, int size)
+{
+	if (!g_webhookURLs.GetString(key, out, size))
+	{
+		ThrowError("Failed to get Webhook URL from Key ID \"%s\" for \"%s\"!", key, requester);
+	}
+}
+
+bool ConfigUtil_StringToBoolean(const char[] str)
+{
+	if (strncmp(str, "yes", 3, false) == 0)
+	{
+		return true;
+	}
+	if (strncmp(str, "true", 4, false) == 0)
+	{
+		return true;
+	}
+	if (strncmp(str, "no", 2, false) == 0)
+	{
+		return false;
+	}
+	if (strncmp(str, "false", 5, false) == 0)
+	{
+		return false;
+	}
+
+	int i = StringToInt(str);
+
+	return i != 0;
+}
+
+void Config_Init()
+{
+	cfg_JoinLeave.enabled = false;
+	cfg_JoinLeave.key = "";
+	cfg_JoinLeave.hasmention = false;
+	cfg_JoinLeave.mention = "";
+
+	cfg_ServerStart.enabled = false;
+	cfg_ServerStart.key = "";
+	cfg_ServerStart.hasmention = false;
+	cfg_ServerStart.sendIP = false;
+	cfg_ServerStart.mention = "";
+
+	cfg_GameEvents.enabled = false;
+	cfg_GameEvents.key = "";
+	cfg_GameEvents.hasmention = false;
+	cfg_GameEvents.mention = "";
+
+	cfg_CallAdmin.enabled = false;
+	cfg_CallAdmin.key = "";
+	cfg_CallAdmin.hasmention = false;
+	cfg_CallAdmin.mention = "";
+
+	cfg_SourceTV.enabled = false;
+	cfg_SourceTV.key = "";
+	cfg_SourceTV.hasmention = false;
+	cfg_SourceTV.mention = "";
+}
+
+void Config_Load()
+{
+	Config_Init();
+
+	if (g_webhookURLs != null)
+	{
+		delete g_webhookURLs;
+		g_webhookURLs = null;
+	}
+
+	g_webhookURLs = new StringMap();
+
+	char file[PLATFORM_MAX_PATH];
+	KeyValues kv = new KeyValues("DiscordStatus");
+	BuildPath(Path_SM, file, sizeof(file), "configs/discordstatus.cfg");
+
+	if (!kv.ImportFromFile(file))
+	{
+		SetFailState("Failed to load config file \"%s\"", file);
+	}
+
+	char key[64];
+	char value[WEBHOOK_URL_MAX_SIZE];    
+
+	if (!kv.JumpToKey("WebHookURLs", false))
+	{
+		SetFailState("Failed to find key \"WebHookURLs\"!");
+	}
+	else
+	{
+		if (!kv.GotoFirstSubKey(false))
+		{
+			SetFailState("Invalid config file!");
+		}
+		else
+		{
+			do
+			{
+				kv.GetSectionName(key, sizeof(key));
+				kv.GetString(NULL_STRING, value, sizeof(value));
+
+				if (g_webhookURLs.ContainsKey(key))
+				{
+					LogError("Duplicate webhook ID \"%s\"!", key);
+					continue;
+				}
+
+				if (!Config_IsWebhookURLValid(value))
+				{
+					LogError("%s: Invalid webhook URL \"%s\"", key, value);
+					continue;
+				}
+
+				g_webhookURLs.SetString(key, value);
+			}
+			while(kv.GotoNextKey(false))
+
+			kv.GoBack();
+		}
+
+		kv.GoBack();
+	}
+
+	if (!kv.JumpToKey("Messages"))
+	{
+		SetFailState("Failed to find \"Messages\" key!");
+	}
+	else
+	{
+		if (kv.JumpToKey("JoinLeave"))
+		{
+			kv.GetString("Enabled", value, sizeof(value));
+			cfg_JoinLeave.enabled = ConfigUtil_StringToBoolean(value);
+			kv.GetString("WebHookKey", cfg_JoinLeave.key, sizeof(cfg_JoinLeave.key));
+			kv.GetString("Mention", value, sizeof(value), "null");
+
+			if (strcmp(value, "null") != 0)
+			{
+				cfg_JoinLeave.hasmention = true;
+				strcopy(cfg_JoinLeave.mention, sizeof(cfg_JoinLeave.mention), value);
+			}
+
+			kv.GoBack();
+		}
+
+		if (kv.JumpToKey("ServerStart"))
+		{
+			kv.GetString("Enabled", value, sizeof(value));
+			cfg_ServerStart.enabled = ConfigUtil_StringToBoolean(value);
+			kv.GetString("SendIP", value, sizeof(value));
+			cfg_ServerStart.sendIP = ConfigUtil_StringToBoolean(value);
+			kv.GetString("WebHookKey", cfg_ServerStart.key, sizeof(cfg_ServerStart.key));
+			kv.GetString("Mention", value, sizeof(value), "null");
+
+			if (strcmp(value, "null") != 0)
+			{
+				cfg_ServerStart.hasmention = true;
+				strcopy(cfg_ServerStart.mention, sizeof(cfg_ServerStart.mention), value);
+			}
+
+			kv.GoBack();
+		}
+
+		if (kv.JumpToKey("GameEvents"))
+		{
+			kv.GetString("Enabled", value, sizeof(value));
+			cfg_GameEvents.enabled = ConfigUtil_StringToBoolean(value);
+			kv.GetString("WebHookKey", cfg_GameEvents.key, sizeof(cfg_GameEvents.key));
+			kv.GetString("Mention", value, sizeof(value), "null");
+
+			if (strcmp(value, "null") != 0)
+			{
+				cfg_GameEvents.hasmention = true;
+				strcopy(cfg_GameEvents.mention, sizeof(cfg_GameEvents.mention), value);
+			}
+
+			kv.GoBack();
+		}
+
+#if defined _calladmin_included
+
+		if (kv.JumpToKey("CallAdmin"))
+		{
+			kv.GetString("Enabled", value, sizeof(value));
+			cfg_CallAdmin.enabled = ConfigUtil_StringToBoolean(value);
+			kv.GetString("WebHookKey", cfg_CallAdmin.key, sizeof(cfg_CallAdmin.key));
+			kv.GetString("Mention", value, sizeof(value), "null");
+
+			if (strcmp(value, "null") != 0)
+			{
+				cfg_CallAdmin.hasmention = true;
+				strcopy(cfg_CallAdmin.mention, sizeof(cfg_CallAdmin.mention), value);
+			}
+
+			kv.GoBack();
+		}
+
+#endif
+
+#if defined _stvmngr_included
+
+		if (kv.JumpToKey("SourceTV"))
+		{
+			kv.GetString("Enabled", value, sizeof(value));
+			cfg_SourceTV.enabled = ConfigUtil_StringToBoolean(value);
+			kv.GetString("WebHookKey", cfg_SourceTV.key, sizeof(cfg_SourceTV.key));
+			kv.GetString("Mention", value, sizeof(value), "null");
+
+			if (strcmp(value, "null") != 0)
+			{
+				cfg_SourceTV.hasmention = true;
+				strcopy(cfg_SourceTV.mention, sizeof(cfg_SourceTV.mention), value);
+			}
+
+			kv.GoBack();
+		}
+
+#endif
+		kv.GoBack();
+	}
+
+	LogMessage("Discord Server Status plugin configuration fully loaded.");
+	LogMessage("JoinLeave: %s ServerStart: %s GameEvents: %s CallAdmin: %s SourceTV: %s", cfg_JoinLeave.enabled ? "Enabled" : "Disabled",
+		cfg_ServerStart.enabled ? "Enabled" : "Disabled",
+		cfg_GameEvents.enabled ? "Enabled" : "Disabled",
+		cfg_CallAdmin.enabled ? "Enabled" : "Disabled",
+		cfg_SourceTV.enabled ? "Enabled" : "Disabled");
+
+	delete kv;
+}

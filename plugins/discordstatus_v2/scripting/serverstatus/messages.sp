@@ -1,6 +1,9 @@
 
 #include "webhook_util.sp"
 
+// shared webhook url buffer
+static char s_webhook_url[WEBHOOK_URL_MAX_SIZE];
+
 void SendMessage_OnClientJoin(int client)
 {
 	if(!client) { return; }
@@ -11,8 +14,18 @@ void SendMessage_OnClientJoin(int client)
 	GetServerName(servername, sizeof(servername));
 	GetMapName(mapname, sizeof(mapname));
 
+	char contents[128];
 
-	Webhook webhook = Init_Webhook();
+	if (cfg_JoinLeave.hasmention)
+	{
+		strcopy(contents, sizeof(contents), cfg_JoinLeave.mention);
+	}
+	else
+	{
+		contents = "";
+	}
+
+	Webhook webhook = Init_Webhook(contents);
 
 	Embed embed1 = new Embed(servername, "Client joined the server!");
 	embed1.SetTimeStampNow();
@@ -41,7 +54,8 @@ void SendMessage_OnClientJoin(int client)
 
 	webhook.AddEmbed(embed1); 
 
-	webhook.Execute(g_primarywebhook, OnWebHookExecuted);
+	Config_GetWebHookURL("JoinLeave", cfg_JoinLeave.key, s_webhook_url, sizeof(s_webhook_url));
+	webhook.Execute(s_webhook_url, OnWebHookExecuted);
 
 	delete webhook;
 }
@@ -54,8 +68,18 @@ void SendMessage_OnClientLeave()
 	GetServerName(servername, sizeof(servername));
 	GetMapName(mapname, sizeof(mapname));
 
+	char contents[128];
 
-	Webhook webhook = Init_Webhook();
+	if (cfg_JoinLeave.hasmention)
+	{
+		strcopy(contents, sizeof(contents), cfg_JoinLeave.mention);
+	}
+	else
+	{
+		contents = "";
+	}
+
+	Webhook webhook = Init_Webhook(contents);
 
 	Embed embed1 = new Embed(servername, "Client left the server!");
 	embed1.SetTimeStampNow();
@@ -71,7 +95,8 @@ void SendMessage_OnClientLeave()
 
 	webhook.AddEmbed(embed1); 
 
-	webhook.Execute(g_primarywebhook, OnWebHookExecuted);
+	Config_GetWebHookURL("JoinLeave", cfg_JoinLeave.key, s_webhook_url, sizeof(s_webhook_url));
+	webhook.Execute(s_webhook_url, OnWebHookExecuted);
 
 	delete webhook;
 }
@@ -86,14 +111,25 @@ void SendMessage_OnServerStart()
 	GetServerName(servername, sizeof(servername));
 	GetMapName(mapname, sizeof(mapname));
 
-	Webhook webhook = Init_Webhook();
+	char contents[128];
+
+	if (cfg_ServerStart.hasmention)
+	{
+		strcopy(contents, sizeof(contents), cfg_ServerStart.mention);
+	}
+	else
+	{
+		contents = "";
+	}
+
+	Webhook webhook = Init_Webhook(contents);
 	
 	char buffer[128];
 	Embed embed1 = new Embed(servername, "Server started!");
 	embed1.SetTimeStampNow();
 	embed1.SetColor(5763719);
 
-	if (c_announceIP.BoolValue)
+	if (cfg_ServerStart.sendIP)
 	{
 		int svport = 0;
 		GetServerHostPort(svport);
@@ -107,7 +143,9 @@ void SendMessage_OnServerStart()
 	embed1.AddField(fieldmap);
 
 	webhook.AddEmbed(embed1); 
-	webhook.Execute(g_primarywebhook, OnWebHookExecuted);
+
+	Config_GetWebHookURL("ServerStart", cfg_ServerStart.key, s_webhook_url, sizeof(s_webhook_url));
+	webhook.Execute(s_webhook_url, OnWebHookExecuted);
 
 	delete webhook;
 }
@@ -134,7 +172,18 @@ void SendMessage_L4D_OnGameMode(int gamemode)
 		default: return;
 	}
 
-	Webhook webhook = Init_Webhook();
+	char contents[128];
+
+	if (cfg_GameEvents.hasmention)
+	{
+		strcopy(contents, sizeof(contents), cfg_GameEvents.mention);
+	}
+	else
+	{
+		contents = "";
+	}
+
+	Webhook webhook = Init_Webhook(contents);
 
 	Embed embed1 = new Embed(servername, "Game mode changed.");
 	embed1.SetTimeStampNow();
@@ -148,7 +197,8 @@ void SendMessage_L4D_OnGameMode(int gamemode)
 
 	webhook.AddEmbed(embed1); 
 
-	webhook.Execute(g_primarywebhook, OnWebHookExecuted);
+	Config_GetWebHookURL("GameEvents", cfg_GameEvents.key, s_webhook_url, sizeof(s_webhook_url));
+	webhook.Execute(s_webhook_url, OnWebHookExecuted);
 
 	delete webhook;
 }
@@ -163,7 +213,18 @@ void SendMessage_L4D_OnRoundStart()
 	GetServerName(servername, sizeof(servername));
 	GetMapName(mapname, sizeof(mapname));
 
-	Webhook webhook = Init_Webhook();
+	char contents[128];
+
+	if (cfg_GameEvents.hasmention)
+	{
+		strcopy(contents, sizeof(contents), cfg_GameEvents.mention);
+	}
+	else
+	{
+		contents = "";
+	}
+
+	Webhook webhook = Init_Webhook(contents);
 
 	Embed embed1 = new Embed(servername, "Round Started");
 	embed1.SetTimeStampNow();
@@ -174,7 +235,8 @@ void SendMessage_L4D_OnRoundStart()
 
 	webhook.AddEmbed(embed1); 
 
-	webhook.Execute(g_primarywebhook, OnWebHookExecuted);
+	Config_GetWebHookURL("GameEvents", cfg_GameEvents.key, s_webhook_url, sizeof(s_webhook_url));
+	webhook.Execute(s_webhook_url, OnWebHookExecuted);
 
 	delete webhook;
 }
@@ -196,7 +258,18 @@ void SendMessage_TF2_OnMvMWaveStart(int wave, int max)
 	TF2MvM_GetMissionName(missioname, sizeof(missioname));
 	FormatEx(waveinfo, sizeof(waveinfo), "%i of %i waves", wave, max);
 
-	Webhook webhook = Init_Webhook();
+	char contents[128];
+
+	if (cfg_GameEvents.hasmention)
+	{
+		strcopy(contents, sizeof(contents), cfg_GameEvents.mention);
+	}
+	else
+	{
+		contents = "";
+	}
+
+	Webhook webhook = Init_Webhook(contents);
 
 	Embed embed1 = new Embed(servername, "Mann vs Machine Wave Started");
 	embed1.SetTimeStampNow();
@@ -213,7 +286,8 @@ void SendMessage_TF2_OnMvMWaveStart(int wave, int max)
 
 	webhook.AddEmbed(embed1); 
 
-	webhook.Execute(g_primarywebhook, OnWebHookExecuted);
+	Config_GetWebHookURL("GameEvents", cfg_GameEvents.key, s_webhook_url, sizeof(s_webhook_url));
+	webhook.Execute(s_webhook_url, OnWebHookExecuted);
 
 	delete webhook;
 }
@@ -226,7 +300,18 @@ void SendMessage_OnSTVRecordingStart(const char[] filename)
 	GetServerName(servername, sizeof(servername));
 	Format(servername, sizeof(servername), "[SourceTV] %s", servername);
 
-	Webhook webhook = Init_Webhook();
+	char contents[128];
+
+	if (cfg_SourceTV.hasmention)
+	{
+		strcopy(contents, sizeof(contents), cfg_SourceTV.mention);
+	}
+	else
+	{
+		contents = "";
+	}
+
+	Webhook webhook = Init_Webhook(contents);
 
 	Embed embed1 = new Embed(servername, "Demo recording started");
 	embed1.SetTimeStampNow();
@@ -237,7 +322,8 @@ void SendMessage_OnSTVRecordingStart(const char[] filename)
 
 	webhook.AddEmbed(embed1); 
 
-	webhook.Execute(g_primarywebhook, OnWebHookExecuted);
+	Config_GetWebHookURL("SourceTV", cfg_SourceTV.key, s_webhook_url, sizeof(s_webhook_url));
+	webhook.Execute(s_webhook_url, OnWebHookExecuted);
 
 	delete webhook;
 }
@@ -252,11 +338,6 @@ void SendMessage_OnCallAdminReport(int client, int target, const char[] reason)
 	char tmp[128];
 	char name1[MAX_NAME_LENGTH];
 	char name2[MAX_NAME_LENGTH];
-
-	if (!IsWebhookURLValid(g_adminwebhook))
-	{
-		return; // Call Admin is optional
-	}
 
 	GetServerName(servername, sizeof(servername));
 	Format(servername, sizeof(servername), "[CallAdmin] %s", servername);
@@ -281,15 +362,18 @@ void SendMessage_OnCallAdminReport(int client, int target, const char[] reason)
 		FormatEx(name2, sizeof(name2), "Unknown");
 	}
 
-	char mention[64];
-	c_calladmin_mention.GetString(mention, sizeof(mention));
+	char contents[128];
 
-	if (!mention[0])
+	if (cfg_CallAdmin.hasmention)
 	{
-		mention = "@here";
+		strcopy(contents, sizeof(contents), cfg_CallAdmin.mention);
+	}
+	else
+	{
+		contents = "";
 	}
 
-	Webhook webhook = Init_Webhook(.username = "Call Admin");
+	Webhook webhook = Init_Webhook(contents, "Call Admin");
 
 	FormatEx(tmp, sizeof(tmp), "Player reported - Report ID %i", CallAdmin_GetReportID());
 	Embed embed1 = new Embed(servername, tmp);
@@ -325,7 +409,8 @@ void SendMessage_OnCallAdminReport(int client, int target, const char[] reason)
 
 	webhook.AddEmbed(embed1); 
 
-	webhook.Execute(g_adminwebhook, OnWebHookExecuted);
+	Config_GetWebHookURL("CallAdmin", cfg_CallAdmin.key, s_webhook_url, sizeof(s_webhook_url));
+	webhook.Execute(s_webhook_url, OnWebHookExecuted);
 
 	delete webhook;
 }
@@ -335,11 +420,6 @@ void SendMessage_OnCallAdminReportHandled(int client, int id)
 	char servername[96];
 	char tmp[128];
 	char name1[MAX_NAME_LENGTH];
-
-	if (!IsWebhookURLValid(g_adminwebhook))
-	{
-		return; // Call Admin is optional
-	}
 
 	GetServerName(servername, sizeof(servername));
 	Format(servername, sizeof(servername), "[CallAdmin] %s", servername);
@@ -354,7 +434,18 @@ void SendMessage_OnCallAdminReportHandled(int client, int id)
 		FormatEx(name1, sizeof(name1), "SERVER");
 	}
 
-	Webhook webhook = Init_Webhook(.username = "Call Admin");
+	char contents[128];
+
+	if (cfg_CallAdmin.hasmention)
+	{
+		strcopy(contents, sizeof(contents), cfg_CallAdmin.mention);
+	}
+	else
+	{
+		contents = "";
+	}
+
+	Webhook webhook = Init_Webhook(contents, "Call Admin");
 
 	FormatEx(tmp, sizeof(tmp), "Reported Handled - %i", id);
 	Embed embed1 = new Embed(servername, tmp);
@@ -382,7 +473,8 @@ void SendMessage_OnCallAdminReportHandled(int client, int id)
 
 	webhook.AddEmbed(embed1); 
 
-	webhook.Execute(g_adminwebhook, OnWebHookExecuted);
+	Config_GetWebHookURL("CallAdmin", cfg_CallAdmin.key, s_webhook_url, sizeof(s_webhook_url));
+	webhook.Execute(s_webhook_url, OnWebHookExecuted);
 
 	delete webhook;
 }

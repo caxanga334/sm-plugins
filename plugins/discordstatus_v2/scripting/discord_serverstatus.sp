@@ -15,7 +15,7 @@
 #pragma newdecls required
 #pragma semicolon 1
 
-#define PLUGIN_VERSION "1.0.3"
+#define PLUGIN_VERSION "1.1.0"
 
 bool g_started; // Has the server started?
 bool g_hasip;
@@ -30,23 +30,14 @@ bool g_sourcetvmanager = false; // Is the SourceTV manager extension installed?
 bool g_steampawn = false; // Is SteamPawn plugin installed?
 #endif
 char g_ipaddr[128];
-char g_primarywebhook[WEBHOOK_URL_MAX_SIZE];
-char g_adminwebhook[WEBHOOK_URL_MAX_SIZE];
 float g_delay;
 EngineVersion g_engine;
-ConVar c_webhook_primary_url;
-ConVar c_webhook_admin;
-ConVar c_webhook_avatar_url;
+ConVar c_dns;
 ConVar c_delay;
 ConVar c_remove1;
 ConVar c_remove2;
-ConVar c_dns;
-ConVar c_announcestart;
-ConVar c_announceIP;
-#if defined _calladmin_included
-ConVar c_calladmin_mention;
-#endif
 
+#include "serverstatus/config.sp"
 #include "serverstatus/utils.sp"
 #include "serverstatus/messages.sp"
 #include "serverstatus/left4dead.sp"
@@ -80,22 +71,10 @@ public void OnPluginStart()
 	AutoExecConfig_SetFile("plugin.serverstatus");
 
 	AutoExecConfig_CreateConVar("sm_serverstatus_version", PLUGIN_VERSION, "Plugin version", FCVAR_DONTRECORD|FCVAR_NOTIFY);
-	c_webhook_primary_url = AutoExecConfig_CreateConVar("sm_serverstatus_webhook_primary_url", "", "Primary webhook URL.", FCVAR_PROTECTED);
-	c_webhook_admin = AutoExecConfig_CreateConVar("sm_serverstatus_webhook_admin_url", "", "Webhook for admin messages.", FCVAR_PROTECTED);
-	c_webhook_avatar_url = AutoExecConfig_CreateConVar("sm_serverstatus_webhook_avatar_url", "", "Avatar URL for the webhook.", FCVAR_PROTECTED);
-	c_delay = AutoExecConfig_CreateConVar("sm_serverstatus_delay", "20.0", "Delay between webhook messages to prevent spam.", FCVAR_NONE, true, 1.0, false);
+	c_dns = AutoExecConfig_CreateConVar("sm_serverstatus_dns", "", "Send the server IP as a domain name (eg: tf2.example.com) instead", FCVAR_NONE);
+	c_delay = AutoExecConfig_CreateConVar("sm_serverstatus_delay", "10.0", "Delay between webhook messages to prevent spam.", FCVAR_NONE, true, 1.0, false);
 	c_remove1 = AutoExecConfig_CreateConVar("sm_serverstatus_remove", "", "Remove this part from servername", FCVAR_NONE);
 	c_remove2 = AutoExecConfig_CreateConVar("sm_serverstatus_remove2", "", "Remove this part from servername", FCVAR_NONE);
-	c_dns = AutoExecConfig_CreateConVar("sm_serverstatus_dns", "", "Send the server IP as a domain name (eg: tf2.example.com) instead", FCVAR_NONE);
-	c_announcestart = AutoExecConfig_CreateConVar("sm_serverstatus_alert_start", "1", "Sends a message when the server starts", FCVAR_NONE, true, 0.0, true, 1.0);
-	c_announceIP = AutoExecConfig_CreateConVar("sm_serverstatus_show_server_ip", "1", "Shows the server IP address on the server start message?", FCVAR_NONE, true, 0.0, true, 1.0);
-#if defined _calladmin_included
-	c_calladmin_mention = AutoExecConfig_CreateConVar("gp_discord_calladmin_mention", "@here", "Role to mention when sending CallAdmin messages. \nTo mention a specific role, use <@&ROLE_ID_HERE>", FCVAR_NONE);
-#endif
-
-	c_webhook_primary_url.AddChangeHook(OnPrimaryURLChanged);
-	c_webhook_admin.AddChangeHook(OnAdminURLChanged);
-	c_webhook_avatar_url.AddChangeHook(OnDefaultWebHookAvatarChanged);
 
 	AutoExecConfig_ExecuteFile();
 	AutoExecConfig_CleanFile();
@@ -104,6 +83,8 @@ public void OnPluginStart()
 #if defined _l4dh_included
 	g_hasconfigs = false;
 #endif
+
+	Config_Load();
 }
 
 public void OnAllPluginsLoaded()
@@ -139,11 +120,6 @@ public void OnConfigsExecuted()
 #if defined _l4dh_included
 	g_hasconfigs = true;
 #endif
-
-	c_webhook_primary_url.GetString(g_primarywebhook, sizeof(g_primarywebhook));
-	c_webhook_admin.GetString(g_adminwebhook, sizeof(g_adminwebhook));
-
-	CreateTimer(0.2, Timer_ValidateURL, .flags = TIMER_FLAG_NO_MAPCHANGE);
 }
 
 public void OnMapStart()
@@ -154,6 +130,11 @@ public void OnMapStart()
 	g_delay_l4d_generic = 0.0;
 #endif
 
+	if (!cfg_ServerStart.enabled)
+	{
+		return;
+	}
+
 #if defined __steampawn_included
 	if (!g_hasip)
 	{
@@ -162,7 +143,7 @@ public void OnMapStart()
 #else
 	g_hasip = BuildServerIPAddr(g_ipaddr, sizeof(g_ipaddr));
 
-	if (g_hasip && !g_started && c_announcestart.BoolValue)
+	if (g_hasip && !g_started)
 	{
 		g_started = true;
 		CreateTimer(15.0, Timer_OnServerStart, _, TIMER_FLAG_NO_MAPCHANGE);
@@ -172,24 +153,30 @@ public void OnMapStart()
 
 public void OnClientPutInServer(int client)
 {
-	g_hasfullyjoined[client] = true;
-
-	if (g_delay <= GetGameTime() && !IsFakeClient(client))
+	if (cfg_JoinLeave.enabled)
 	{
-		g_delay = GetGameTime() + c_delay.FloatValue;
-		CreateTimer(1.0, Timer_OnClientJoin, GetClientSerial(client), TIMER_FLAG_NO_MAPCHANGE);
+		g_hasfullyjoined[client] = true;
+
+		if (g_delay <= GetGameTime() && !IsFakeClient(client))
+		{
+			g_delay = GetGameTime() + c_delay.FloatValue;
+			CreateTimer(1.0, Timer_OnClientJoin, GetClientSerial(client), TIMER_FLAG_NO_MAPCHANGE);
+		}
 	}
 }
 
 public void OnClientDisconnect(int client)
 {
-	if (g_hasfullyjoined[client] && !IsFakeClient(client))
+	if (cfg_JoinLeave.enabled)
 	{
-		g_hasfullyjoined[client] = false;
-		if(g_delay <= GetGameTime())
+		if (g_hasfullyjoined[client] && !IsFakeClient(client))
 		{
-			g_delay = GetGameTime() + c_delay.FloatValue;
-			CreateTimer(1.0, Timer_OnClientLeave, _, TIMER_FLAG_NO_MAPCHANGE);
+			g_hasfullyjoined[client] = false;
+			if(g_delay <= GetGameTime())
+			{
+				g_delay = GetGameTime() + c_delay.FloatValue;
+				CreateTimer(1.0, Timer_OnClientLeave, _, TIMER_FLAG_NO_MAPCHANGE);
+			}
 		}
 	}
 }
@@ -218,7 +205,7 @@ public Action Timer_SDR_BuildIP(Handle timer)
 {
 	g_hasip = BuildServerIPAddr(g_ipaddr, sizeof(g_ipaddr));
 
-	if (g_hasip && !g_started && c_announcestart.BoolValue)
+	if (g_hasip && !g_started)
 	{
 		g_started = true;
 		CreateTimer(15.0, Timer_OnServerStart, _, TIMER_FLAG_NO_MAPCHANGE);
@@ -228,22 +215,6 @@ public Action Timer_SDR_BuildIP(Handle timer)
 }
 #endif
 
-// Checks if we have a valid discord webhook url
-public Action Timer_ValidateURL(Handle timer)
-{
-	if (StrContains(g_primarywebhook, "discord.com/api/webhooks/") == -1)
-	{
-		SetFailState("Primary Webhook URL not set! The plugin cannot function without it. Set it at \"cfg/sourcemod/plugin.serverstatus.cfg\".");
-	}
-
-	if (StrContains(g_adminwebhook, "discord.com/api/webhooks/") == -1)
-	{
-		LogMessage("Admin webhook not set or misconfigured. Admin messages unavailable.");
-	}
-
-	return Plugin_Stop;
-}
-
 public void OnWebHookExecuted(HTTPResponse response, any value, const char[] error)
 {
 	if (response.Status != HTTPStatus_OK)
@@ -251,14 +222,4 @@ public void OnWebHookExecuted(HTTPResponse response, any value, const char[] err
 		LogError("Failed to send webhook message! Status: %i Error: %s", view_as<int>(response.Status), error);
 		return;
 	}
-}
-
-void OnPrimaryURLChanged(ConVar convar, const char[] oldValue, const char[] newValue)
-{
-	convar.GetString(g_primarywebhook, sizeof(g_primarywebhook));
-}
-
-void OnAdminURLChanged(ConVar convar, const char[] oldValue, const char[] newValue)
-{
-	convar.GetString(g_adminwebhook, sizeof(g_adminwebhook));
 }

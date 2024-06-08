@@ -139,6 +139,10 @@ jobs:
         run: |
           rsync -rv ${{ env.BUILD_PATH }}/*.smx ${{ env.BINARY_PATH }}/
 
+      - name: Move Additional Files to Package Directory
+        run: |
+          rsync -rv ${{ github.workspace }}/sourcefiles/plugins/discordstatus_v2/configs/* ${{ env.CONFIGS_PATH }}/
+
       - name: Fetch Short SHA
         uses: benjlevesque/short-sha@v3.0
         id: short-sha

@@ -46,7 +46,10 @@ void TF2MvM_GetMissionName(char[] name, int size)
 
 void EV_TF2_OnMvMWaveStart(Event event, const char[] name, bool dontBroadcast)
 {
-    int wave = event.GetInt("wave_index", -1);
-    int max = event.GetInt("max_waves", -1);
-    SendMessage_TF2_OnMvMWaveStart(wave + 1, max);
+	if (!cfg_GameEvents.enabled)
+		return;
+
+	int wave = event.GetInt("wave_index", -1);
+	int max = event.GetInt("max_waves", -1);
+	SendMessage_TF2_OnMvMWaveStart(wave + 1, max);
 }
