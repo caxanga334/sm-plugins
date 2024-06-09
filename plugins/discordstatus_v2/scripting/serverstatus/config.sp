@@ -380,6 +380,14 @@ void Config_Load()
 		kv.GoBack();
 	}
 
+	delete kv;
+
+	if (g_webhookURLs.Size == 0)
+	{
+		LogError("Set URLs at \"%s\"", file);
+		SetFailState("No valids webhook URLs added to the config file.");
+	}
+
 	LogMessage("Discord Server Status plugin configuration fully loaded.");
 	LogMessage("JoinLeave: %s ServerStart: %s GameEvents: %s CallAdmin: %s SourceTV: %s Server Seed: %s SourceBans: %s", 
 		cfg_JoinLeave.enabled ? "Enabled" : "Disabled",
@@ -389,8 +397,6 @@ void Config_Load()
 		cfg_SourceTV.enabled ? "Enabled" : "Disabled",
 		cfg_Seed.enabled ? "Enabled" : "Disabled",
 		cfg_SourceBans.enabled ? "Enabled" : "Disabled");
-
-	delete kv;
 }
 
 Webhook Config_CreateWebHook(const char[] contents = "", const char[] defaultusername = "Server Status", const char[] key)
