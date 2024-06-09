@@ -789,7 +789,7 @@ void SendMessage_L4D_OnNativeVote(int client, const char[] issue, const char[] o
 		contents = "";
 	}
 
-	Webhook webhook = Config_CreateWebHook(contents, "Vote Logger", cfg_SourceBans.key);
+	Webhook webhook = Config_CreateWebHook(contents, "Vote Logger", cfg_NativeVotes.key);
 
 	Embed embed1 = new Embed(servername, "A vote has been called.");
 	embed1.SetTimeStampNow();
