@@ -613,7 +613,16 @@ void SendMessage_OnSBBanAdded(int iAdmin, int iTarget, int iTime, const char[] s
 	FormatEx(buffer, sizeof(buffer), "%s (%s)", targetName, targetSID);
 	EmbedField field2 = new EmbedField("Target", buffer, false);
 	embed1.AddField(field2);
-	FormatEx(buffer, sizeof(buffer), "%i minutes.", iTime);
+	
+	if (iTime == 0)
+	{
+		FormatEx(buffer, sizeof(buffer), "Permanent");
+	}
+	else
+	{
+		FormatMessage_Time(iTime, buffer, sizeof(buffer));
+	}
+
 	EmbedField field3 = new EmbedField("Ban Length", buffer, false);
 	embed1.AddField(field3);
 	EmbedField field4 = new EmbedField("Ban Reason", sReason, false);
@@ -700,7 +709,21 @@ void SendMessage_OnSBCommsBlockAdded(int admin, int target, int time, int type, 
 	FormatEx(buffer, sizeof(buffer), "%s (%s)", targetName, targetSID);
 	EmbedField field2 = new EmbedField("Target", buffer, false);
 	embed1.AddField(field2);
-	FormatEx(buffer, sizeof(buffer), "%i minutes.", time);
+
+	if (time < 0)
+	{
+		FormatEx(buffer, sizeof(buffer), "Session");
+	}
+	else if (time == 0)
+	{
+		FormatEx(buffer, sizeof(buffer), "Permanent");
+	}
+	else
+	{
+		FormatMessage_Time(time, buffer, sizeof(buffer));
+	}
+
+	
 	EmbedField field3 = new EmbedField("Block Length", buffer, false);
 	embed1.AddField(field3);
 

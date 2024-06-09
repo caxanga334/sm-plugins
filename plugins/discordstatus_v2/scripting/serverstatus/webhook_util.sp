@@ -89,3 +89,13 @@ void FormatMessage_L4D_NativeVote(const char[] issue, const char[] option, char[
 
 	LogError("Unhandled vote issue: %s option: %s", issue, option);
 }
+
+FormatMessage_Time(const int time, char[] out, const int size)
+{
+    int days = time / 1440;
+    int hours = time / 60;
+    hours = hours % 24;
+    int minutes = time - (days * 1440) - (hours * 60);
+
+	FormatEx(out, size, "%i Days, %i Hours and %i Minutes.", days, hours, minutes);
+}
