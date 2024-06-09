@@ -108,6 +108,12 @@ jobs:
           repository: shqke/sp_public
           path: shqkeplugins
 
+      - name: Fetch SourceBans++
+        uses: actions/checkout@v4.1.1
+        with:
+          repository: sbpp/sourcebans-pp
+          path: sbpp
+
       - name: Move Fetched Includes to Shared Includes Path
         run: |
           rsync -rv ${{ github.workspace }}/ripext/pawn/scripting/include/* ${{ env.TPINCLUDES_PATH }}/
@@ -115,6 +121,7 @@ jobs:
           rsync -rv ${{ github.workspace }}/smlib/scripting/include/* ${{ env.TPINCLUDES_PATH }}/
           rsync -rv ${{ github.workspace }}/multicolors/addons/sourcemod/scripting/include/* ${{ env.TPINCLUDES_PATH }}/
           rsync -rv ${{ github.workspace }}/shqkeplugins/.deps/include/* ${{ env.TPINCLUDES_PATH }}/
+          rsync -rv ${{ github.workspace }}/sbpp/game/addons/sourcemod/scripting/include/* ${{ env.TPINCLUDES_PATH }}/
           ls -lah ${{ env.TPINCLUDES_PATH }}/
 
       - name: Move Plugin Source Files to Build Directory
