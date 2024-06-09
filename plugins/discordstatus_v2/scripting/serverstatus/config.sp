@@ -31,12 +31,23 @@ enum struct SeedConfig
 	float cooldown;
 }
 
+enum struct SourceBansConfig
+{
+	bool enabled;
+	char key[64];
+	char mention[128];
+	bool hasmention;
+	char sburl[1024];
+	bool hasurl;
+}
+
 BaseConfig cfg_JoinLeave;
 ServerStartConfig cfg_ServerStart;
 BaseConfig cfg_GameEvents;
 BaseConfig cfg_CallAdmin;
 BaseConfig cfg_SourceTV;
 SeedConfig cfg_Seed;
+SourceBansConfig cfg_SourceBans;
 
 bool Config_IsWebhookURLValid(const char[] url)
 {
@@ -113,6 +124,13 @@ void Config_Init()
 	cfg_Seed.hasmention = false;
 	cfg_Seed.mention = "";
 	cfg_Seed.sendIP = false;
+
+	cfg_SourceBans.enabled = false;
+	cfg_SourceBans.key = "";
+	cfg_SourceBans.hasmention = false;
+	cfg_SourceBans.mention = "";
+	cfg_SourceBans.sburl = "";
+	cfg_SourceBans.hasurl = false;
 }
 
 void Config_Load()
@@ -332,16 +350,45 @@ void Config_Load()
 			kv.GoBack();
 		}
 
+#if defined _sourcebanspp_included
+
+		if (kv.JumpToKey("SourceBans"))
+		{
+			kv.GetString("Enabled", value, sizeof(value));
+			cfg_SourceBans.enabled = ConfigUtil_StringToBoolean(value);
+			kv.GetString("WebHookKey", cfg_SourceBans.key, sizeof(cfg_SourceBans.key));
+			kv.GetString("Mention", value, sizeof(value), "null");
+
+			if (strcmp(value, "null") != 0)
+			{
+				cfg_SourceBans.hasmention = true;
+				strcopy(cfg_SourceBans.mention, sizeof(cfg_SourceBans.mention), value);
+			}
+
+			kv.GetString("SourceBansWebURL", cfg_SourceBans.sburl, sizeof(cfg_SourceBans.sburl));
+
+			if (StrContains(cfg_SourceBans.sburl, "http", false) != -1)
+			{
+				cfg_SourceBans.hasurl = true;
+			}
+
+			kv.GoBack();
+		}
+
+#endif
+
 		kv.GoBack();
 	}
 
 	LogMessage("Discord Server Status plugin configuration fully loaded.");
-	LogMessage("JoinLeave: %s ServerStart: %s GameEvents: %s CallAdmin: %s SourceTV: %s Server Seed: %s", cfg_JoinLeave.enabled ? "Enabled" : "Disabled",
+	LogMessage("JoinLeave: %s ServerStart: %s GameEvents: %s CallAdmin: %s SourceTV: %s Server Seed: %s SourceBans: %s", 
+		cfg_JoinLeave.enabled ? "Enabled" : "Disabled",
 		cfg_ServerStart.enabled ? "Enabled" : "Disabled",
 		cfg_GameEvents.enabled ? "Enabled" : "Disabled",
 		cfg_CallAdmin.enabled ? "Enabled" : "Disabled",
 		cfg_SourceTV.enabled ? "Enabled" : "Disabled",
-		cfg_Seed.enabled ? "Enabled" : "Disabled");
+		cfg_Seed.enabled ? "Enabled" : "Disabled",
+		cfg_SourceBans.enabled ? "Enabled" : "Disabled");
 
 	delete kv;
 }

@@ -4,6 +4,7 @@
 #include <steamworks>
 #include <discordWebhookAPI>
 #include <autoexecconfig>
+
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
 #tryinclude <left4dhooks>
@@ -11,11 +12,13 @@
 #tryinclude <calladmin>
 #tryinclude <steampawn>
 #tryinclude <smlib/server>
+#tryinclude <sourcebanspp>
+#tryinclude <sourcecomms>
 
 #pragma newdecls required
 #pragma semicolon 1
 
-#define PLUGIN_VERSION "1.1.4"
+#define PLUGIN_VERSION "1.1.5"
 
 bool g_started; // Has the server started?
 bool g_hasip;
@@ -45,6 +48,7 @@ ConVar c_remove2;
 #include "serverstatus/teamfortress2.sp"
 #include "serverstatus/sourcetv.sp"
 #include "serverstatus/calladmin.sp"
+#include "serverstatus/sourcebans.sp"
 
 public Plugin myinfo =
 {

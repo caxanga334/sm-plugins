@@ -64,7 +64,7 @@ void SendMessage_OnClientLeave()
 {
 	int maxslots = GetServerMaxSlots();
 	char mapname[64];
-	char servername[64];
+	char servername[128];
 	GetServerName(servername, sizeof(servername));
 	GetMapName(mapname, sizeof(mapname));
 
@@ -107,7 +107,7 @@ void SendMessage_OnClientLeave()
 void SendMessage_OnServerStart()
 {
 	char mapname[64];
-	char servername[64];
+	char servername[128];
 	GetServerName(servername, sizeof(servername));
 	GetMapName(mapname, sizeof(mapname));
 
@@ -158,7 +158,7 @@ void SendMessage_OnServerStart()
 void SendMessage_L4D_OnGameMode(int gamemode)
 {
 	char mapname[64];
-	char servername[64];
+	char servername[128];
 	char szgamemode[16];
 	GetServerName(servername, sizeof(servername));
 	GetMapName(mapname, sizeof(mapname));
@@ -209,7 +209,7 @@ void SendMessage_L4D_OnGameMode(int gamemode)
 void SendMessage_L4D_OnRoundStart()
 {
 	char mapname[64];
-	char servername[64];
+	char servername[128];
 	GetServerName(servername, sizeof(servername));
 	GetMapName(mapname, sizeof(mapname));
 
@@ -249,7 +249,7 @@ void SendMessage_L4D_OnRoundStart()
 void SendMessage_TF2_OnMvMWaveStart(int wave, int max)
 {
 	char mapname[64];
-	char servername[64];
+	char servername[128];
 	char missioname[128];
 	char waveinfo[16];
 	GetServerName(servername, sizeof(servername));
@@ -482,7 +482,7 @@ void SendMessage_OnCallAdminReportHandled(int client, int id)
 void SendMessage_OnSeedRequest(int requestingClient)
 {
 	char mapname[64];
-	char servername[64];
+	char servername[128];
 	GetServerName(servername, sizeof(servername));
 	GetMapName(mapname, sizeof(mapname));
 
@@ -500,7 +500,7 @@ void SendMessage_OnSeedRequest(int requestingClient)
 	Webhook webhook = Config_CreateWebHook(contents, "Seed Request", cfg_Seed.key);
 	
 	char buffer[512];
-	Embed embed1 = new Embed(servername, "Seed request for this server!");
+	Embed embed1 = new Embed(servername, "This server is looking for players!");
 	embed1.SetTimeStampNow();
 	embed1.SetColor(32768);
 
@@ -546,6 +546,199 @@ void SendMessage_OnSeedRequest(int requestingClient)
 	webhook.AddEmbed(embed1); 
 
 	Config_GetWebHookURL("Seed", cfg_Seed.key, s_webhook_url, sizeof(s_webhook_url));
+	webhook.Execute(s_webhook_url, OnWebHookExecuted);
+
+	delete webhook;
+}
+
+#endif
+
+#if defined _sourcebanspp_included
+
+void SendMessage_OnSBBanAdded(int iAdmin, int iTarget, int iTime, const char[] sReason)
+{
+	char servername[128];
+	GetServerName(servername, sizeof(servername));
+
+	char adminName[MAX_NAME_LENGTH];
+	char adminSID[MAX_AUTHID_LENGTH];
+	char targetName[MAX_NAME_LENGTH];
+	char targetSID[MAX_AUTHID_LENGTH];
+
+	if (iAdmin == 0)
+	{
+		adminName = "CONSOLE";
+		adminSID = "";
+	}
+	else
+	{
+		GetClientName(iAdmin, adminName, sizeof(adminName));
+
+		if (!GetClientAuthId(iAdmin, AuthId_SteamID64, adminSID, sizeof(adminSID)))
+		{
+			adminSID = "";
+		}
+	}
+
+	GetClientName(iTarget, targetName, sizeof(targetName));
+
+	if (!GetClientAuthId(iTarget, AuthId_SteamID64, targetSID, sizeof(targetSID)))
+	{
+		targetSID = "";
+	}
+
+	char contents[128];
+
+	if (cfg_SourceBans.hasmention)
+	{
+		strcopy(contents, sizeof(contents), cfg_SourceBans.mention);
+	}
+	else
+	{
+		contents = "";
+	}
+
+	Webhook webhook = Config_CreateWebHook(contents, "SourceBans", cfg_SourceBans.key);
+
+	char buffer[1024];
+	Embed embed1 = new Embed("View on SourceBans Web", "A player has been banned.");
+	embed1.SetTimeStampNow();
+	embed1.SetColor(16656146);
+
+	EmbedField field0 = new EmbedField("Server", servername, false);
+	embed1.AddField(field0);
+	FormatEx(buffer, sizeof(buffer), "%s (%s)", adminName, adminSID);
+	EmbedField field1 = new EmbedField("Admin", buffer, false);
+	embed1.AddField(field1);
+	FormatEx(buffer, sizeof(buffer), "%s (%s)", targetName, targetSID);
+	EmbedField field2 = new EmbedField("Target", buffer, false);
+	embed1.AddField(field2);
+	FormatEx(buffer, sizeof(buffer), "%i minutes.", iTime);
+	EmbedField field3 = new EmbedField("Ban Length", buffer, false);
+	embed1.AddField(field3);
+	EmbedField field4 = new EmbedField("Ban Reason", sReason, false);
+	embed1.AddField(field4);
+
+	if (cfg_SourceBans.hasurl)
+	{
+		char webSID[MAX_AUTHID_LENGTH];
+		
+		if (GetClientAuthId(iTarget, AuthId_Steam2, webSID, sizeof(webSID)))
+		{
+			FormatEx(buffer, sizeof(buffer), "%sindex.php?p=banlist&advSearch=%s&advType=steamid&Submit", cfg_SourceBans.sburl, webSID);
+			embed1.SetURL(buffer);
+		}
+	}
+
+	webhook.AddEmbed(embed1); 
+
+	Config_GetWebHookURL("SourceBans", cfg_SourceBans.key, s_webhook_url, sizeof(s_webhook_url));
+	webhook.Execute(s_webhook_url, OnWebHookExecuted);
+
+	delete webhook;
+}
+
+#endif
+
+#if defined _sourcecomms_included
+
+void SendMessage_OnSBCommsBlockAdded(int admin, int target, int time, int type, char[] reason)
+{
+	char servername[128];
+	GetServerName(servername, sizeof(servername));
+
+	char adminName[MAX_NAME_LENGTH];
+	char adminSID[MAX_AUTHID_LENGTH];
+	char targetName[MAX_NAME_LENGTH];
+	char targetSID[MAX_AUTHID_LENGTH];
+
+	if (admin == 0)
+	{
+		adminName = "CONSOLE";
+		adminSID = "";
+	}
+	else
+	{
+		GetClientName(admin, adminName, sizeof(adminName));
+
+		if (!GetClientAuthId(admin, AuthId_SteamID64, adminSID, sizeof(adminSID)))
+		{
+			adminSID = "";
+		}
+	}
+
+	GetClientName(target, targetName, sizeof(targetName));
+
+	if (!GetClientAuthId(target, AuthId_SteamID64, targetSID, sizeof(targetSID)))
+	{
+		targetSID = "";
+	}
+
+	char contents[128];
+
+	if (cfg_SourceBans.hasmention)
+	{
+		strcopy(contents, sizeof(contents), cfg_SourceBans.mention);
+	}
+	else
+	{
+		contents = "";
+	}
+
+	Webhook webhook = Config_CreateWebHook(contents, "SourceBans", cfg_SourceBans.key);
+
+	char buffer[1024];
+	Embed embed1 = new Embed("View on SourceBans Web", "A player has been banned.");
+	embed1.SetTimeStampNow();
+	embed1.SetColor(16656146);
+
+	EmbedField field0 = new EmbedField("Server", servername, false);
+	embed1.AddField(field0);
+	FormatEx(buffer, sizeof(buffer), "%s (%s)", adminName, adminSID);
+	EmbedField field1 = new EmbedField("Admin", buffer, false);
+	embed1.AddField(field1);
+	FormatEx(buffer, sizeof(buffer), "%s (%s)", targetName, targetSID);
+	EmbedField field2 = new EmbedField("Target", buffer, false);
+	embed1.AddField(field2);
+	FormatEx(buffer, sizeof(buffer), "%i minutes.", time);
+	EmbedField field3 = new EmbedField("Block Length", buffer, false);
+	embed1.AddField(field3);
+
+	switch (type)
+	{
+		case TYPE_MUTE:
+		{
+			buffer = "Muted";
+		}
+		case TYPE_GAG:
+		{
+			buffer = "Gagged";
+		}
+		case TYPE_SILENCE:
+		{
+			buffer = "Silenced";
+		}
+	}
+
+	EmbedField field4 = new EmbedField("Block Type", buffer, false);
+	embed1.AddField(field4);
+	EmbedField field5 = new EmbedField("Block Reason", reason, false);
+	embed1.AddField(field5);
+
+	if (cfg_SourceBans.hasurl)
+	{
+		char webSID[MAX_AUTHID_LENGTH];
+		
+		if (GetClientAuthId(target, AuthId_Steam2, webSID, sizeof(webSID)))
+		{
+			FormatEx(buffer, sizeof(buffer), "%sindex.php?p=commslist&advSearch=%s&advType=steamid&Submit", cfg_SourceBans.sburl, webSID);
+			embed1.SetURL(buffer);
+		}
+	}
+
+	webhook.AddEmbed(embed1); 
+
+	Config_GetWebHookURL("SourceBans", cfg_SourceBans.key, s_webhook_url, sizeof(s_webhook_url));
 	webhook.Execute(s_webhook_url, OnWebHookExecuted);
 
 	delete webhook;
