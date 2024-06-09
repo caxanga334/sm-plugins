@@ -4,10 +4,10 @@
 
 public void SBPP_OnBanPlayer(int iAdmin, int iTarget, int iTime, const char[] sReason)
 {
-    if (cfg_SourceBans.enabled)
-    {
-        SendMessage_OnSBBanAdded(iAdmin, iTarget, iTime, sReason);
-    }
+	if (cfg_SourceBans.enabled)
+	{
+		SendMessage_OnSBBanAdded(iAdmin, iTarget, iTime, sReason);
+	}
 }
 
 #endif
@@ -16,10 +16,10 @@ public void SBPP_OnBanPlayer(int iAdmin, int iTarget, int iTime, const char[] sR
 
 public void SourceComms_OnBlockAdded(int client, int target, int time, int type, char[] reason)
 {
-    if (cfg_SourceBans.enabled)
-    {
-        SendMessage_OnSBCommsBlockAdded(client, target, time, type, reason);
-    }
+	if (cfg_SourceBans.enabled)
+	{
+		SendMessage_OnSBCommsBlockAdded(client, target, time, type, reason);
+	}
 }
 
 #endif

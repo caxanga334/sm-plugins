@@ -48,6 +48,7 @@ BaseConfig cfg_CallAdmin;
 BaseConfig cfg_SourceTV;
 SeedConfig cfg_Seed;
 SourceBansConfig cfg_SourceBans;
+BaseConfig cfg_NativeVotes;
 
 bool Config_IsWebhookURLValid(const char[] url)
 {
@@ -131,6 +132,11 @@ void Config_Init()
 	cfg_SourceBans.mention = "";
 	cfg_SourceBans.sburl = "";
 	cfg_SourceBans.hasurl = false;
+
+	cfg_NativeVotes.enabled = false;
+	cfg_NativeVotes.key = "";
+	cfg_NativeVotes.hasmention = false;
+	cfg_NativeVotes.mention = "";
 }
 
 void Config_Load()
@@ -377,6 +383,22 @@ void Config_Load()
 
 #endif
 
+		if (kv.JumpToKey("NativeVotes"))
+		{
+			kv.GetString("Enabled", value, sizeof(value));
+			cfg_NativeVotes.enabled = ConfigUtil_StringToBoolean(value);
+			kv.GetString("WebHookKey", cfg_NativeVotes.key, sizeof(cfg_NativeVotes.key));
+			kv.GetString("Mention", value, sizeof(value), "null");
+
+			if (strcmp(value, "null") != 0)
+			{
+				cfg_NativeVotes.hasmention = true;
+				strcopy(cfg_NativeVotes.mention, sizeof(cfg_NativeVotes.mention), value);
+			}
+
+			kv.GoBack();
+		}	
+
 		kv.GoBack();
 	}
 
@@ -389,14 +411,15 @@ void Config_Load()
 	}
 
 	LogMessage("Discord Server Status plugin configuration fully loaded.");
-	LogMessage("JoinLeave: %s ServerStart: %s GameEvents: %s CallAdmin: %s SourceTV: %s Server Seed: %s SourceBans: %s", 
+	LogMessage("JoinLeave: %s ServerStart: %s GameEvents: %s CallAdmin: %s SourceTV: %s Server Seed: %s SourceBans: %s Native Votes: %s", 
 		cfg_JoinLeave.enabled ? "Enabled" : "Disabled",
 		cfg_ServerStart.enabled ? "Enabled" : "Disabled",
 		cfg_GameEvents.enabled ? "Enabled" : "Disabled",
 		cfg_CallAdmin.enabled ? "Enabled" : "Disabled",
 		cfg_SourceTV.enabled ? "Enabled" : "Disabled",
 		cfg_Seed.enabled ? "Enabled" : "Disabled",
-		cfg_SourceBans.enabled ? "Enabled" : "Disabled");
+		cfg_SourceBans.enabled ? "Enabled" : "Disabled",
+		cfg_NativeVotes.enabled ? "Enabled" : "Disabled");
 }
 
 Webhook Config_CreateWebHook(const char[] contents = "", const char[] defaultusername = "Server Status", const char[] key)

@@ -18,7 +18,7 @@
 #pragma newdecls required
 #pragma semicolon 1
 
-#define PLUGIN_VERSION "1.1.6"
+#define PLUGIN_VERSION "1.1.7"
 
 bool g_started; // Has the server started?
 bool g_hasip;
@@ -62,12 +62,6 @@ public Plugin myinfo =
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
 	g_engine = GetEngineVersion();
-
-	if (g_engine == Engine_TF2)
-	{
-		HookEvent("mvm_begin_wave", EV_TF2_OnMvMWaveStart);
-	}
-
 	return APLRes_Success;
 }
 
@@ -90,6 +84,16 @@ public void OnPluginStart()
 #if defined _l4dh_included
 	g_hasconfigs = false;
 #endif
+
+	if (g_engine == Engine_TF2)
+	{
+		HookEvent("mvm_begin_wave", EV_TF2_OnMvMWaveStart);
+	}
+
+	if (g_engine == Engine_Left4Dead || g_engine == Engine_Left4Dead2)
+	{
+		AddCommandListener(L4D_OnCallVote, "callvote");
+	}
 
 	Config_Load();
 }

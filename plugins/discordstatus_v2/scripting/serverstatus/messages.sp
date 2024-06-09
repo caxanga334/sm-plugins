@@ -745,3 +745,50 @@ void SendMessage_OnSBCommsBlockAdded(int admin, int target, int time, int type, 
 }
 
 #endif
+
+void SendMessage_L4D_OnNativeVote(int client, const char[] issue, const char[] option, const int argc)
+{
+	char servername[128];
+	char contents[128];
+	char buffer[512];
+	char votename[128];
+	char voteoption[256];
+	GetServerName(servername, sizeof(servername));
+
+	FormatMessage_L4D_NativeVote(issue, option, votename, sizeof(votename), voteoption, sizeof(voteoption), argc);
+
+	if (cfg_NativeVotes.hasmention)
+	{
+		strcopy(contents, sizeof(contents), cfg_NativeVotes.mention);
+	}
+	else
+	{
+		contents = "";
+	}
+
+	Webhook webhook = Config_CreateWebHook(contents, "SourceBans", cfg_SourceBans.key);
+
+	Embed embed1 = new Embed(servername, "A vote has been called.");
+	embed1.SetTimeStampNow();
+	embed1.SetColor(149502);
+
+	if (!GetClientAuthId(client, AuthId_SteamID64, buffer, sizeof(buffer)))
+	{
+		buffer = "";
+	}
+
+	Format(buffer, sizeof(buffer), "%N (%s)", client, buffer);
+	EmbedField field1 = new EmbedField("Caller", buffer, false);
+	embed1.AddField(field1);
+	EmbedField field2 = new EmbedField("Issue", votename, true);
+	embed1.AddField(field2);
+	EmbedField field3 = new EmbedField("Option", voteoption, true);
+	embed1.AddField(field3);
+
+	webhook.AddEmbed(embed1); 
+
+	Config_GetWebHookURL("SourceBans", cfg_NativeVotes.key, s_webhook_url, sizeof(s_webhook_url));
+	webhook.Execute(s_webhook_url, OnWebHookExecuted);
+
+	delete webhook;
+}

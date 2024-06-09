@@ -20,3 +20,72 @@ stock void AddSpacer(Embed &embed)
 	EmbedField fieldspacer = new EmbedField("\n_ _", "\n_ _", false);
 	embed.AddField(fieldspacer);
 }
+
+void FormatMessage_L4D_NativeVote(const char[] issue, const char[] option, char[] outissue, int outissue_max, char[] outoption, int outoption_max, const int argc)
+{
+	if (argc >= 2)
+	{
+		if (strcmp(issue, "ChangeDifficulty", false) == 0)
+		{
+			strcopy(outissue, outissue_max, "Change Difficulty");
+			strcopy(outoption, outoption_max, option);
+		}
+		else if (strcmp(issue, "ChangeMission", false) == 0)
+		{
+			strcopy(outissue, outissue_max, "Change Mission");
+			strcopy(outoption, outoption_max, option);
+		}
+		else if (strcmp(issue, "ChangeChapter", false) == 0)
+		{
+			strcopy(outissue, outissue_max, "Change Chapter");
+			strcopy(outoption, outoption_max, option);
+		}
+		else if (strcmp(issue, "Kick", false) == 0)
+		{
+			strcopy(outissue, outissue_max, "Kick Player");
+
+			int userid = StringToInt(option);
+
+			if (userid > 0)
+			{
+				int target = GetClientOfUserId(userid);
+
+				if (target > 0 && IsClientInGame(target))
+				{
+					char SID[MAX_AUTHID_LENGTH];
+					
+					if (!GetClientAuthId(target, AuthId_SteamID64, SID, sizeof(SID)))
+					{
+						SID = "";
+					}
+
+					FormatEx(outoption, outoption_max, "Target: %N (%s)");
+				}
+			}
+			else
+			{
+				FormatEx(outoption, outoption_max, "UserID: %s", option);
+			}
+		}
+	}
+	else if (argc == 1)
+	{
+		if (strcmp(issue, "RestartGame", false) == 0)
+		{
+			strcopy(outissue, outissue_max, "Restart Game");
+			strcopy(outoption, outoption_max, "");
+		}
+		else if (strcmp(issue, "ReturnToLobby", false) == 0)
+		{
+			strcopy(outissue, outissue_max, "Return to Lobby");
+			strcopy(outoption, outoption_max, "");
+		}
+		else if (strcmp(issue, "ChangeAllTalk", false) == 0)
+		{
+			strcopy(outissue, outissue_max, "Change All Talk");
+			strcopy(outoption, outoption_max, "");
+		}
+	}
+
+	LogError("Unhandled vote issue: %s option: %s", issue, option);
+}
