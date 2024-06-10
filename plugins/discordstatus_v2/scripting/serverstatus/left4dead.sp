@@ -49,7 +49,7 @@ Action L4D_OnCallVote(int client, const char[] command, int argc)
 			option = "";
 		}
 
-		SendMessage_L4D_OnNativeVote(client, vote, option, argc);
+		SendMessage_L4D_OnNativeVote(client, vote, option);
 	}
 
 	return Plugin_Continue;

@@ -769,7 +769,7 @@ void SendMessage_OnSBCommsBlockAdded(int admin, int target, int time, int type, 
 
 #endif
 
-void SendMessage_L4D_OnNativeVote(int client, const char[] issue, const char[] option, const int argc)
+void SendMessage_L4D_OnNativeVote(int client, const char[] issue, const char[] option)
 {
 	char servername[128];
 	char contents[128];
@@ -778,7 +778,7 @@ void SendMessage_L4D_OnNativeVote(int client, const char[] issue, const char[] o
 	char voteoption[256];
 	GetServerName(servername, sizeof(servername));
 
-	FormatMessage_L4D_NativeVote(issue, option, votename, sizeof(votename), voteoption, sizeof(voteoption), argc);
+	FormatMessage_L4D_NativeVote(issue, option, votename, sizeof(votename), voteoption, sizeof(voteoption));
 
 	if (cfg_NativeVotes.hasmention)
 	{
