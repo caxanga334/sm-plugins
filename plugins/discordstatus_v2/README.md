@@ -7,9 +7,12 @@ Status messages includes:
 * Server Start
 * Map Changes
 * Player join/leave
-* Game Specific status
+* Game Specific Status
 * Call Admin Reports
-* SourceTV Demo recordings
+* SourceTV Demo Recordings
+* SourceTV Demo Requests
+* Native Vote Logging (on supported games)
+* Seed Requests
 
 # Requirements
 

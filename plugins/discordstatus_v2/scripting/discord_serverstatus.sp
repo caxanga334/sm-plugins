@@ -35,11 +35,52 @@ bool g_steampawn = false; // Is SteamPawn plugin installed?
 char g_ipaddr[128];
 float g_delay;
 float g_seed_cooldown;
+float g_demorequest_cooldown[MAXPLAYERS + 1];
 EngineVersion g_engine;
 ConVar c_dns;
 ConVar c_delay;
 ConVar c_remove1;
 ConVar c_remove2;
+
+#define NULL_PLAYER view_as<CPlayer>(0)
+
+methodmap CPlayer
+{
+	public CPlayer(int index)
+	{
+		return view_as<CPlayer>(index);
+	}
+
+	public static CPlayer GetPlayerByIndex(int index)
+	{
+		if (index > 0 && index < MaxClients && IsClientInGame(index))
+		{
+			return CPlayer(index);
+		}
+
+		return NULL_PLAYER;
+	}
+
+	public bool IsAllowedToRequestDemos()
+	{
+		return GetGameTime() > g_demorequest_cooldown[this.index];
+	}
+
+	public void OnDemoRequested(float cooldown)
+	{
+		g_demorequest_cooldown[this.index] = GetGameTime() + cooldown;
+	}
+
+	public void Reset()
+	{
+		g_demorequest_cooldown[this.index] = 0.0;
+	}
+
+	property int index
+	{
+		public get() { return view_as<int>(this); }
+	}
+}
 
 #include "serverstatus/config.sp"
 #include "serverstatus/utils.sp"
@@ -79,6 +120,9 @@ public void OnPluginStart()
 	AutoExecConfig_CleanFile();
 
 	RegAdminCmd("sm_seed", ConCmd_Seed, 0, "Sends a seed request for this server.");
+	RegAdminCmd("sm_demorequest", ConCmd_DemoRequest, 0, "Sends a SourceTV demo request notification.");
+	RegAdminCmd("sm_demo", ConCmd_DemoRequest, 0, "Sends a SourceTV demo request notification.");
+	RegAdminCmd("sm_dr", ConCmd_DemoRequest, 0, "Sends a SourceTV demo request notification.");
 
 	g_started = false;
 #if defined _l4dh_included
@@ -175,6 +219,9 @@ public void OnClientPutInServer(int client)
 			CreateTimer(1.0, Timer_OnClientJoin, GetClientSerial(client), TIMER_FLAG_NO_MAPCHANGE);
 		}
 	}
+
+	CPlayer player = CPlayer(client);
+	player.Reset();
 }
 
 public void OnClientDisconnect(int client)
@@ -224,6 +271,60 @@ Action ConCmd_Seed(int client, int args)
 	LogMessage("%L sent a seed request.", client);
 	SendMessage_OnSeedRequest(client);
 	return Plugin_Handled;
+}
+
+Action ConCmd_DemoRequest(int client, int args)
+{
+#if !defined _stvmngr_included
+	return Plugin_Handled;
+#else
+	if (!cfg_DemoRequests.enabled)
+	{
+		ReplyToCommand(client, "This server has disabled demo requests.");
+		return Plugin_Handled;
+	}
+
+	if (!g_sourcetvmanager)
+	{
+		if (client == 0)
+		{
+			// Command was executed by console, warn server ops that they didn't install the extension
+			LogError("SourceTV Manager not loaded!");
+		}
+
+		return Plugin_Handled;
+	}
+
+	if (!SourceTV_IsActive() || !SourceTV_IsRecording())
+	{
+		ReplyToCommand(client, "SourceTV is not available.");
+		return Plugin_Handled;
+	}
+
+	if (client == 0)
+	{
+		SendMessage_OnDemoRequest(client);
+		return Plugin_Handled;
+	}
+
+	CPlayer player = CPlayer(client);
+
+	if (!player.IsAllowedToRequestDemos())
+	{
+		ReplyToCommand(client, "Please wait before requesting demos again.");
+		return Plugin_Handled;
+	}
+
+	player.OnDemoRequested(cfg_DemoRequests.cooldown);
+	SendMessage_OnDemoRequest(client);
+
+	if (cfg_DemoRequests.hasaccessurl)
+	{
+		ReplyToCommand(client, "Demo request received. Access it at %s", cfg_DemoRequests.accessurl);
+	}
+
+	return Plugin_Handled;
+#endif
 }
 
 public Action Timer_OnClientJoin(Handle timer, any data)

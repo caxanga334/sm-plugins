@@ -41,6 +41,17 @@ enum struct SourceBansConfig
 	bool hasurl;
 }
 
+enum struct DemoRequestConfig
+{
+	bool enabled;
+	char key[64];
+	char mention[128];
+	bool hasmention;
+	char accessurl[1024];
+	bool hasaccessurl;
+	float cooldown;
+}
+
 BaseConfig cfg_JoinLeave;
 ServerStartConfig cfg_ServerStart;
 BaseConfig cfg_GameEvents;
@@ -49,6 +60,7 @@ BaseConfig cfg_SourceTV;
 SeedConfig cfg_Seed;
 SourceBansConfig cfg_SourceBans;
 BaseConfig cfg_NativeVotes;
+DemoRequestConfig cfg_DemoRequests;
 
 bool Config_IsWebhookURLValid(const char[] url)
 {
@@ -137,6 +149,14 @@ void Config_Init()
 	cfg_NativeVotes.key = "";
 	cfg_NativeVotes.hasmention = false;
 	cfg_NativeVotes.mention = "";
+
+	cfg_DemoRequests.enabled = false;
+	cfg_DemoRequests.key = "";
+	cfg_DemoRequests.hasmention = false;
+	cfg_DemoRequests.mention = "";
+	cfg_DemoRequests.accessurl = "";
+	cfg_DemoRequests.hasaccessurl = false;
+	cfg_DemoRequests.cooldown = 900.0;
 }
 
 void Config_Load()
@@ -334,6 +354,31 @@ void Config_Load()
 			kv.GoBack();
 		}
 
+		if (kv.JumpToKey("DemoRequests"))
+		{
+			kv.GetString("Enabled", value, sizeof(value));
+			cfg_DemoRequests.enabled = ConfigUtil_StringToBoolean(value);
+			kv.GetString("WebHookKey", cfg_DemoRequests.key, sizeof(cfg_DemoRequests.key));
+			kv.GetString("Mention", value, sizeof(value), "null");
+
+			if (strcmp(value, "null") != 0)
+			{
+				cfg_DemoRequests.hasmention = true;
+				strcopy(cfg_DemoRequests.mention, sizeof(cfg_DemoRequests.mention), value);
+			}
+
+			kv.GetString("AccessURL", cfg_DemoRequests.accessurl, sizeof(cfg_DemoRequests.accessurl), "null");
+
+			if (strcmp(cfg_DemoRequests.accessurl, "null") != 0)
+			{
+				cfg_DemoRequests.hasaccessurl = true;
+			}
+
+			cfg_DemoRequests.cooldown = kv.GetFloat("Cooldown", 900.0);
+
+			kv.GoBack();
+		}
+
 #endif
 
 		if (kv.JumpToKey("Seed"))
@@ -411,7 +456,7 @@ void Config_Load()
 	}
 
 	LogMessage("Discord Server Status plugin configuration fully loaded.");
-	LogMessage("JoinLeave: %s ServerStart: %s GameEvents: %s CallAdmin: %s SourceTV: %s Server Seed: %s SourceBans: %s Native Votes: %s", 
+	LogMessage("JoinLeave: %s ServerStart: %s GameEvents: %s CallAdmin: %s SourceTV: %s Server Seed: %s SourceBans: %s Native Votes: %s Demo Requests: %s", 
 		cfg_JoinLeave.enabled ? "Enabled" : "Disabled",
 		cfg_ServerStart.enabled ? "Enabled" : "Disabled",
 		cfg_GameEvents.enabled ? "Enabled" : "Disabled",
@@ -419,7 +464,8 @@ void Config_Load()
 		cfg_SourceTV.enabled ? "Enabled" : "Disabled",
 		cfg_Seed.enabled ? "Enabled" : "Disabled",
 		cfg_SourceBans.enabled ? "Enabled" : "Disabled",
-		cfg_NativeVotes.enabled ? "Enabled" : "Disabled");
+		cfg_NativeVotes.enabled ? "Enabled" : "Disabled",
+		cfg_DemoRequests.enabled ? "Enabled" : "Disabled");
 }
 
 Webhook Config_CreateWebHook(const char[] contents = "", const char[] defaultusername = "Server Status", const char[] key)

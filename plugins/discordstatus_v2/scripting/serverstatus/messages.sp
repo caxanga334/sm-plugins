@@ -815,3 +815,67 @@ void SendMessage_L4D_OnNativeVote(int client, const char[] issue, const char[] o
 
 	delete webhook;
 }
+
+#if defined _stvmngr_included
+void SendMessage_OnDemoRequest(int requester)
+{
+	char servername[128];
+	char contents[128];
+	char mapname[128];
+	char buffer[512];
+	GetServerName(servername, sizeof(servername));
+	GetMapName(mapname, sizeof(mapname));
+
+	char name[MAX_NAME_LENGTH + MAX_AUTHID_LENGTH + 8];
+
+	if (requester == 0)
+	{
+		name = "CONSOLE";
+	}
+	else
+	{
+		if (!GetClientAuthId(requester, AuthId_SteamID64, buffer, sizeof(buffer)))
+		{
+			buffer = "";
+		}
+
+		FormatEx(name, sizeof(name), "%N (%s)", requester, buffer);
+	}
+
+	if (cfg_DemoRequests.hasmention)
+	{
+		strcopy(contents, sizeof(contents), cfg_DemoRequests.mention);
+	}
+	else
+	{
+		contents = "";
+	}
+
+	Webhook webhook = Config_CreateWebHook(contents, "SourceTV", cfg_DemoRequests.key);
+
+	Embed embed1 = new Embed(servername, "SourceTV demo recording requested.");
+	embed1.SetTimeStampNow();
+	embed1.SetColor(8323199);
+
+	EmbedField field1 = new EmbedField("Requester", name, false);
+	embed1.AddField(field1);
+	SourceTV_GetDemoFileName(buffer, sizeof(buffer));
+	EmbedField field2 = new EmbedField("File Name", buffer, true);
+	embed1.AddField(field2);
+	FormatEx(buffer, sizeof(buffer), "%i", SourceTV_GetRecordingTick());
+	EmbedField field3 = new EmbedField("Tick", buffer, true);
+	embed1.AddField(field3);
+	EmbedField field4 = new EmbedField("Map", mapname, false);
+	embed1.AddField(field4);
+	FormatTime(buffer, sizeof(buffer), "%A, %d, %B, %Y - %H:%M:%S %Z");
+	EmbedField field5 = new EmbedField("Request Time", buffer, false);
+	embed1.AddField(field5);
+
+	webhook.AddEmbed(embed1);
+
+	Config_GetWebHookURL("DemoRequests", cfg_DemoRequests.key, s_webhook_url, sizeof(s_webhook_url));
+	webhook.Execute(s_webhook_url, OnWebHookExecuted);
+
+	delete webhook;
+}
+#endif
