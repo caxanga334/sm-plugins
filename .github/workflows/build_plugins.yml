@@ -131,6 +131,7 @@ jobs:
           rsync -rv ${{ github.workspace }}/sourcefiles/plugins/autorecorder/scripting/* ${{ env.BUILD_PATH }}/
           cp ${{ github.workspace }}/sourcefiles/source/connectlog.sp ${{ env.BUILD_PATH }}/
           cp ${{ github.workspace }}/sourcefiles/source/l4d_antiearlyvote.sp ${{ env.BUILD_PATH }}/
+          cp ${{ github.workspace }}/sourcefiles/source/sessionbans.sp ${{ env.BUILD_PATH }}/
 
 
       - name: Compile Plugins
