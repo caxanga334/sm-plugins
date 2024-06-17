@@ -9,6 +9,8 @@
 #define SPECMODE_3RDPERSON 5
 #define SPECMODE_FREELOOK 6
 
+// foo
+
 #pragma newdecls required // enforce new SM 1.7 syntax
 
 // ===variables===
