@@ -5,7 +5,7 @@
 #pragma newdecls required
 #pragma semicolon 1
 
-#define PLUGIN_VERSION "1.0.0"
+#define PLUGIN_VERSION "1.0.1"
 
 public Plugin myinfo =
 {
@@ -75,6 +75,12 @@ public void OnClientPutInServer(int client)
 
 public void OnClientCookiesCached(int client)
 {
+	if (IsFakeClient(client) || !CheckCommandAccess(client, "sm_toggle_fake_latency", ADMFLAG_ROOT))
+	{
+		g_settings[client].Reset();
+		return;
+	}
+
 	char buffer[16];
 
 	g_cookieFLEnabled.Get(client, buffer, sizeof(buffer));
@@ -147,6 +153,7 @@ Action CMD_ToggleFakeLatency(int client, int args)
 		g_cookieFLMax.Set(client, buffer);
 	}
 
+	LogAction(client, -1, "%L Toggled fake latency.", client);
 	g_settings[client].cachedlatency = GetRandomInt(g_settings[client].minlatency, g_settings[client].maxlatency);
 
 	return Plugin_Handled;
@@ -189,6 +196,7 @@ Action CMD_SetMinMax(int client, int args)
 	FormatEx(buffer, sizeof(buffer), "%i", g_settings[client].maxlatency);
 	g_cookieFLMax.Set(client, buffer);
 
+	LogAction(client, -1, "%L changed fake latency min to %i and max to %i.", client, min, max);
 	ReplyToCommand(client, "[SM] New Min: %i / New Max: %i", min, max);
 
 	return Plugin_Handled;
