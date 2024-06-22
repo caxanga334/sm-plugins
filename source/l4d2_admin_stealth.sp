@@ -40,6 +40,19 @@ enum struct AdminSettings
 
 AdminSettings g_settings[MAXPLAYERS + 1];
 
+public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
+{
+	EngineVersion engine = GetEngineVersion();
+
+	if (engine != Engine_Left4Dead2)
+	{
+		FormatEx(error, err_max, "This plugin is for Left 4 Dead 2 only!");
+		return APLRes_Failure;
+	}
+
+	return APLRes_Success;
+}
+
 public void OnPluginStart()
 {
 	g_cookieFLEnabled = RegClientCookie("L4D2ADMSTHFLB", "L4D2 Admin Stealth fake latency enabled.", CookieAccess_Protected);
