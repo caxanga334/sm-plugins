@@ -808,6 +808,20 @@ void SendMessage_L4D_OnNativeVote(int client, const char[] issue, const char[] o
 	EmbedField field3 = new EmbedField("Option", voteoption, true);
 	embed1.AddField(field3);
 
+#if defined _stvmngr_included
+
+	if (g_sourcetvmanager && SourceTV_IsRecording())
+	{
+		SourceTV_GetDemoFileName(buffer, sizeof(buffer));
+		EmbedField field4 = new EmbedField("Demo File", buffer, false);
+		embed1.AddField(field4);
+		Formatex(buffer, sizeof(buffer), "%i", SourceTV_GetRecordingTick());
+		EmbedField field5 = new EmbedField("Tick", buffer, false);
+		embed1.AddField(field5);
+	}
+
+#endif
+
 	webhook.AddEmbed(embed1); 
 
 	Config_GetWebHookURL("SourceBans", cfg_NativeVotes.key, s_webhook_url, sizeof(s_webhook_url));

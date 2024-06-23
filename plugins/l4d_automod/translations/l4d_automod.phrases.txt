@@ -1,0 +1,7 @@
+"Phrases"
+{
+	"Notice_FriendlyFire"
+	{
+		"en"    "did excessive friendly fire damage!"
+	}
+}

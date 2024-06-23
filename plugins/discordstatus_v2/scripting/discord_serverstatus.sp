@@ -18,7 +18,7 @@
 #pragma newdecls required
 #pragma semicolon 1
 
-#define PLUGIN_VERSION "1.1.9"
+#define PLUGIN_VERSION "1.1.10"
 
 bool g_started; // Has the server started?
 bool g_hasip;
