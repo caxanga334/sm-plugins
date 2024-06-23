@@ -8,7 +8,7 @@
 #undef REQUIRE_EXTENSIONS
 #tryinclude <sourcetvmanager>
 
-#define PLUGIN_VERSION "1.0.0"
+#define PLUGIN_VERSION "1.0.1"
 
 public Plugin myinfo =
 {
@@ -99,7 +99,7 @@ void EV_PlayerHurt(Event event, const char[] name, bool dontBroadcast)
 	Player victim = Player(GetClientOfUserId(event.GetInt("userid")));
 	Player attacker = Player(event.GetInt("attackerentid"));
 
-	if (!victim.IsValid() || attacker.IsValid())
+	if (!victim.IsValid() || !attacker.IsValid())
 	{
 		// both victim and attacker must be a player entity and must be in-game
 		return;
