@@ -815,7 +815,7 @@ void SendMessage_L4D_OnNativeVote(int client, const char[] issue, const char[] o
 		SourceTV_GetDemoFileName(buffer, sizeof(buffer));
 		EmbedField field4 = new EmbedField("Demo File", buffer, false);
 		embed1.AddField(field4);
-		Formatex(buffer, sizeof(buffer), "%i", SourceTV_GetRecordingTick());
+		FormatEx(buffer, sizeof(buffer), "%i", SourceTV_GetRecordingTick());
 		EmbedField field5 = new EmbedField("Tick", buffer, false);
 		embed1.AddField(field5);
 	}
