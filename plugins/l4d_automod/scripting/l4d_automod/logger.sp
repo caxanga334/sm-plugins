@@ -21,7 +21,7 @@ void Logger_LogFriendlyFire(int client, int victim)
 		char demofile[PLATFORM_MAX_PATH];
 		SourceTV_GetDemoFileName(demofile, sizeof(demofile));
 		char demoinfo[PLATFORM_MAX_PATH + 32];
-		FormatEx(demoinfo, sizeof(demoinfo), " SourceTV Demo: %s (%i)", SourceTV_GetRecordingTick());
+		FormatEx(demoinfo, sizeof(demoinfo), " SourceTV Demo: %s (%i)", demofile, SourceTV_GetRecordingTick());
 
 		StrCat(buffer, sizeof(buffer), demoinfo);
 	}
