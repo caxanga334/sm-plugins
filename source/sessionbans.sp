@@ -43,6 +43,12 @@ public void OnMapStart()
 // This plugin doesn't handle clients without auth, another plugin should be used for that
 public void OnClientPostAdminCheck(int client)
 {
+	// Ignore bots
+	if (IsFakeClient(client))
+	{
+		return;
+	}
+
 	char steamID[MAX_AUTHID_LENGTH];
 
 	if (!GetClientAuthId(client, AuthId_SteamID64, steamID, sizeof(steamID)))
