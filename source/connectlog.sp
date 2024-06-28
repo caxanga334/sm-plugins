@@ -10,7 +10,7 @@ public Plugin myinfo = {
 	name = "[ANY] Connect Log",
 	author = "caxanga334",
 	description = "Logs connections to a file.",
-	version = "1.0.0",
+	version = "1.1.0",
 	url = "https://github.com/caxanga334/"
 }
 
@@ -33,24 +33,31 @@ public void OnMapStart() {
 
 public void OnClientConnected(int client) {
 	char sClientIP[64];
+
 	GetClientIP(client, sClientIP, sizeof(sClientIP), false);
-	if (!IsFakeClient(client)) {
-		LogToFileEx(g_sLogPath,
-			"[Connection Log] New connection (%s).",
-			sClientIP);
+
+	if (!IsFakeClient(client)) 
+	{
+		LogToFileEx(g_sLogPath, "[Connection Log] New connection (%s).", sClientIP);
 	}
 }
 
 public void OnClientAuthorized(int client, const char[] auth) {
 	char sName[MAX_NAME_LENGTH];
-	char sAuth[MAX_NAME_LENGTH];
+	char sAuth[MAX_AUTHID_LENGTH];
+	char sMethod[64];
+
 	GetClientName(client, sName, sizeof(sName));
 	GetClientAuthId(client, AuthId_Engine, sAuth, sizeof(sAuth));
-	if (!IsFakeClient(client)) {
-		LogToFileEx(g_sLogPath,
-			"[Connection Log] Client %s Authorized (%s).",
-			sName,
-			sAuth);
+
+	if (!GetClientInfo(client, "cl_connectmethod", sMethod, sizeof(sMethod)))
+	{
+		strcopy(sMethod, sizeof(sMethod), "Unknown");
+	}
+
+	if (!IsFakeClient(client)) 
+	{
+		LogToFileEx(g_sLogPath, "[Connection Log] Client %s Authorized (%s). Connection Method: %s", sName, sAuth, sMethod);
 	}
 }
 
