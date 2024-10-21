@@ -16,19 +16,26 @@ jobs:
         buildjobs:
           - sourcemod-1.11
           - sourcemod-1.12
+          - sourcemod-1.13
 
         include:
 
           - buildjobs: sourcemod-1.11
             os_version: ubuntu-latest
-            identifier: 'Sourcemod Stable'
+            identifier: 'Sourcemod Old'
             sm-version: '1.11.x'
-            package-name: 'sm-stable'
+            package-name: 'sm-old'
 
           - buildjobs: sourcemod-1.12
             os_version: ubuntu-latest
-            identifier: 'Sourcemod Dev'
+            identifier: 'Sourcemod Stable'
             sm-version: '1.12.x'
+            package-name: 'sm-stable'
+
+          - buildjobs: sourcemod-1.13
+            os_version: ubuntu-latest
+            identifier: 'Sourcemod Dev'
+            sm-version: '1.13.x'
             package-name: 'sm-dev'
 
     steps:
