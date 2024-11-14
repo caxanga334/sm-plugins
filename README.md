@@ -8,3 +8,5 @@ You must be logged in a Github account to download build artifacts.
 
 # Contact
 * [Discord](https://discord.gg/bh9g8MebJn)
+
+<!-- CI trigger comment -->
