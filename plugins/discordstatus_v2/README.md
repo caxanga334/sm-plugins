@@ -49,13 +49,13 @@ A config file will be auto generated at `cfg/sourcemod/plugin.serverstatus.cfg` 
 
 The following libraries are **required** for the plugin to compile.
 
-* [SteamWorks](https://github.com/KyleSanderson/SteamWorks)
 * [REST in Pawn](https://github.com/ErikMinekus/sm-ripext)
 * [Discord Webhook API](https://github.com/Sarrus1/DiscordWebhookAPI)
 * [AutoExecConfig](https://github.com/Impact123/AutoExecConfig)
   
 The following libraries are **optional** for compiling the plugin.
 
+* [SteamWorks](https://github.com/KyleSanderson/SteamWorks)
 * [SteamPawn](https://github.com/nosoop/SM-SteamPawn)
 * [SourceTV Manager](https://github.com/peace-maker/sourcetvmanager)
 * [Left 4 DHooks Direct](https://forums.alliedmods.net/showthread.php?t=321696)
