@@ -147,7 +147,7 @@ jobs:
         run: |
           for file in *.sp; do
             echo -e "\nCompiling $file..."
-            spcomp -O2 -v2 -i ${{ env.TPINCLUDES_PATH }}/ $file
+            spcomp -v2 -i ${{ env.TPINCLUDES_PATH }}/ $file
           done
           echo "===OUT FILES==="
           ls -lah *.smx

@@ -16,7 +16,6 @@ Status messages includes:
 
 # Requirements
 
-* [SteamWorks](https://github.com/KyleSanderson/SteamWorks)
 * [REST in Pawn](https://github.com/ErikMinekus/sm-ripext)
 * [Left 4 DHooks Direct](https://forums.alliedmods.net/showthread.php?t=321696)
 
@@ -26,10 +25,13 @@ Status messages includes:
 
 * [SteamPawn](https://github.com/nosoop/SM-SteamPawn)
 * [SourceTV Manager](https://github.com/peace-maker/sourcetvmanager)
+* [SteamWorks](https://github.com/KyleSanderson/SteamWorks)
 
 **SteamPawn** allows the plugins to obtain the server's Fake IP address and port obtained from SDR.
 
 **SourceTV Manager** allows the plugin to send demo recording status notification and the current demo filename and tick.
+
+**SteamWorks** allows the plugin to obtain the server's IP address while behind NAT.
 
 # Usage
 

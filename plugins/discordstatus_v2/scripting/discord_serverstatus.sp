@@ -1,7 +1,7 @@
 #include <sourcemod>
 #include <sdktools>
 #include <ripext>
-#include <steamworks>
+
 #include <discordWebhookAPI>
 #include <autoexecconfig>
 
@@ -14,6 +14,7 @@
 #tryinclude <smlib/server>
 #tryinclude <sourcebanspp>
 #tryinclude <sourcecomms>
+#tryinclude <steamworks>
 
 #pragma newdecls required
 #pragma semicolon 1
@@ -31,6 +32,9 @@ bool g_sourcetvmanager = false; // Is the SourceTV manager extension installed?
 #endif
 #if defined __steampawn_included
 bool g_steampawn = false; // Is SteamPawn plugin installed?
+#endif
+#if defined _SteamWorks_Included
+bool g_steamworks = false; // Is SteamWorks extension installed?
 #endif
 char g_ipaddr[128];
 float g_delay;
@@ -147,6 +151,11 @@ public void OnAllPluginsLoaded()
 #if defined _stvmngr_included
 	// Note: OnLibraryAdded/Removed is not called for extensions
 	g_sourcetvmanager = LibraryExists("sourcetvmanager");
+#endif
+
+#if defined _SteamWorks_Included
+	// Note: OnLibraryAdded/Removed is not called for extensions
+	g_steamworks = LibraryExists("SteamWorks");
 #endif
 }
 

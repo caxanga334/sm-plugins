@@ -157,14 +157,26 @@ bool BuildServerIPAddr(char[] buffer, int size)
 	}
 #endif
 
-	int ipaddr[4];
-
-	if (SteamWorks_GetPublicIP(ipaddr))
+#if defined _SteamWorks_Included
+	if (g_steamworks)
 	{
-		FormatEx(buffer, size, "%i.%i.%i.%i", ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3]);
-		LogMessage("Found IP Address via SteamWorks (%s)", buffer);
+		int ipaddr[4];
+
+		if (SteamWorks_GetPublicIP(ipaddr))
+		{
+			FormatEx(buffer, size, "%i.%i.%i.%i", ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3]);
+			LogMessage("Found IP Address via SteamWorks (%s)", buffer);
+			return true;
+		}
+	}
+#endif
+
+#if defined _smlib_server_included
+	if (Server_GetIPString(buffer, size, false))
+	{
 		return true;
 	}
+#endif
 
 	strcopy(buffer, size, "FAILED TO RETREIVE IP ADDRESS");
 	return false;
