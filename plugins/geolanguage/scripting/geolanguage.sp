@@ -7,7 +7,7 @@
 #include <clientprefs>
 
 #define PLUGIN_NAME 	"GeoIP Language Selection"
-#define PLUGIN_VERSION 	"1.3.1"
+#define PLUGIN_VERSION 	"1.3.2"
 
 Handle g_hLangList = INVALID_HANDLE;
 Handle g_hLangMenu = INVALID_HANDLE;
@@ -250,6 +250,8 @@ public int CookieMenu_GeoLanguage(int client, CookieMenuAction action, any info,
 			DisplayMenu(g_hLangMenu, client, MENU_TIME_FOREVER);
 		}
 	}
+
+	return 0;
 }
 
 public int LanguageMenu_Handler(Menu menu, MenuAction action, int param1, int param2)
