@@ -296,6 +296,7 @@ Action Command_ReportEngineVersion(int client, int args)
 		{
 			ReplyToCommand(client, "Engine: Day of Infamy");
 		}
+#if SOURCEMOD_V_MINOR >= 12
 		case Engine_PVKII:
 		{
 			ReplyToCommand(client, "Engine: Pirates, Vikings, and Knights II");
@@ -304,6 +305,7 @@ Action Command_ReportEngineVersion(int client, int args)
 		{
 			ReplyToCommand(client, "Engine: Military Conflict: Vietnam");
 		}
+#endif
 		default:
 		{
 			ReplyToCommand(client, "Engine: Unknown (Out of Bounds)");
@@ -535,6 +537,8 @@ Action Command_GenericSDKToolsTests(int client, int args)
 	return Plugin_Handled;
 }
 
+#if SOURCEMOD_V_MINOR >= 12
+
 void Timer_Extinguish(Handle timer, any data)
 {
 	int entity = EntRefToEntIndex(view_as<int>(data));
@@ -555,10 +559,22 @@ Action Command_IgniteSelf(int client, int args)
 
 	IgniteEntity(client, 10.0);
 
+	// 1.11 complains about this
 	CreateTimer(2.0, Timer_Extinguish, view_as<any>(EntIndexToEntRef(client)));
 
 	ReplyToCommand(client, "Burning you!");
 
 	return Plugin_Handled;
 }
+
+#else
+
+Action Command_IgniteSelf(int client, int args)
+{
+	ReplyToCommand(client, "This command requires SM 1.12 or better.");
+
+	return Plugin_Handled;
+}
+
+#endif
 
