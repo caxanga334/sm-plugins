@@ -296,6 +296,7 @@ Action Command_ReportEngineVersion(int client, int args)
 		{
 			ReplyToCommand(client, "Engine: Day of Infamy");
 		}
+#if SOURCEMOD_V_MINOR >= 12
 		case Engine_PVKII:
 		{
 			ReplyToCommand(client, "Engine: Pirates, Vikings, and Knights II");
@@ -304,6 +305,7 @@ Action Command_ReportEngineVersion(int client, int args)
 		{
 			ReplyToCommand(client, "Engine: Military Conflict: Vietnam");
 		}
+#endif
 		default:
 		{
 			ReplyToCommand(client, "Engine: Unknown (Out of Bounds)");
