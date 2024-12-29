@@ -142,6 +142,7 @@ jobs:
           cp ${{ github.workspace }}/sourcefiles/source/l4d_antiearlyvote.sp ${{ env.BUILD_PATH }}/
           cp ${{ github.workspace }}/sourcefiles/source/sessionbans.sp ${{ env.BUILD_PATH }}/
           cp ${{ github.workspace }}/sourcefiles/source/l4d2_admin_stealth.sp ${{ env.BUILD_PATH }}/
+          cp ${{ github.workspace }}/sourcefiles/source/sm_gamedata_tester.sp ${{ env.BUILD_PATH }}/
 
       - name: Compile Plugins
         working-directory: ${{ env.BUILD_PATH }}
@@ -163,6 +164,7 @@ jobs:
           rsync -rv ${{ github.workspace }}/sourcefiles/plugins/l4d_automod/configs/* ${{ env.CONFIGS_PATH }}/
           rsync -rv ${{ github.workspace }}/sourcefiles/plugins/l4d_automod/translations/* ${{ env.LOC_PATH }}/
           rsync -rv ${{ github.workspace }}/sourcefiles/plugins/geolanguage/configs/* ${{ env.CONFIGS_PATH }}/
+          rsync -rv ${{ github.workspace }}/sourcefiles/gamedata/* ${{ env.GAMEDATA_PATH }}/
 
       - name: Fetch Short SHA
         uses: benjlevesque/short-sha@v3.0

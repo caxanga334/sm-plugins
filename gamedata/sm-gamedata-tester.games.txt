@@ -1,0 +1,16 @@
+"Games"
+{
+	"#default"
+	{
+		"Offsets"
+		{
+			"CGameRules_GetDamageMultiplier"
+			{
+				"windows"       "33"
+				"windows64"     "33"
+				"linux"         "34"
+				"linux64"       "34"
+			}
+		}
+	}
+}
