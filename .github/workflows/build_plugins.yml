@@ -143,6 +143,7 @@ jobs:
           cp ${{ github.workspace }}/sourcefiles/source/sessionbans.sp ${{ env.BUILD_PATH }}/
           cp ${{ github.workspace }}/sourcefiles/source/l4d2_admin_stealth.sp ${{ env.BUILD_PATH }}/
           cp ${{ github.workspace }}/sourcefiles/source/sm_gamedata_tester.sp ${{ env.BUILD_PATH }}/
+          cp ${{ github.workspace }}/sourcefiles/source/ainfile-blocker.sp ${{ env.BUILD_PATH }}/
 
       - name: Compile Plugins
         working-directory: ${{ env.BUILD_PATH }}

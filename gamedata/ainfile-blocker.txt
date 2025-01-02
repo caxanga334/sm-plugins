@@ -1,0 +1,87 @@
+"Games"
+{
+	"#default"
+	{
+		"Signatures"
+		{
+			"OnResourcePrecachedFullPath"
+			{
+				"library"		"engine"
+				"linux"			"@_ZN22CDownloadListGenerator27OnResourcePrecachedFullPathEPcPKc"
+				"windows"		"\x55\x8B\xEC\x81\xEC\x2A\x2A\x2A\x2A\x56\x8B\x75\x08\x57\x6A\x5C\x56\x8B\xF9\xE8"
+			}
+		}
+		"Functions"
+		{
+			"OnResourcePrecachedFullPath"
+			{
+				"signature"  "OnResourcePrecachedFullPath"
+				"callconv"  "thiscall"
+				"return"  "void"
+				"this"  "ignore"
+				"arguments"
+				{
+					"param1"
+					{
+						"type"	"charptr"
+					}
+					"param2"
+					{
+						"type"	"charptr"
+					}
+				}
+			}
+		}
+	}
+	"hl2mp"
+	{
+		"Signatures"
+		{
+			"OnResourcePrecachedFullPath"
+			{
+				"library"		"engine"
+				"linux"			"@_ZN22CDownloadListGenerator27OnResourcePrecachedFullPathEPcPKc.part.0"
+				"windows"		"\x55\x8B\xEC\x81\xEC\x04\x01\x00\x00\x56\x8B\x75\x2A\x57\x6A\x5C"
+			}
+		}
+		"Functions"
+		{
+			"OnResourcePrecachedFullPath"
+			{
+				"signature"  "OnResourcePrecachedFullPath"
+
+				"linux"
+				{
+					"callconv"  "cdecl"
+				}
+				"windows"
+				{
+					"callconv"  "thiscall"
+				}
+
+				"return"  "void"
+				"this"  "ignore"
+
+				"arguments"
+				{
+					"param1"
+					{
+						"type"	"charptr"
+						"linux"
+						{
+							"register"  "edx"
+						}
+					}
+					"param2"
+					{
+						"type"	"charptr"
+						"linux"
+						{
+							"register"  "ecx"
+						}
+					}
+				}
+			}
+		}
+	}
+}
