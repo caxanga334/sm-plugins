@@ -174,7 +174,7 @@ jobs:
           rsync -rv ${{ github.workspace }}/sourcefiles/plugins/l4d_automod/translations/* ${{ env.LOC_PATH }}/
           rsync -rv ${{ github.workspace }}/sourcefiles/plugins/geolanguage/configs/* ${{ env.CONFIGS_PATH }}/
           rsync -rv ${{ github.workspace }}/sourcefiles/plugins/rcbot2_randomseedfix/gamedata/* ${{ env.GAMEDATA_PATH }}/
-          rsync -rv ${{ github.workspace }}/sourcefiles/plugins/plugins/tf_bots_mvm_currency/gamedata/* ${{ env.GAMEDATA_PATH }}/
+          rsync -rv ${{ github.workspace }}/sourcefiles/plugins/tf_bots_mvm_currency/gamedata/* ${{ env.GAMEDATA_PATH }}/
           rsync -rv ${{ github.workspace }}/sourcefiles/gamedata/* ${{ env.GAMEDATA_PATH }}/
 
       - name: Fetch Short SHA
