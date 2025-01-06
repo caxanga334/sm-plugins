@@ -1,0 +1,48 @@
+"Games"
+{
+	"tf"
+	{
+		"Offsets"
+		{
+			/* These are vtable offsets */
+			"CCurrencyPack::MyTouch"
+			{
+				"windows"			"228"
+				"windows64"			"228"
+				"linux"				"229"
+				"linux64"			"229"
+			}
+			"CBasePlayer::IsBot"
+			{
+				"windows"			"454"
+				"windows64"			"454"
+				"linux"				"455"
+				"linux64"			"455"
+			}
+		}
+		"Functions"
+		{
+			"CCurrencyPack::MyTouch"
+			{
+				"offset"  "CCurrencyPack::MyTouch"
+				"callconv"  "thiscall"
+				"return"  "bool"
+				"this"  "entity"
+				"arguments"
+				{
+					"param1"
+					{
+						"type"	"cbaseentity"
+					}
+				}
+			}
+			"CBasePlayer::IsBot"
+			{
+				"offset"  "CBasePlayer::IsBot"
+				"callconv"  "thiscall"
+				"return"  "bool"
+				"this"  "entity"
+			}
+		}
+	}
+}
