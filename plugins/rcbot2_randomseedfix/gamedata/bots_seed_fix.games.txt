@@ -1,0 +1,21 @@
+"Games"
+{
+	"#default"
+	{
+		"Offsets"
+		{
+			/* Offset to random_seed */
+			"CUserCmd::random_seed"
+			{
+				"windows"		"52"
+				"linux"			"52"
+			}
+			/* Offset to server_random_seed */
+			"CUserCmd::server_random_seed"
+			{
+				"windows"		"56"
+				"linux"			"56"
+			}
+		}
+	}
+}
