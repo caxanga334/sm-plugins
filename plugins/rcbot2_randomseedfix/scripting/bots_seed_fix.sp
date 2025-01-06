@@ -98,8 +98,8 @@ MRESReturn Hook_PlayerRunCommand_Pre(Address pThis, DHookParam hParams)
 
 	if (random_seed == 0 || server_random_seed == 0)
 	{
-		int seed1 = GetURandomInt();
-		int seed2 = GetURandomInt();
+		int seed1 = GetRandomInt(0, 0x7fffffff);
+		int seed2 = GetRandomInt(0, 0x7fffffff);
 		StoreToAddress(addr_rnseed, view_as<any>(seed1), NumberType_Int32);
 		StoreToAddress(addr_svrnseed, view_as<any>(seed2), NumberType_Int32);
 	}
