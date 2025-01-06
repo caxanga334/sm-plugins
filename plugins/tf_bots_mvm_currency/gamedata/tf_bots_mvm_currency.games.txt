@@ -24,10 +24,11 @@
 		{
 			"CCurrencyPack::MyTouch"
 			{
-				"offset"  "CCurrencyPack::MyTouch"
-				"callconv"  "thiscall"
-				"return"  "bool"
-				"this"  "entity"
+				"offset"  		"CCurrencyPack::MyTouch"
+				"callconv"  	"thiscall"
+				"return"  		"bool"
+				"this"  		"entity"
+				"hooktype"		"entity"
 				"arguments"
 				{
 					"param1"
@@ -38,10 +39,11 @@
 			}
 			"CBasePlayer::IsBot"
 			{
-				"offset"  "CBasePlayer::IsBot"
-				"callconv"  "thiscall"
-				"return"  "bool"
-				"this"  "entity"
+				"offset"  		"CBasePlayer::IsBot"
+				"callconv"  	"thiscall"
+				"return"  		"bool"
+				"this"  		"entity"
+				"hooktype"		"entity"
 			}
 		}
 	}
