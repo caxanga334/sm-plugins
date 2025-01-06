@@ -1,13 +1,12 @@
 #include <sourcemod>
 #include <sdkhooks>
 #include <dhooks>
-#include <stocksoup/memory>
 #include <tf2_stocks>
 
 #pragma newdecls required
 #pragma semicolon 1
 
-#define PLUGIN_VERSION "1.0.0"
+#define PLUGIN_VERSION "1.1.0"
 
 DynamicHook g_mytouch;
 DynamicHook g_isbot;
@@ -67,6 +66,8 @@ public void OnPluginStart()
 	}
 
 	LogMessage("Dynamic hooks for CCurrencyPack::MyTouch and CBasePlayer::IsBot are ok!");
+
+	CreateConVar("sm_mvm_bots_currency_version", PLUGIN_VERSION, "Fix MvM Currency for RED Bots plugin version", FCVAR_NOTIFY);
 }
 
 public void OnMapStart()
@@ -95,37 +96,35 @@ public void OnClientPutInServer(int client)
 	}
 }
 
-MRESReturn Hook_MyTouch_Pre(Address pThis, DHookReturn hReturn, DHookParam hParams)
+MRESReturn Hook_MyTouch_Pre(int pThis, DHookReturn hReturn, DHookParam hParams)
 {
-	Address pPlayer = DHookGetParamAddress(hParams, 1);
-	int player = GetEntityFromAddress(pPlayer);
+	int player = DHookGetParam(hParams, 1);
 
 	if (IsValidEntity(player) && IsFakeClient(player) && TF2_GetClientTeam(player) == TFTeam_Red)
 	{
+		// PrintToServer("[PRE] Currency Pack touched by bot %i", player);
 		g_touchbypass[player] = true;
 	}
 
 	return MRES_Ignored;
 }
 
-MRESReturn Hook_MyTouch_Post(Address pThis, DHookReturn hReturn, DHookParam hParams)
+MRESReturn Hook_MyTouch_Post(int pThis, DHookReturn hReturn, DHookParam hParams)
 {
-	Address pPlayer = DHookGetParamAddress(hParams, 1);
-	int player = GetEntityFromAddress(pPlayer);
+	int player = DHookGetParam(hParams, 1);
 
 	if (IsValidEntity(player) && g_touchbypass[player])
 	{
+		// PrintToServer("[POST] Currency Pack touched by bot %i", player);
 		g_touchbypass[player] = false;
 	}
 
 	return MRES_Ignored;
 }
 
-MRESReturn Hook_IsBot_Pre(Address pThis, DHookReturn hReturn)
+MRESReturn Hook_IsBot_Pre(int pThis, DHookReturn hReturn)
 {
-	int player = GetEntityFromAddress(pThis);
-
-	if (IsValidEntity(player) && g_touchbypass[player])
+	if (IsValidEntity(pThis) && g_touchbypass[pThis])
 	{
 		DHookSetReturn(hReturn, view_as<any>(false));
 		return MRES_Override;
@@ -134,11 +133,9 @@ MRESReturn Hook_IsBot_Pre(Address pThis, DHookReturn hReturn)
 	return MRES_Ignored;
 }
 
-MRESReturn Hook_IsBot_Post(Address pThis, DHookReturn hReturn)
+MRESReturn Hook_IsBot_Post(int pThis, DHookReturn hReturn)
 {
-	int player = GetEntityFromAddress(pThis);
-
-	if (IsValidEntity(player) && g_touchbypass[player])
+	if (IsValidEntity(pThis) && g_touchbypass[pThis])
 	{
 		DHookSetReturn(hReturn, view_as<any>(false));
 		return MRES_Override;
