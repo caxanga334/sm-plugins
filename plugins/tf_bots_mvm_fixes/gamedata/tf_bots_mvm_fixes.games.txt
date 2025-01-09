@@ -19,6 +19,13 @@
 				"linux"				"455"
 				"linux64"			"455"
 			}
+			"CTFPlayer::Event_Killed"
+			{
+				"windows"			"68"
+				"windows64"			"68"
+				"linux"				"69"
+				"linux64"			"69"
+			}
 		}
 		"Functions"
 		{
@@ -44,6 +51,22 @@
 				"return"  		"bool"
 				"this"  		"entity"
 				"hooktype"		"entity"
+			}
+			"CTFPlayer::Event_Killed"
+			{
+				"offset"		"CTFPlayer::Event_Killed"
+				"callconv"		"thiscall"
+				"return"		"void"
+				"this"			"entity"
+				"hooktype"		"entity"
+				"arguments"
+				{
+					"param1"
+					{
+						/* actually it's a CTakeDamageInfo object by reference but we don't read/write to it, we just care about the function itself being called */
+						"type"	"objectptr"
+					}
+				}
 			}
 		}
 	}
