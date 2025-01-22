@@ -14,6 +14,14 @@ body:
     validations:
       required: true
   - type: input
+    id: game-name
+    attributes:
+      label: Game Name
+      description: The name of the game/mod you're running.
+      placeholder: Team Fortress 2
+    validations:
+      required: true
+  - type: input
     id: sm-version
     attributes:
       label: Sourcemod version
