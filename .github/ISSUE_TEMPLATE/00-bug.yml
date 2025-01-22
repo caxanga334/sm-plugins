@@ -1,0 +1,94 @@
+﻿name: Bug Report
+description: File a bug report.
+title: "[Bug]: "
+labels: ["bug"]
+assignees: 
+  - caxanga334
+body:
+  - type: input
+    id: plugin-name
+    attributes:
+      label: Plugin Name
+      description: The name of the plugin.
+      placeholder: Auto Recorder
+    validations:
+      required: true
+  - type: input
+    id: sm-version
+    attributes:
+      label: Sourcemod version
+      description: The Sourcemod version used.
+      placeholder: "1.12.0.7168"
+    validations:
+      required: true
+  - type: input
+    id: mm-version
+    attributes:
+      label: Metamod Source version
+      description: The Metamod Source version used.
+      placeholder: "1.12.0.1205"
+    validations:
+      required: true
+  - type: textarea
+    id: sm-plugins
+    attributes:
+      label: Sourcemod Plugin List
+      description: List of plugins installed on the server.
+      placeholder: |
+                  [SM] Listing 34 plugins:
+                    01 "Anti-Flood" (1.11.0.6952) by AlliedModders LLC
+                    ...
+    validations:
+      required: true
+  - type: textarea
+    id: sm-exts
+    attributes:
+      label: Sourcemod Extension List
+      description: List of extensions installed on the server.
+      placeholder: |
+                  [SM] Displaying 12 extensions:
+                    [01] Automatic Updater (1.11.0.6952): Updates SourceMod gamedata files
+                    [02] Webternet (1.11.0.6952): Extension for interacting with URLs
+                    ...
+    validations:
+      required: true
+  - type: textarea
+    id: mm-plugins
+    attributes:
+      label: Metamod Source Plugin List
+      description: List of metamod source plugins installed on the server.
+      placeholder: |
+                  Listing 3 plugins:
+                    [01] SourceMod (1.11.0.6952) by AlliedModders LLC
+                    ...
+    validations:
+      required: true
+  - type: textarea
+    id: bug-desc
+    attributes:
+      label: Describe the bug
+      description: Provide a description of the bug.
+      placeholder: I did X and Y happened.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to Reproduce
+      description: Provide the smallests steps needed to reproduce the bug.
+      placeholder: |
+                  1. Do this.
+                  2. Then this.
+                  3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: crash-links
+    attributes:
+      label: Crash Reports
+      description: If the server is crashing, post links to Accelerator crash reports.
+      placeholder: |
+                  https://crash.limetech.org/ze4gqy3regur
+                  https://crash.limetech.org/hi6x2h9vy4pr
+    validations:
+      required: false
