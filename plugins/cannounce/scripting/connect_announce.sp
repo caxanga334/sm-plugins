@@ -28,7 +28,7 @@ public void OnPluginStart()
 
 	HookEvent("player_disconnect", Event_PlayerDisconnect, EventHookMode_Pre);
 
-	LoadTranslations("l4d_automod.phrases");
+	LoadTranslations("cannounce.phrases");
 }
 
 public void OnClientAuthorized(int client, const char[] auth)
