@@ -1,0 +1,34 @@
+"Phrases"
+{
+	"ClientPreConnect"
+	{
+		// client name, authID
+		"#format"		"{1:s},{2:s}"
+		"en"			"Player {1} ({2}) is connecting to the server."
+		"pt"			"Jogador {1} ({2}) está conectando ao servidor."
+	}
+
+	"ClientJoined"
+	{
+		// client name, authID
+		"#format"		"{1:s},{2:s}"
+		"en"			"Player {1} ({2}) has connected to the server."
+		"pt"			"Jogador {1} ({2}) conectou ao servidor."
+	}
+
+	"ClientDisconnectSimple"
+	{
+		// client name, authID
+		"#format"		"{1:s},{2:s}"
+		"en"			"Player {1} ({2}) has disconnected from the server."
+		"pt"			"Jogador {1} ({2}) desconectou do servidor."
+	}
+
+	"ClientDisconnectWithReason"
+	{
+		// client name, authID, disconnect reason
+		"#format"		"{1:s},{2:s},{3:s}"
+		"en"			"{1} ({2}) has disconnected from the server. Reason: {3}"
+		"pt"			"{1} ({2}) desconectou do servidor. Motivo: {3}"
+	}
+}
