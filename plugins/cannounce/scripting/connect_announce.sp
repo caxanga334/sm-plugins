@@ -99,13 +99,13 @@ Action Event_PlayerDisconnect(Event event, const char[] name, bool dontBroadcast
 		strcopy(authid, sizeof(authid), "STEAM_ID_UNAUTHENTICATED");
 	}
 
-	char name[128];
+	char Clientname[128];
 	char reason[512];
 
-	GetClientName(client, name, sizeof(name));
+	GetClientName(client, Clientname, sizeof(Clientname));
 	event.GetString("reason", reason, sizeof(reason));
 
-	PrintToChatAll("[SM] %t", "ClientDisconnectWithReason", name, authid, reason);
+	PrintToChatAll("[SM] %t", "ClientDisconnectWithReason", Clientname, authid, reason);
 
 	return Plugin_Continue;
 }
