@@ -8,7 +8,7 @@ public Plugin myinfo =
 	name = "Connect Announce",
 	author = "caxanga334",
 	description = "Announces player connects and disconnects.",
-	version = "1.0.0",
+	version = "1.0.1",
 	url = "https://github.com/caxanga334/sm-plugins"
 };
 
@@ -91,6 +91,8 @@ Action Event_PlayerDisconnect(Event event, const char[] name, bool dontBroadcast
 	int client = GetClientOfUserId(event.GetInt("userid"));
 
 	if (client == 0) { return Plugin_Continue; }
+
+	if (IsFakeClient(client)) { return Plugin_Continue; }
 
 	char authid[MAX_AUTHID_LENGTH];
 
