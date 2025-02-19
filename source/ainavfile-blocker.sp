@@ -9,18 +9,18 @@
 
 public Plugin myinfo =
 {
-	name = "Ain File Download Blocker",
+	name = "AI Navigation File Download Blocker",
 	author = "Russianeer, caxanga334",
 	description = "Blocks the server navigation files from being downloaded by the client.",
-	version = "1.1.0",
+	version = "1.2.0",
 	url = "https://forums.alliedmods.net/showthread.php?p=2805645"
 };
 
 public void OnPluginStart()
 {
-	GameData gamedata = LoadGameConfigFile("ainfile-blocker");
+	GameData gamedata = LoadGameConfigFile("ainavfile-blocker");
 
-	if(!gamedata)
+	if (gamedata == null)
 	{
 		SetFailState("Could't find ainfile-blocker.txt!");
 	}
@@ -54,7 +54,7 @@ public MRESReturn Detour_OnResourcePrecachedFullPath(Handle hParams)
 
 	int len = strlen(sFile);
 
-	if(len > 3 && strcmp(sFile[len-4], ".ain", false) == 0)
+	if(len > 3 && (strcmp(sFile[len-4], ".ain", false) == 0 || strcmp(sFile[len-4], ".nav", false) == 0))
 	{
 #if defined(DEBUG)
 		LogMessage("Precache Blocked for \"%s\"!", sFile);

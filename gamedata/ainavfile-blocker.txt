@@ -33,8 +33,18 @@
 			}
 		}
 	}
-	"hl2mp"
+	"#default"
 	{
+		/* Games using the TF2 engine branch */
+		"#supported"
+		{
+			"game"		"tf"
+			"game"		"hl2mp"
+			"game"		"css"
+			"game"		"dods"
+			"game"		"hl1mp"
+		}
+
 		"Signatures"
 		{
 			"OnResourcePrecachedFullPath"
