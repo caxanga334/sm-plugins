@@ -40,7 +40,7 @@
 		{
 			"game"		"tf"
 			"game"		"hl2mp"
-			"game"		"css"
+			"game"		"cstrike"
 			"game"		"dods"
 			"game"		"hl1mp"
 		}
