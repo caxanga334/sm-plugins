@@ -32,6 +32,7 @@ public void OnPluginStart()
 	RegAdminCmd("sm_dev_gimme", Command_Gimme, ADMFLAG_ROOT, "Gives you items.");
 	RegAdminCmd("sm_dev_sdktools", Command_GenericSDKToolsTests, ADMFLAG_ROOT, "Generic SDKTools tests.");
 	RegAdminCmd("sm_dev_burnme", Command_IgniteSelf, ADMFLAG_ROOT, "Test the ignite gamedata.");
+	RegAdminCmd("sm_dev_forcesuicide", Command_ForceSuicide, ADMFLAG_ROOT, "Tests the force suicide gamedata.");
 }
 
 void Hook_ClientSpawnPost(int entity)
@@ -578,3 +579,28 @@ Action Command_IgniteSelf(int client, int args)
 
 #endif
 
+Action Command_ForceSuicide(int client, int args)
+{
+	int cl = client;
+
+	if (cl == 0)
+	{
+		if (!IsDedicatedServer())
+		{
+			cl = 1;
+		}
+	}
+
+	if (args < 1)
+	{
+		ForcePlayerSuicide(cl, false);
+		ReplyToCommand(cl, "ForceSuicide: explode = false");
+	}
+	else
+	{
+		ForcePlayerSuicide(cl, true);
+		ReplyToCommand(cl, "ForceSuicide: explode = true");
+	}
+
+	return Plugin_Handled;
+}
