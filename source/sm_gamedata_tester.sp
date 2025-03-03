@@ -591,6 +591,7 @@ Action Command_ForceSuicide(int client, int args)
 		}
 	}
 
+#if SOURCEMOD_V_MINOR >= 12
 	if (args < 1)
 	{
 		ForcePlayerSuicide(cl, false);
@@ -601,6 +602,9 @@ Action Command_ForceSuicide(int client, int args)
 		ForcePlayerSuicide(cl, true);
 		ReplyToCommand(cl, "ForceSuicide: explode = true");
 	}
-
+#else
+	ForcePlayerSuicide(cl);
+	ReplyToCommand(cl, "ForceSuicide");
+#endif
 	return Plugin_Handled;
 }
