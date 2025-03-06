@@ -6,7 +6,7 @@
 #pragma newdecls required // enforce new SM 1.7 syntax
 #pragma semicolon 1
 
-#define PLUGIN_VERSION "1.2.0"
+#define PLUGIN_VERSION "1.3.0"
 
 // variables
 char g_strMissionName[128]; // The current mission name
@@ -17,6 +17,7 @@ UserMsg g_uRefund;
 float g_flAnnounceTimer;
 eMissionDifficulty g_Difficulty; // Current mission difficulty
 bool g_bMissionWasChangedOrRestarted;
+Handle g_tBotsTimer;
 
 // ConVars
 ConVar cv_BaseCredits = null;
@@ -31,6 +32,7 @@ ConVar cv_Multiplier_Normal = null;
 ConVar cv_Multiplier_Intermediate = null;
 ConVar cv_Multiplier_Advanced = null;
 ConVar cv_Multiplier_Expert = null;
+ConVar cv_AutoRunForBots = null;
 
 enum eMissionDifficulty
 {
@@ -101,6 +103,7 @@ public void OnPluginStart()
 	cv_Multiplier_Intermediate = CreateConVar("sm_mvmcredits_multiplier_intermediate", "1.3", "Multiplier for nintermediate difficulty missions", FCVAR_NONE, true, 0.01, true, 5.0);
 	cv_Multiplier_Advanced = CreateConVar("sm_mvmcredits_multiplier_advanced", "1.6", "Multiplier for advanced difficulty missions", FCVAR_NONE, true, 0.01, true, 5.0);
 	cv_Multiplier_Expert = CreateConVar("sm_mvmcredits_multiplier_expert", "2.0", "Multiplier for expert difficulty missions", FCVAR_NONE, true, 0.01, true, 5.0);
+	cv_AutoRunForBots = CreateConVar("sm_mvmcredits_auto_run_on_bots", "0", "If enabled, will automatically run the request credits commands for RED team bots", FCVAR_NONE, true, 0.0, true, 1.0);
 	AutoExecConfig(true, "plugin.mvmcredits");
 
 	RegConsoleCmd("sm_requestcredits", command_requestcredits, "Request MvM Currency");
@@ -139,6 +142,14 @@ public void OnMapStart()
 	g_iCurrentWave = 0;
 	g_Difficulty = MD_Normal;
 	g_flAnnounceTimer = GetGameTime();
+}
+
+public void OnMapEnd()
+{
+	if (g_tBotsTimer != null)
+	{
+		g_tBotsTimer = null;
+	}
 }
 
 public void TF2_OnWaitingForPlayersStart()
@@ -326,6 +337,7 @@ public Action EventWaveEnd(Event event, const char[] name, bool dontBroadcast)
 		g_iNumWaveFails = 0;
 	
 	AddBonusToAll(cv_CreditsBonusPerWaveWon.IntValue);
+	StartBotTimer();
 	return Plugin_Continue;
 }
 
@@ -364,6 +376,9 @@ public Action Timer_CheckCredits(Handle timer)
 			}
 		}
 	}
+
+	// this is called when the wave is failed
+	StartBotTimer();
 	
 	return Plugin_Stop;
 }
@@ -485,6 +500,33 @@ void ApplyDifficultyMultiplier(int &credits)
 	}
 
 	credits = RoundToNearest(flcredits);
+}
+
+Action Timer_RunBotCommand(Handle timer)
+{
+	for(int client = 1; client <= MaxClients; client++)
+	{
+		if (IsClientInGame(client) && IsFakeClient(client) && TF2_GetClientTeam(client) == TFTeam_Red)
+		{
+			command_requestcredits(client, 0);
+		}
+	}
+
+	g_tBotsTimer = null;
+	return Plugin_Stop;
+}
+
+void StartBotTimer()
+{
+	if (!cv_AutoRunForBots.BoolValue)
+	{
+		return;
+	}
+
+	if (g_tBotsTimer == null)
+	{
+		g_tBotsTimer = CreateTimer(0.5, Timer_RunBotCommand, .flags = TIMER_FLAG_NO_MAPCHANGE);
+	}
 }
 
 stock void TF2_SetClientCredits(int client, int amount = 0)
