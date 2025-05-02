@@ -7,17 +7,17 @@
 			/* These are vtable offsets */
 			"CCurrencyPack::MyTouch"
 			{
-				"windows"			"228"
-				"windows64"			"228"
-				"linux"				"229"
-				"linux64"			"229"
+				"windows"			"229"
+				"windows64"			"229"
+				"linux"				"230"
+				"linux64"			"230"
 			}
 			"CBasePlayer::IsBot"
 			{
-				"windows"			"454"
-				"windows64"			"454"
-				"linux"				"455"
-				"linux64"			"455"
+				"windows"			"455"
+				"windows64"			"455"
+				"linux"				"456"
+				"linux64"			"456"
 			}
 			"CTFPlayer::Event_Killed"
 			{
