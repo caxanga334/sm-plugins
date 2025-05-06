@@ -6,13 +6,29 @@
 #pragma newdecls required
 #pragma semicolon 1
 
-#define PLUGIN_VERSION "1.2.0"
+#define PLUGIN_VERSION "1.3.0"
 
 DynamicHook g_mytouch;
 DynamicHook g_isbot;
 DynamicHook g_eventkilled;
+DynamicHook g_builderattack;
 bool g_fakeIsBot[MAXPLAYERS + 1]; // when true, IsBot will always return false
 bool g_bEnabled;
+
+//--------------------------------------------------------------------------
+// Builder "weapon" states
+//--------------------------------------------------------------------------
+enum 
+{
+	BS_IDLE = 0,
+	BS_SELECTING,
+	BS_PLACING,
+	BS_PLACING_INVALID
+
+	//
+	// ADD NEW ITEMS HERE TO AVOID BREAKING DEMOS
+	//
+};
 
 public Plugin myinfo =
 {
@@ -46,6 +62,7 @@ public void OnPluginStart()
 	g_mytouch = DynamicHook.FromConf(gd, "CCurrencyPack::MyTouch");
 	g_isbot = DynamicHook.FromConf(gd, "CBasePlayer::IsBot");
 	g_eventkilled = DynamicHook.FromConf(gd, "CTFPlayer::Event_Killed");
+	g_builderattack = DynamicHook.FromConf(gd, "CTFWeaponBuilder::PrimaryAttack");
 
 	delete gd;
 
@@ -79,7 +96,7 @@ public void OnPluginStart()
 	LogMessage("Plugin gamedata is ok!");
 	g_bEnabled = false;
 
-	CreateConVar("sm_mvm_bots_currency_version", PLUGIN_VERSION, "Fix MvM Currency for RED Bots plugin version", FCVAR_NOTIFY);
+	CreateConVar("sm_mvm_bots_fixes_version", PLUGIN_VERSION, "MvM RED bot fixes plugin version.", FCVAR_NOTIFY);
 }
 
 public void OnMapStart()
@@ -110,6 +127,17 @@ public void OnMapStart()
 		navbot_collect_currency.BoolValue = true;
 	}
 
+	ConVar navbot_spy_sap_robots = FindConVar("sm_navbot_tf_spy_can_sap_robots");
+
+	if (navbot_spy_sap_robots != null)
+	{
+		if (navbot_spy_sap_robots.BoolValue == false)
+		{
+			LogMessage("[NavBot Compatibility] Setting convar to enable bots to sap robots.");
+		}
+
+		navbot_spy_sap_robots.BoolValue = true;
+	}
 }
 
 public void OnEntityCreated(int entity, const char[] classname)
@@ -123,6 +151,11 @@ public void OnEntityCreated(int entity, const char[] classname)
 	{
 		g_mytouch.HookEntity(Hook_Pre, entity, Hook_MyTouch_Pre);
 		g_mytouch.HookEntity(Hook_Post, entity, Hook_MyTouch_Post);
+	}
+	else if (strncmp(classname, "tf_weapon_builder", 17) == 0)
+	{
+		g_builderattack.HookEntity(Hook_Pre, entity, Hook_CTFWeaponBuilder_PrimaryAttack_Pre);
+		g_builderattack.HookEntity(Hook_Post, entity, Hook_CTFWeaponBuilder_PrimaryAttack_Post);
 	}
 }
 
@@ -211,6 +244,34 @@ MRESReturn Hook_CTFPlayer_Event_Killed_Post(int pThis, DHookReturn hReturn, DHoo
 	{
 		// don't bother with team checks here it doesn't matter
 		g_fakeIsBot[pThis] = false; // lie about being a bot
+	}
+
+	return MRES_Ignored;
+}
+
+MRESReturn Hook_CTFWeaponBuilder_PrimaryAttack_Pre(int pThis)
+{
+	int owner = GetEntPropEnt(pThis, Prop_Send, "m_hOwner");
+	int state = GetEntProp(pThis, Prop_Send, "m_iBuildState");
+
+	// PrintToServer("Hook_CTFWeaponBuilder_PrimaryAttack_Pre %i %i %i", pThis, owner, state);
+
+	if (IsValidEntity(owner) && state == BS_PLACING && IsFakeClient(owner) && TF2_GetClientTeam(owner) == TFTeam_Red)
+	{
+		g_fakeIsBot[owner] = true;
+	}
+
+	return MRES_Ignored;
+}
+
+MRESReturn Hook_CTFWeaponBuilder_PrimaryAttack_Post(int pThis)
+{
+	int owner = GetEntPropEnt(pThis, Prop_Send, "m_hOwner");
+	int state = GetEntProp(pThis, Prop_Send, "m_iBuildState");
+
+	if (IsValidEntity(owner) && state == BS_PLACING && IsFakeClient(owner) && TF2_GetClientTeam(owner) == TFTeam_Red)
+	{
+		g_fakeIsBot[owner] = false;
 	}
 
 	return MRES_Ignored;

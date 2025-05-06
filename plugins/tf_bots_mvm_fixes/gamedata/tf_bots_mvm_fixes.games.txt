@@ -26,6 +26,13 @@
 				"linux"				"69"
 				"linux64"			"69"
 			}
+			"CTFWeaponBuilder::PrimaryAttack"
+			{
+				"windows"			"287"
+				"windows64"			"287"
+				"linux"				"293"
+				"linux64"			"293"
+			}
 		}
 		"Functions"
 		{
@@ -67,6 +74,14 @@
 						"type"	"objectptr"
 					}
 				}
+			}
+			"CTFWeaponBuilder::PrimaryAttack"
+			{
+				"offset"  		"CTFWeaponBuilder::PrimaryAttack"
+				"callconv"  	"thiscall"
+				"return"  		"void"
+				"this"  		"entity"
+				"hooktype"		"entity"
 			}
 		}
 	}
