@@ -33,7 +33,7 @@ public void OnClientPutInServer(int client)
 
 void OnPlayerSpawnPost(int entity)
 {
-	CreateTimer(0.3, Timer_OnPlayerSpawned, view_as<any>(GetClientSerial(entity)), TIMER_FLAG_NO_MAPCHANGE);
+	CreateTimer(0.3, Timer_OnPlayerSpawned, GetClientSerial(entity), TIMER_FLAG_NO_MAPCHANGE);
 }
 
 void Timer_OnPlayerSpawned(Handle timer, any data)

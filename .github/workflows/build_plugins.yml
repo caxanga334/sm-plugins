@@ -14,17 +14,10 @@ jobs:
       fail-fast: false
       matrix:
         buildjobs:
-          - sourcemod-1.11
           - sourcemod-1.12
           - sourcemod-1.13
 
         include:
-
-          - buildjobs: sourcemod-1.11
-            os_version: ubuntu-latest
-            identifier: 'Sourcemod Old'
-            sm-version: '1.11.x'
-            package-name: 'sm-old'
 
           - buildjobs: sourcemod-1.12
             os_version: ubuntu-latest
