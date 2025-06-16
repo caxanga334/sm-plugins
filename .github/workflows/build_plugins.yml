@@ -154,6 +154,7 @@ jobs:
           cp ${{ github.workspace }}/sourcefiles/source/sm_gamedata_tester.sp ${{ env.BUILD_PATH }}/
           cp ${{ github.workspace }}/sourcefiles/source/ainavfile-blocker.sp ${{ env.BUILD_PATH }}/
           cp ${{ github.workspace }}/sourcefiles/source/cl_cmds_logger.sp ${{ env.BUILD_PATH }}/
+          cp ${{ github.workspace }}/sourcefiles/source/player_spawn_logger.sp ${{ env.BUILD_PATH }}/
 
       - name: Compile Plugins
         working-directory: ${{ env.BUILD_PATH }}
