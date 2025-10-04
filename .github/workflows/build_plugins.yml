@@ -73,6 +73,8 @@ jobs:
           wget https://raw.githubusercontent.com/peace-maker/sourcetvmanager/master/sourcetvmanager.inc -O sourcetvmanager.inc
           wget https://raw.githubusercontent.com/nosoop/SM-SteamPawn/main/scripting/include/steampawn.inc -O steampawn.inc
           wget https://raw.githubusercontent.com/Impact123/CallAdmin/development/gameserver/scripting/include/calladmin.inc -O calladmin.inc
+          wget https://raw.githubusercontent.com/FlaminSarge/tf2attributes/refs/heads/master/scripting/include/tf2attributes.inc -O tf2attributes.inc
+          wget https://raw.githubusercontent.com/nosoop/SM-TFUtils/refs/heads/master/scripting/include/tf2utils.inc -O tf2utils.inc
           ls -lah
 
       - name: Fetch REST in SourcePawn
@@ -140,6 +142,7 @@ jobs:
           rsync -rv ${{ github.workspace }}/sourcefiles/plugins/rcbot2_randomseedfix/scripting/* ${{ env.BUILD_PATH }}/
           rsync -rv ${{ github.workspace }}/sourcefiles/plugins/tf_bots_mvm_fixes/scripting/* ${{ env.BUILD_PATH }}/
           rsync -rv ${{ github.workspace }}/sourcefiles/plugins/cannounce/scripting/* ${{ env.BUILD_PATH }}/
+          rsync -rv ${{ github.workspace }}/sourcefiles/plugins/gpluck/scripting/* ${{ env.BUILD_PATH }}/
           cp ${{ github.workspace }}/sourcefiles/source/connectlog.sp ${{ env.BUILD_PATH }}/
           cp ${{ github.workspace }}/sourcefiles/source/l4d_antiearlyvote.sp ${{ env.BUILD_PATH }}/
           cp ${{ github.workspace }}/sourcefiles/source/sessionbans.sp ${{ env.BUILD_PATH }}/
@@ -150,6 +153,7 @@ jobs:
           cp ${{ github.workspace }}/sourcefiles/source/player_spawn_logger.sp ${{ env.BUILD_PATH }}/
           cp ${{ github.workspace }}/sourcefiles/source/autobalance_bots.sp ${{ env.BUILD_PATH }}/
           cp ${{ github.workspace }}/sourcefiles/source/player_movement_bug_test.sp ${{ env.BUILD_PATH }}/
+          cp ${{ github.workspace }}/sourcefiles/source/simple_stopwatch.sp ${{ env.BUILD_PATH }}/
 
       - name: Compile Plugins
         working-directory: ${{ env.BUILD_PATH }}
@@ -175,6 +179,7 @@ jobs:
           rsync -rv ${{ github.workspace }}/sourcefiles/plugins/tf_bots_mvm_fixes/gamedata/* ${{ env.GAMEDATA_PATH }}/
           rsync -rv ${{ github.workspace }}/sourcefiles/plugins/cannounce/translations/* ${{ env.LOC_PATH }}/
           rsync -rv ${{ github.workspace }}/sourcefiles/gamedata/* ${{ env.GAMEDATA_PATH }}/
+          rsync -rv ${{ github.workspace }}/sourcefiles/plugins/gpluck/configs/* ${{ env.CONFIGS_PATH }}/
 
       - name: Fetch Short SHA
         uses: benjlevesque/short-sha@v3.0
