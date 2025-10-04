@@ -242,6 +242,7 @@ void GetEffectName(const int effect, char[] buffer, int size)
 		case LUCK_EFFECT_LAG: strcopy(buffer, size, "Lag");
 		case LUCK_EFFECT_FORCE_MOVE: strcopy(buffer, size, "Force Move");
 		case LUCK_EFFECT_FORCE_ATTACK: strcopy(buffer, size, "Force Attack");
+		case LUCK_EFFECT_XY_SHIFT: strcopy(buffer, size, "XY Shift");
 		case LUCK_EFFECT_MAX: strcopy(buffer, size, "Invalid (Max)");
 		default: strcopy(buffer, size, "Invalid (Unknown)");
 	}

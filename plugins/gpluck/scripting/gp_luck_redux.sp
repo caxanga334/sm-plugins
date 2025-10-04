@@ -165,7 +165,7 @@ public Plugin myinfo =
 	name = "[GP] Luck Rolls Module",
 	author = "caxanga334",
 	description = "Gamers ala Pro Luck Rolls Module",
-	version = "2.1.0",
+	version = "2.1.1",
 	url = "https://github.com/caxanga334/"
 };
 
