@@ -54,7 +54,7 @@ jobs:
           mkdir -p ${{ env.LOC_PATH }}
 
       - name: Fetch Plugins Sources
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v5.0.0
         with:
           path: sourcefiles
 
@@ -78,44 +78,44 @@ jobs:
           ls -lah
 
       - name: Fetch REST in SourcePawn
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v5.0.0
         with:
           repository: ErikMinekus/sm-ripext
           path: ripext
 
       - name: Fetch Left 4 DHooks Direct
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v5.0.0
         with:
           repository: SilvDev/Left4DHooks
           path: left4dhooks
   
       - name: Fetch SMLIB
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v5.0.0
         with:
           repository: bcserv/smlib
           path: smlib
           ref: transitional_syntax
 
       - name: Fetch MultiColors
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v5.0.0
         with:
           repository: Bara/Multi-Colors
           path: multicolors
 
       - name: Fetch shqke
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v5.0.0
         with:
           repository: shqke/sp_public
           path: shqkeplugins
 
       - name: Fetch SourceBans++
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v5.0.0
         with:
           repository: sbpp/sourcebans-pp
           path: sbpp
 
       - name: Fetch Stocksoup
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v5.0.0
         with:
           repository: nosoop/stocksoup
           path: stocksoup
@@ -186,7 +186,7 @@ jobs:
         id: short-sha
 
       - name: Upload Compiled Plugins Artifact
-        uses: actions/upload-artifact@v4.6.0
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: plugins-${{ matrix.package-name }}-${{ steps.short-sha.outputs.sha }}
           path: |
