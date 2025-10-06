@@ -1,258 +1,435 @@
 // Attributes handler
+#define ATTRIBUTES_MAX_ITERATIONS 20
+#define SLOT_RANDOM_WEAPON -1
+#define SLOT_ACTIVE_WEAPON -2
+#define ATTRIBUTE_NAME_SIZE 64
+#define ATTRIBUTE_STRING_VALUE_SIZE 64
 
-#define CONST_MAX_CHAR_ATTRIBUTES 13 // Maximum number of char attributes listed
-#define CONST_MAX_WEAPON_ATTRIBUTES 13 // Maximum number of weapon attributes listed
-
-// Enum Struct with char attribute data
-enum struct eCharAttributes
+enum struct AttributeData_s
 {
-	char name[64]; // Attribute name
-	float min; // Min Random Value
-	float max; // Max Random Value
-	TFClassType class; // Class limited attribute
-}
-eCharAttributes g_charattrib[CONST_MAX_CHAR_ATTRIBUTES];
+	char name[ATTRIBUTE_NAME_SIZE]; // Attribute name
+	float min; // Minimum random value
+	float max; // Maximum random value
+	bool is_fixed; // uses fixed value
+	float fixed_value; // fixed value
+	bool is_string; // is string value
+	char szval[ATTRIBUTE_STRING_VALUE_SIZE]; // string value
+	int slot; // slot restriction if this is a weapon attribute
+	TFClassType class; // class restriction
 
-// Enum Struct with weapon attribute data
-enum struct eWeaponAttributes
-{
-	char name[64]; // Attribute name
-	float min; // Min Random Value
-	float max; // Max Random Value
-	TFClassType class; // Class limited attribute
-	int slot; // Only apply to a specific weapon slot
-}
-eWeaponAttributes g_weaponattrib[CONST_MAX_WEAPON_ATTRIBUTES];
-
-// Initializes attribute data. TO-DO: Move this to a config file
-void InitAttributes()
-{
-	// Character attributes
-	g_charattrib[0].name = "move speed bonus";
-	g_charattrib[0].min = 1.10;
-	g_charattrib[0].max = 5.00;
-	g_charattrib[0].class = TFClass_Unknown;
-
-	g_charattrib[1].name = "health regen";
-	g_charattrib[1].min = -1.00;
-	g_charattrib[1].max = 100.0;
-	g_charattrib[1].class = TFClass_Unknown;
-
-	g_charattrib[2].name = "dmg taken from fire reduced";
-	g_charattrib[2].min = 0.05;
-	g_charattrib[2].max = 0.95;
-	g_charattrib[2].class = TFClass_Unknown;
-
-	g_charattrib[3].name = "dmg taken from blast reduced";
-	g_charattrib[3].min = 0.05;
-	g_charattrib[3].max = 0.95;
-	g_charattrib[3].class = TFClass_Unknown;
-
-	g_charattrib[4].name = "dmg taken from bullets reduced";
-	g_charattrib[4].min = 0.05;
-	g_charattrib[4].max = 0.95;
-	g_charattrib[4].class = TFClass_Unknown;
-
-	g_charattrib[5].name = "dmg taken from crit reduced";
-	g_charattrib[5].min = 0.05;
-	g_charattrib[5].max = 0.95;
-	g_charattrib[5].class = TFClass_Unknown;
-
-	g_charattrib[6].name = "dmg taken from fire increased";
-	g_charattrib[6].min = 1.15;
-	g_charattrib[6].max = 5.00;
-	g_charattrib[6].class = TFClass_Unknown;
-
-	g_charattrib[7].name = "dmg taken from blast increased";
-	g_charattrib[7].min = 1.15;
-	g_charattrib[7].max = 5.00;
-	g_charattrib[7].class = TFClass_Unknown;
-
-	g_charattrib[8].name = "dmg taken from bullets increased";
-	g_charattrib[8].min = 1.15;
-	g_charattrib[8].max = 5.00;
-	g_charattrib[8].class = TFClass_Unknown;
-
-	g_charattrib[9].name = "dmg taken from crit increased";
-	g_charattrib[9].min = 1.15;
-	g_charattrib[9].max = 5.00;
-	g_charattrib[9].class = TFClass_Unknown;
-
-	g_charattrib[10].name = "move speed penalty";
-	g_charattrib[10].min = 0.25;
-	g_charattrib[10].max = 0.85;
-	g_charattrib[10].class = TFClass_Unknown;
-
-	g_charattrib[11].name = "max health additive bonus";
-	g_charattrib[11].min = 1.00;
-	g_charattrib[11].max = 1000.0;
-	g_charattrib[11].class = TFClass_Unknown;
-
-	g_charattrib[12].name = "max health additive penalty";
-	g_charattrib[12].min = -60.00;
-	g_charattrib[12].max = -1.0;
-	g_charattrib[12].class = TFClass_Unknown;
-
-	// Weapon Attributes
-	g_weaponattrib[0].name = "damage bonus";
-	g_weaponattrib[0].min = 1.05;
-	g_weaponattrib[0].max = 10.00;
-	g_weaponattrib[0].class = TFClass_Unknown;
-	g_weaponattrib[0].slot = -1;
-
-	g_weaponattrib[1].name = "damage penalty";
-	g_weaponattrib[1].min = -3.00;
-	g_weaponattrib[1].max = 0.50;
-	g_weaponattrib[1].class = TFClass_Unknown;
-	g_weaponattrib[1].slot = -1;
-
-	g_weaponattrib[2].name = "kill forces attacker to laugh";
-	g_weaponattrib[2].min = 1.00;
-	g_weaponattrib[2].max = 1.00;
-	g_weaponattrib[2].class = TFClass_Unknown;
-	g_weaponattrib[2].slot = -1;
-
-	g_weaponattrib[3].name = "hit self on miss";
-	g_weaponattrib[3].min = 1.00;
-	g_weaponattrib[3].max = 1.00;
-	g_weaponattrib[3].class = TFClass_Unknown;
-	g_weaponattrib[3].slot = TFWeaponSlot_Melee;
-
-	g_weaponattrib[4].name = "restore health on kill";
-	g_weaponattrib[4].min = 1.00;
-	g_weaponattrib[4].max = 100.00;
-	g_weaponattrib[4].class = TFClass_Unknown;
-	g_weaponattrib[4].slot = -1;
-
-	g_weaponattrib[5].name = "no crit boost";
-	g_weaponattrib[5].min = 1.00;
-	g_weaponattrib[5].max = 1.00;
-	g_weaponattrib[5].class = TFClass_Unknown;
-	g_weaponattrib[5].slot = -1;
-
-	g_weaponattrib[6].name = "critboost on kill";
-	g_weaponattrib[6].min = 1.00;
-	g_weaponattrib[6].max = 60.00;
-	g_weaponattrib[6].class = TFClass_Unknown;
-	g_weaponattrib[6].slot = -1;
-
-	g_weaponattrib[7].name = "ammo regen";
-	g_weaponattrib[7].min = 0.01;
-	g_weaponattrib[7].max = 1.00;
-	g_weaponattrib[7].class = TFClass_Unknown;
-	g_weaponattrib[7].slot = -1;
-
-	g_weaponattrib[8].name = "Reload time decreased";
-	g_weaponattrib[8].min = -2.00;
-	g_weaponattrib[8].max = 0.75;
-	g_weaponattrib[8].class = TFClass_Unknown;
-	g_weaponattrib[8].slot = -1;
-
-	g_weaponattrib[9].name = "Reload time increased";
-	g_weaponattrib[9].min = 1.25;
-	g_weaponattrib[9].max = 10.00;
-	g_weaponattrib[9].class = TFClass_Unknown;
-	g_weaponattrib[9].slot = -1;
-
-	g_weaponattrib[10].name = "bleeding duration";
-	g_weaponattrib[10].min = 1.00;
-	g_weaponattrib[10].max = 60.00;
-	g_weaponattrib[10].class = TFClass_Unknown;
-	g_weaponattrib[10].slot = -1;
-
-	g_weaponattrib[11].name = "turn to gold";
-	g_weaponattrib[11].min = 1.00;
-	g_weaponattrib[11].max = 1.00;
-	g_weaponattrib[11].class = TFClass_Unknown;
-	g_weaponattrib[11].slot = -1;
-
-	g_weaponattrib[12].name = "minicrits become crits";
-	g_weaponattrib[12].min = 1.00;
-	g_weaponattrib[12].max = 1.00;
-	g_weaponattrib[12].class = TFClass_Unknown;
-	g_weaponattrib[12].slot = -1;
-}
-
-/**
- * Retreives a random character attribute
- *
- * @param client        The client which the attribute will be applied to
- * @param name          Char buffer to store the attribute name
- * @param size          Char buffer size
- * @param min           The attribute min random value
- * @param max           The attribute max random value
- * @return              TRUE on success
- */
-bool GetRandomCharAttribute(int client, char[] name, int size, float &min, float &max)
-{
-	TFClassType class = TF2_GetPlayerClass(client);
-
-	int[] id = new int[CONST_MAX_CHAR_ATTRIBUTES];
-	int counter = 0;
-
-	for(int i = 0;i < CONST_MAX_CHAR_ATTRIBUTES;i++)
+	// Constructs a "new" AttributeData instance
+	void CTor()
 	{
-		// Filter class
-		if(g_charattrib[i].class != TFClass_Unknown && g_charattrib[i].class != class)
-			continue;
-
-		id[counter] = i;
-		counter++;
+		this.name[0] = '\0';
+		this.min = 0.0;
+		this.max = 0.0;
+		this.is_fixed = false;
+		this.fixed_value = 0.0;
+		this.is_string = false;
+		this.szval[0] = '\0';
+		this.slot = SLOT_RANDOM_WEAPON;
+		this.class = TFClass_Unknown;
 	}
 
-	if(counter == 0)
-		return false;
-
-	int y = id[Math_GetRandomInt(0, counter-1)];
-
-	strcopy(name, size, g_charattrib[y].name);
-	min = g_charattrib[y].min;
-	max = g_charattrib[y].max;
-
-	PrintToServer("GetRandomCharAttribute:: name: \"%s\" min: %.2f max: %.2f counter: %i id: %i", name, min, max, counter, y);
-
-	return true;
-}
-
-/**
- * Retreives a random weapon attribute
- *
- * @param client        The client which the attribute will be applied to
- * @param name          Char buffer to store the attribute name
- * @param size          Char buffer size
- * @param min           The attribute min random value
- * @param max           The attribute max random value
- * @param slot          Weapon slot restriction
- * @return              TRUE on success
- */
-bool GetRandomWeaponAttribute(int client, char[] name, int size, float &min, float &max, int &slot)
-{
-	TFClassType class = TF2_GetPlayerClass(client);
-
-	int[] id = new int[CONST_MAX_CHAR_ATTRIBUTES];
-	int counter = 0;
-
-	for(int i = 0;i < CONST_MAX_CHAR_ATTRIBUTES;i++)
+	void AssignName(const char[] newname)
 	{
-		// Filter class
-		if(g_weaponattrib[i].class != TFClass_Unknown && g_weaponattrib[i].class != class)
-			continue;
-
-		id[counter] = i;
-		counter++;
+		strcopy(this.name, sizeof(this.name), newname);
 	}
 
-	if(counter == 0)
-		return false;
+	void AssignStringValue(const char[] value)
+	{
+		strcopy(this.szval, sizeof(this.szval), value);
+	}
 
-	int y = id[Math_GetRandomInt(0, counter-1)];
+	bool IsClassAllowed(TFClassType other)
+	{
+		if (this.class != TFClass_Unknown && this.class != other)
+		{
+			return false;
+		}
 
-	strcopy(name, size, g_weaponattrib[y].name);
-	min = g_weaponattrib[y].min;
-	max = g_weaponattrib[y].max;
-	slot = g_weaponattrib[y].slot;
+		return true;
+	}
 
-	PrintToServer("GetRandomWeaponAttribute:: name: \"%s\" min: %.2f max: %.2f counter: %i id: %i", name, min, max, counter, y);
+	bool IsFloatValue()
+	{
+		return !this.is_string;
+	}
 
-	return true;
+	bool IsStringValue()
+	{
+		return this.is_string;
+	}
+
+	bool IsRandomValue()
+	{
+		return !this.is_string && !this.is_fixed;
+	}
+
+	// Use this for fixed and random value types
+	float GetValue()
+	{
+		if (this.is_fixed)
+		{
+			return this.fixed_value;
+		}
+
+		return Math_GetRandomFloat(this.min, this.max);
+	}
+
+	void GetStringValue(char[] value, int size)
+	{
+		strcopy(value, size, this.szval);
+	}
+	// See if the attribute is valid
+	bool IsValid()
+	{
+		if (this.IsRandomValue())
+		{
+			if (this.min >= this.max)
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+}
+
+static ArrayList s_charAttrib;
+static ArrayList s_weapAttrib;
+static bool s_attribParserValid;
+static bool s_attribParserWeapon;
+static bool s_attribParserPlayer;
+static bool s_attribParserInAttribute;
+static AttributeData_s s_attribParserData;
+static int s_attribParserIndex;
+static int s_attribParserLine;
+static int s_attribParserCol;
+
+static SMCResult AttributesParser_NewSection(SMCParser smc, const char[] name, bool opt_quotes)
+{
+	if (!s_attribParserValid)
+	{
+		if (strcmp(name, "Attributes", false) == 0)
+		{
+			s_attribParserValid = true;
+			return SMCParse_Continue;
+		}
+		else
+		{
+			return SMCParse_HaltFail;
+		}
+	}
+
+	if (s_attribParserInAttribute)
+	{
+		LogError("Invalid attribute file format!");
+		return SMCParse_HaltFail;
+	}
+
+	if (s_attribParserPlayer || s_attribParserWeapon)
+	{
+		s_attribParserInAttribute = true;
+		// begin new attribute
+		s_attribParserData.CTor();
+
+		// the section name is the attribute name
+		s_attribParserData.AssignName(name);
+
+		return SMCParse_Continue;
+	}
+
+	if (strcmp(name, "PlayerAttributes", false) == 0)
+	{
+		s_attribParserPlayer = true;
+		s_attribParserIndex = 0;
+		return SMCParse_Continue;
+	}
+	
+	if (strcmp(name, "WeaponAttributes", false) == 0)
+	{
+		s_attribParserWeapon = true;
+		s_attribParserIndex = 0;
+		return SMCParse_Continue;
+	}
+
+	LogError("Attribute parser: Unknown section \"%s\"");
+	return SMCParse_HaltFail;
+}
+
+static SMCResult AttributesParser_KeyValue(SMCParser smc, const char[] key, const char[] value, bool key_quotes, bool value_quotes)
+{
+	if (strcmp(key, "min_random_value", false) == 0)
+	{
+		s_attribParserData.min = StringToFloat(value);
+	}
+	else if (strcmp(key, "max_random_value", false) == 0)
+	{
+		s_attribParserData.max = StringToFloat(value);
+	}
+	else if (strcmp(key, "fixed_value", false) == 0)
+	{
+		s_attribParserData.is_fixed = true;
+		s_attribParserData.fixed_value = StringToFloat(value);
+	}
+	else if (strcmp(key, "string_value", false) == 0)
+	{
+		s_attribParserData.is_string = true;
+		s_attribParserData.AssignStringValue(value);
+	}
+	else if (strcmp(key, "slot", false) == 0)
+	{
+		if (s_attribParserPlayer)
+		{
+			LogError("Error: Player attribute with slot key value! line %i col %i", s_attribParserLine, s_attribParserCol);
+			return SMCParse_Continue;
+		}
+
+		s_attribParserData.slot = StringToInt(value);
+	}
+	else if (strcmp(key, "class", false) == 0)
+	{
+		TFClassType class = TF2_GetClass(value);
+
+		if (class == TFClass_Unknown)
+		{
+			LogError("Error: Unknown TF class \"%s\"! line %i col %i", value, s_attribParserLine, s_attribParserCol);
+			return SMCParse_Continue;
+		}
+
+		s_attribParserData.class = class;
+	}
+	else
+	{
+		LogError("Attribute Parser: Unknown key value pair! %s %s", key, value);
+	}
+
+	return SMCParse_Continue;
+}
+
+static SMCResult AttributesParser_EndSection(SMCParser smc)
+{
+	if (s_attribParserInAttribute)
+	{
+		s_attribParserInAttribute = false;
+
+		if (!s_attribParserData.IsValid())
+		{
+			LogError("Invalid attribute %s at line %i col %i", s_attribParserData.name, s_attribParserLine, s_attribParserCol);
+			return SMCParse_Continue;
+		}
+
+		s_attribParserIndex++;
+		
+		if (s_attribParserPlayer)
+		{
+			s_charAttrib.PushArray(s_attribParserData, sizeof(s_attribParserData));
+		}
+
+		if (s_attribParserWeapon)
+		{
+			s_weapAttrib.PushArray(s_attribParserData, sizeof(s_attribParserData));
+		}
+
+		return SMCParse_Continue;
+	}
+
+	if (s_attribParserPlayer)
+	{
+		s_attribParserPlayer = false;
+		return SMCParse_Continue;
+	}
+
+	if (s_attribParserWeapon)
+	{
+		s_attribParserWeapon = false;
+		return SMCParse_Continue;
+	}
+
+	if (s_attribParserValid)
+	{
+		s_attribParserValid = false;
+		return SMCParse_Continue;
+	}
+
+	return SMCParse_Continue;
+}
+
+void Attributes_Init()
+{
+	s_charAttrib = new ArrayList(sizeof(AttributeData_s));
+	s_weapAttrib = new ArrayList(sizeof(AttributeData_s));
+
+	Attributes_LoadConfig();
+
+	if (s_charAttrib.Length == 0 && s_weapAttrib.Length == 0)
+	{
+		SetFailState("Must have at least one player and one weapon attribute!");
+	}
+}
+
+static void Attributes_LoadConfig()
+{
+	char path[PLATFORM_MAX_PATH];
+	BuildPath(Path_SM, path, sizeof(path), "configs/gpluck/attributes.cfg");
+
+	if (!FileExists(path))
+	{
+		SetFailState("Faile to load attributes! File \"%s\" does not exists!", path);
+		return;
+	}
+
+	s_attribParserValid = false;
+	s_attribParserWeapon = false;
+	s_attribParserPlayer = false;
+	s_attribParserInAttribute = false;
+	s_attribParserIndex = 0;
+
+	SMCParser smc = new SMCParser();
+	smc.OnEnterSection = AttributesParser_NewSection;
+	smc.OnKeyValue = AttributesParser_KeyValue;
+	smc.OnLeaveSection = AttributesParser_EndSection;
+
+	SMCError error = smc.ParseFile(path, s_attribParserLine, s_attribParserCol);
+
+	if (error != SMCError_Okay)
+	{
+		char szerror[64];
+		SMC_GetErrorString(error, szerror, sizeof(szerror));
+		delete smc;
+		SetFailState("Error while parsing attribute config file! Error: \"%s\" line %i col %i", szerror, s_attribParserLine, s_attribParserCol);
+		return;
+	}
+
+	PrintToServer("Loaded %i player and %i weapon attributes", s_charAttrib.Length, s_weapAttrib.Length);
+	delete smc;
+}
+
+bool Attributes_GetRandomPlayerAttribute(int client, AttributeData_s attrib)
+{
+	TFClassType class = TF2_GetPlayerClass(client);
+	int n = 0;
+	int index = Math_GetRandomInt(0, s_charAttrib.Length - 1);
+
+	do
+	{
+		n++;
+		AttributeData_s data;
+		s_charAttrib.GetArray(index, data, sizeof(AttributeData_s));
+
+		if (++index >= s_charAttrib.Length)
+		{
+			index = 0;
+		}
+
+		if (!data.IsClassAllowed(class))
+		{
+			continue;
+		}
+
+		attrib = data;
+		return true;
+	}
+	while (n <= ATTRIBUTES_MAX_ITERATIONS);
+
+	return false;
+}
+
+int Attributes_SelectClientWeapon(int client, int slot)
+{
+	if (slot == SLOT_ACTIVE_WEAPON)
+	{
+		return GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon");
+	}
+
+	if (slot == SLOT_RANDOM_WEAPON)
+	{
+		int weapons[48];
+		int n = 0;
+
+		for (int s = 0; s <= view_as<int>(TFWeaponSlot_Item2); s++)
+		{
+			int entity = TF2Util_GetPlayerLoadoutEntity(client, s);
+
+			if (entity != INVALID_ENT_REFERENCE)
+			{
+				weapons[n] = entity;
+				n++;
+			}
+
+			if (n >= sizeof(weapons)) { break; }
+		}
+
+		if (n == 0) { return INVALID_ENT_REFERENCE; }
+
+		return weapons[Math_GetRandomInt(0, n - 1)];
+	}
+
+	// specific slot
+	return TF2Util_GetPlayerLoadoutEntity(client, slot);
+}
+
+bool Attributes_GetRandomWeaponAttribute(int client, AttributeData_s attrib)
+{
+	TFClassType class = TF2_GetPlayerClass(client);
+	int n = 0;
+	int index = Math_GetRandomInt(0, s_weapAttrib.Length - 1);
+
+	do
+	{
+		n++;
+		AttributeData_s data;
+		s_weapAttrib.GetArray(index, data, sizeof(AttributeData_s));
+
+		if (++index >= s_weapAttrib.Length)
+		{
+			index = 0;
+		}
+
+		if (!data.IsClassAllowed(class))
+		{
+			continue;
+		}
+
+		if (data.slot == SLOT_ACTIVE_WEAPON)
+		{
+			if (GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon") == INVALID_ENT_REFERENCE)
+			{
+				continue;
+			}
+		}
+
+		if (data.slot >= view_as<int>(TFWeaponSlot_Primary))
+		{
+			// specific slot, check if the player has an item on the slot
+			if (TF2Util_GetPlayerLoadoutEntity(client, data.slot) == INVALID_ENT_REFERENCE)
+			{
+				continue;
+			}
+		}
+
+		attrib = data;
+		return true;
+	}
+	while (n <= ATTRIBUTES_MAX_ITERATIONS);
+
+	return false;
+}
+
+void Attributes_ApplyAttribute(int entity, AttributeData_s attrib)
+{
+	if (attrib.IsStringValue())
+	{
+		TF2Attrib_SetFromStringValue(entity, attrib.name, attrib.szval);
+	}
+	else if (!attrib.IsRandomValue())
+	{
+		TF2Attrib_SetByName(entity, attrib.name, attrib.fixed_value);
+	}
+	else
+	{
+		float random = Math_GetRandomFloat(attrib.min, attrib.max);
+		TF2Attrib_SetByName(entity, attrib.name, random);
+	}
 }

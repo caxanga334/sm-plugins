@@ -151,16 +151,6 @@ stock bool Math_RandomChance(int chance)
 }
 
 /**
- * Checks if the current game mode is Mann Vs Machine
- *
- * @return		TRUE if the current game mode is Mann vs Machine, FALSE otherwise.
- */
-bool IsMannVsMachine()
-{
-	return !!GameRules_GetPropEnt("m_bPlayingMannVsMachine");
-}
-
-/**
  * Spawns an oildrum
  *
  * @return		The oildrum entity reference
@@ -246,59 +236,6 @@ void GetEffectName(const int effect, char[] buffer, int size)
 		case LUCK_EFFECT_MAX: strcopy(buffer, size, "Invalid (Max)");
 		default: strcopy(buffer, size, "Invalid (Unknown)");
 	}
-}
-
-/**
- * Gets the first available weapon entity via loop
- *
- * @param client		Client index
- * @return		Entity index
- */
-int GetFirstWeaponViaLoop(int client)
-{
-	int entity = -1;
-
-	for(int slot = 0;slot <= 5;slot++)
-	{
-		entity = TF2Util_GetPlayerLoadoutEntity(client, slot, true);
-		if(IsValidEntity(entity))
-		{
-			return entity;
-		}
-	}
-
-	return -1;
-}
-
-/**
- * Gets the entity index for the best weapon available for the given client and class
- *
- * @param client		Client index
- * @param class			Client's TF class
- * @return				Entity index or -1 on failure
- */
-int GetBestWeaponEntity(int client, const TFClassType class)
-{
-	int entity = -1;
-
-	switch(class)
-	{
-		case TFClass_Spy:
-		{
-			entity = TF2Util_GetPlayerLoadoutEntity(client, TFWeaponSlot_Melee, true); // For spy, try the knife first
-
-			if(!IsValidEntity(entity))
-			{
-				entity = GetFirstWeaponViaLoop(client);
-			}
-		}
-		default:
-		{
-			entity = GetFirstWeaponViaLoop(client);
-		}
-	}
-
-	return entity;
 }
 
 /**

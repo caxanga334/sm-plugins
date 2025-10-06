@@ -121,23 +121,15 @@ void ApplyOilDrumRainEffect(int client)
  */
 void ApplyCharAttribEffect(int client)
 {
-	char attribute[64];
-	float min, max, value;
-	Address addr = Address_Null;
+	AttributeData_s attrib;
 
-	if(!GetRandomCharAttribute(client, attribute, sizeof(attribute), min, max))
-		return;
-
-	addr = TF2Attrib_GetByName(client, attribute);
-	value = Math_GetRandomFloat(min, max);
-
-	if(addr != Address_Null)
+	if (!Attributes_GetRandomPlayerAttribute(client, attrib))
 	{
-		value = TF2Attrib_GetValue(addr) + value;
+		return;
 	}
 
-	TF2Attrib_SetByName(client, attribute, value);
-	CPrintToChatAll("{green}[LUCK] {cyan}%N received a random character attribute {gold}\"%s\"{cyan} with a value of {gold}%.4f{cyan}.", client, attribute, value);
+	Attributes_ApplyAttribute(client, attrib);
+	CPrintToChatAll("{green}[LUCK] {cyan}%N received a random character attribute {gold}\"%s\"{cyan}.", client, attrib.name);
 }
 
 /**
@@ -148,35 +140,21 @@ void ApplyCharAttribEffect(int client)
  */
 void ApplyWeaponAttribEffect(int client)
 {
-	char attribute[64], itemname[64];
-	float min, max, value;
-	int slot, weapon;
-	Address addr = Address_Null;
+	AttributeData_s attrib;
 
-	if(!GetRandomWeaponAttribute(client, attribute, sizeof(attribute), min, max, slot))
+	if (!Attributes_GetRandomWeaponAttribute(client, attrib))
+	{
 		return;
-
-	if(slot == -1) // Get best
-	{
-		weapon = GetBestWeaponEntity(client, TF2_GetPlayerClass(client));
-	}
-	else
-	{
-		weapon = TF2Util_GetPlayerLoadoutEntity(client, slot, true);
 	}
 
-	addr = TF2Attrib_GetByName(weapon, attribute);
-	value = Math_GetRandomFloat(min, max);
+	int weapon = Attributes_SelectClientWeapon(client, attrib.slot);
 
-	if(addr != Address_Null)
-	{
-		value = TF2Attrib_GetValue(addr) + value;
-	}
+	if (weapon == INVALID_ENT_REFERENCE) { return; }
 
-	TF2Attrib_SetByName(weapon, attribute, value);
-	GetEntityClassname(weapon, itemname, sizeof(itemname));
-
-	CPrintToChatAll("{green}[LUCK] {cyan}%N received a random weapon attribute {gold}\"%s\"{cyan} with a value of {gold}%.4f{cyan} on their {gold}\"%s\"{cyan}.", client, attribute, value, itemname);
+	char classname[64];
+	if (!GetEntityClassname(weapon, classname, sizeof(classname))) { strcopy(classname, sizeof(classname), "NULL"); }
+	Attributes_ApplyAttribute(weapon, attrib);
+	CPrintToChatAll("{green}[LUCK] {cyan}%N received a random weapon attribute {gold}\"%s\"{cyan} on their {gold}\"%s\"{cyan}.", client, attrib.name, classname);
 }
 
 /**

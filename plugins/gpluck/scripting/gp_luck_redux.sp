@@ -76,7 +76,7 @@ methodmap LuckClient
 		public get()    { return g_LuckData[this.index].cooldown; }
 		public set(float value)    { g_LuckData[this.index].cooldown = value; }
 	}
-	property float Timer
+	property float FTimer
 	{
 		public get()    { return g_LuckData[this.index].timer; }
 		public set(float value)    { g_LuckData[this.index].timer = value; }
@@ -110,6 +110,10 @@ methodmap LuckClient
 	public void Roll()
 	{
 		RollLuckEffectOnClient(this.index);
+	}
+	public void AutoRoll()
+	{
+		ConCmd_Luck(this.index, 0);
 	}
 	public float GetRemainingCooldownTime()
 	{
@@ -153,6 +157,7 @@ methodmap LuckClient
 
 char g_logpath[PLATFORM_MAX_PATH];
 
+#include "luck/timers.sp"
 #include "luck/configs.sp"
 #include "luck/attributes.sp"
 #include "luck/functions.sp"
@@ -165,7 +170,7 @@ public Plugin myinfo =
 	name = "[GP] Luck Rolls Module",
 	author = "caxanga334",
 	description = "Gamers ala Pro Luck Rolls Module",
-	version = "2.1.1",
+	version = "2.2.0",
 	url = "https://github.com/caxanga334/"
 };
 
@@ -200,20 +205,25 @@ public void OnPluginStart()
 	// Game Events
 	HookEvent("player_death", E_PlayerDeath, EventHookMode_Post);
 
-	InitAttributes();
-
 	BuildPath(Path_SM, g_logpath, sizeof(g_logpath), "logs/luck.log");
 	
 	g_RandomNames1 = new ArrayList(ByteCountToCells(LUCK_RANDOM_NAME_ARRAY_SIZE));
 	g_RandomNames2 = new ArrayList(ByteCountToCells(LUCK_RANDOM_NAME_ARRAY_SIZE));
 
+	Config_LoadMain();
 	Config_LoadRandomNames();
+	Attributes_Init();
 }
 
 // Called when the map starts
 public void OnMapStart()
 {
 	PrecacheModel("models/props_c17/oildrum001_explosive.mdl", true);
+
+	if (g_config.allow_bots && g_config.autoroll_bots)
+	{
+		CreateTimer(5.0, Timer_RunBotLogic, .flags = (TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE));
+	}
 }
  
 // Called when a client is entering the game
@@ -232,12 +242,34 @@ public Action ConCmd_Luck(int client, int args)
 		return Plugin_Handled;
 	}
 
-	if(IsFakeClient(client))
-		return Plugin_Handled;
-
-	if(TF2_GetClientTeam(client) == TFTeam_Blue && IsMannVsMachine())
+	if (!IsPlayerAlive(client))
 	{
-		CReplyToCommand(client, "{orange}Your team cannot use this command.");
+		CReplyToCommand(client, "{orange}You must be alive to use this command.");
+		return Plugin_Handled;
+	}
+
+	if (!g_config.allow_bots && IsFakeClient(client))
+	{
+		return Plugin_Handled;
+	}
+
+	TFTeam team = TF2_GetClientTeam(client);
+
+	if (view_as<int>(team) <= view_as<int>(TFTeam_Spectator))
+	{
+		CReplyToCommand(client, "{fullred}Invalid team!");
+		return Plugin_Handled;
+	}
+
+	if (team == TFTeam_Red && !g_config.red_allowed)
+	{
+		CReplyToCommand(client, "{orange}RED team is not allowed.");
+		return Plugin_Handled;
+	}
+
+	if (team == TFTeam_Blue && !g_config.blu_allowed)
+	{
+		CReplyToCommand(client, "{orange}BLU team is not allowed.");
 		return Plugin_Handled;
 	}
 
@@ -245,12 +277,12 @@ public Action ConCmd_Luck(int client, int args)
 
 	if(!lc.CanRoll())
 	{
-		CReplyToCommand(client, "{cyan}Luck roll is currently in cooldown, please wait{green} %0.6f {cyan}second(s).", lc.GetRemainingCooldownTime());
+		CReplyToCommand(client, "{cyan}Luck roll is currently in cooldown, please wait{green} %3.2f {cyan}second(s).", lc.GetRemainingCooldownTime());
 		return Plugin_Handled;
 	}
 
 	lc.Roll();
-	lc.Cooldown = GetGameTime() + Math_GetRandomFloat(60.0, 180.0);
+	lc.Cooldown = GetGameTime() + g_config.GetRollCooldown();
 
 	return Plugin_Handled;
 }
@@ -412,8 +444,8 @@ void ActivateEffect(int client, const int effect)
 		{
 			lc.Effect = LUCK_EFFECT_OILDRUM_RAIN;
 			lc.StartTime = gametime;
-			lc.Duration = Math_GetRandomFloat(30.0, 60.0);
-			lc.Timer = gametime + 1.5;
+			lc.Duration = g_config.GetEffectLength();
+			lc.FTimer = gametime + 1.5;
 			CPrintToChatAll("{green}[LUCK] {cyan}%N rolled {gold}\"Oil Drum Rain\"{cyan}.", client);
 		}
 		case LUCK_EFFECT_CHAR_ATTRIBUTE:
@@ -428,16 +460,16 @@ void ActivateEffect(int client, const int effect)
 		{
 			lc.Effect = LUCK_EFFECT_RANDOM_IMPULSE;
 			lc.StartTime = gametime;
-			lc.Duration = Math_GetRandomFloat(30.0, 60.0);
-			lc.Timer = gametime + 1.5;
+			lc.Duration = g_config.GetEffectLength();
+			lc.FTimer = gametime + 1.5;
 			CPrintToChatAll("{green}[LUCK] {cyan}%N rolled {gold}\"Random Impulse\"{cyan}.", client);
 		}
 		case LUCK_EFFECT_LAG:
 		{
 			lc.Effect = LUCK_EFFECT_LAG;
 			lc.StartTime = gametime;
-			lc.Duration = Math_GetRandomFloat(30.0, 60.0);
-			lc.Timer = gametime + 1.0;
+			lc.Duration = g_config.GetEffectLength();
+			lc.FTimer = gametime + 1.0;
 			lc.SubTimer = gametime + Math_GetRandomFloat(0.10, 0.75);
 			CPrintToChatAll("{green}[LUCK] {cyan}%N rolled {gold}\"Lag\"{cyan}.", client);
 		}
@@ -445,8 +477,8 @@ void ActivateEffect(int client, const int effect)
 		{
 			lc.Effect = LUCK_EFFECT_FORCE_MOVE;
 			lc.StartTime = gametime;
-			lc.Duration = Math_GetRandomFloat(30.0, 60.0);
-			lc.Timer = gametime + Math_GetRandomFloat(5.0, 10.0);
+			lc.Duration = g_config.GetEffectLength();
+			lc.FTimer = gametime + Math_GetRandomFloat(5.0, 10.0);
 			lc.State = Math_GetRandomInt(0,3);
 			CPrintToChatAll("{green}[LUCK] {cyan}%N rolled {gold}\"Force Move\"{cyan}.", client);
 		}
@@ -454,7 +486,7 @@ void ActivateEffect(int client, const int effect)
 		{
 			lc.Effect = LUCK_EFFECT_FORCE_ATTACK;
 			lc.StartTime = gametime;
-			lc.Duration = Math_GetRandomFloat(30.0, 60.0);
+			lc.Duration = g_config.GetEffectLength();
 			CPrintToChatAll("{green}[LUCK] {cyan}%N rolled {gold}\"Force Attack\"{cyan}.", client);
 		}
 		case LUCK_EFFECT_XY_SHIFT:
@@ -510,7 +542,7 @@ public Action OnPlayerRunCmd(int client, int& buttons, int& impulse, float vel[3
 				if(lc.IsTimerUp())
 				{
 					ApplyOilDrumRainEffect(client);
-					lc.Timer = GetGameTime() + 1.5;
+					lc.FTimer = GetGameTime() + 1.5;
 				}
 			}
 			case LUCK_EFFECT_RANDOM_IMPULSE:
@@ -518,7 +550,7 @@ public Action OnPlayerRunCmd(int client, int& buttons, int& impulse, float vel[3
 				if(lc.IsTimerUp())
 				{
 					ApplyRandomImpulseEffect(client);
-					lc.Timer = GetGameTime() + 1.5;
+					lc.FTimer = GetGameTime() + 1.5;
 				}
 			}
 			case LUCK_EFFECT_LAG:
@@ -536,7 +568,7 @@ public Action OnPlayerRunCmd(int client, int& buttons, int& impulse, float vel[3
 					float vec[3];
 					lc.GetDataVector(vec);
 					ApplyLagEffect(client, vec);
-					lc.Timer = GetGameTime() + 1.0;
+					lc.FTimer = GetGameTime() + 1.0;
 					lc.SubTimer = GetGameTime() + Math_GetRandomFloat(0.10, 0.75);
 				}
 			}
@@ -544,7 +576,7 @@ public Action OnPlayerRunCmd(int client, int& buttons, int& impulse, float vel[3
 			{
 				if(lc.IsTimerUp())
 				{
-					lc.Timer = GetGameTime() + Math_GetRandomFloat(5.0, 10.0);
+					lc.FTimer = GetGameTime() + Math_GetRandomFloat(5.0, 10.0);
 					lc.State = Math_GetRandomInt(0,3);
 				}
 
