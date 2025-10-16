@@ -61,6 +61,7 @@ SeedConfig cfg_Seed;
 SourceBansConfig cfg_SourceBans;
 BaseConfig cfg_NativeVotes;
 DemoRequestConfig cfg_DemoRequests;
+BaseConfig cfg_UpdateRequested;
 
 bool Config_IsWebhookURLValid(const char[] url)
 {
@@ -157,6 +158,11 @@ void Config_Init()
 	cfg_DemoRequests.accessurl = "";
 	cfg_DemoRequests.hasaccessurl = false;
 	cfg_DemoRequests.cooldown = 900.0;
+
+	cfg_UpdateRequested.enabled = false;
+	cfg_UpdateRequested.key = "";
+	cfg_UpdateRequested.hasmention = false;
+	cfg_UpdateRequested.mention = "";
 }
 
 void Config_Load()
@@ -442,7 +448,25 @@ void Config_Load()
 			}
 
 			kv.GoBack();
-		}	
+		}
+
+#if defined __steampawn_included
+		if (kv.JumpToKey("UpdateRequested"))
+		{
+			kv.GetString("Enabled", value, sizeof(value));
+			cfg_UpdateRequested.enabled = ConfigUtil_StringToBoolean(value);
+			kv.GetString("WebHookKey", cfg_UpdateRequested.key, sizeof(cfg_UpdateRequested.key));
+			kv.GetString("Mention", value, sizeof(value), "null");
+
+			if (strcmp(value, "null") != 0)
+			{
+				cfg_UpdateRequested.hasmention = true;
+				strcopy(cfg_UpdateRequested.mention, sizeof(cfg_UpdateRequested.mention), value);
+			}
+
+			kv.GoBack();
+		}
+#endif
 
 		kv.GoBack();
 	}
@@ -456,7 +480,7 @@ void Config_Load()
 	}
 
 	LogMessage("Discord Server Status plugin configuration fully loaded.");
-	LogMessage("JoinLeave: %s ServerStart: %s GameEvents: %s CallAdmin: %s SourceTV: %s Server Seed: %s SourceBans: %s Native Votes: %s Demo Requests: %s", 
+	LogMessage("JoinLeave: %s ServerStart: %s GameEvents: %s CallAdmin: %s SourceTV: %s Server Seed: %s SourceBans: %s Native Votes: %s Demo Requests: %s Updated Requests: %s", 
 		cfg_JoinLeave.enabled ? "Enabled" : "Disabled",
 		cfg_ServerStart.enabled ? "Enabled" : "Disabled",
 		cfg_GameEvents.enabled ? "Enabled" : "Disabled",
@@ -465,7 +489,8 @@ void Config_Load()
 		cfg_Seed.enabled ? "Enabled" : "Disabled",
 		cfg_SourceBans.enabled ? "Enabled" : "Disabled",
 		cfg_NativeVotes.enabled ? "Enabled" : "Disabled",
-		cfg_DemoRequests.enabled ? "Enabled" : "Disabled");
+		cfg_DemoRequests.enabled ? "Enabled" : "Disabled",
+		cfg_UpdateRequested.enabled ? "Enabled" : "Disabled");
 }
 
 Webhook Config_CreateWebHook(const char[] contents = "", const char[] defaultusername = "Server Status", const char[] key)

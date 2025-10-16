@@ -893,3 +893,35 @@ void SendMessage_OnDemoRequest(int requester)
 	delete webhook;
 }
 #endif
+
+void SendMessage_OnUpdateRequested()
+{
+	char servername[128];
+	char contents[128];
+	GetServerName(servername, sizeof(servername));
+
+	if (cfg_UpdateRequested.hasmention)
+	{
+		strcopy(contents, sizeof(contents), cfg_UpdateRequested.mention);
+	}
+	else
+	{
+		contents = "";
+	}
+
+	Webhook webhook = Config_CreateWebHook(contents, "Server Updater", cfg_UpdateRequested.key);
+
+	Embed embed1 = new Embed(servername, "Update Requested");
+	embed1.SetTimeStampNow();
+	embed1.SetColor(16776960);
+
+	EmbedField field1 = new EmbedField("Update", "Update requested by Steam master servers.", false);
+	embed1.AddField(field1);
+
+	webhook.AddEmbed(embed1);
+
+	Config_GetWebHookURL("UpdateRequested", cfg_UpdateRequested.key, s_webhook_url, sizeof(s_webhook_url));
+	webhook.Execute(s_webhook_url, OnWebHookExecuted);
+
+	delete webhook;
+}

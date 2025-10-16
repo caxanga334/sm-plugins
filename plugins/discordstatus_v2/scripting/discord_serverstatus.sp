@@ -3,7 +3,6 @@
 #include <ripext>
 
 #include <discordWebhookAPI>
-#include <autoexecconfig>
 
 #undef REQUIRE_EXTENSIONS
 #undef REQUIRE_PLUGIN
@@ -19,7 +18,7 @@
 #pragma newdecls required
 #pragma semicolon 1
 
-#define PLUGIN_VERSION "1.1.10"
+#define PLUGIN_VERSION "1.2.0"
 
 bool g_started; // Has the server started?
 bool g_hasip;
@@ -94,6 +93,7 @@ methodmap CPlayer
 #include "serverstatus/sourcetv.sp"
 #include "serverstatus/calladmin.sp"
 #include "serverstatus/sourcebans.sp"
+#include "serverstatus/steampawn.sp"
 
 public Plugin myinfo =
 {
@@ -112,16 +112,13 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 
 public void OnPluginStart()
 {
-	AutoExecConfig_SetFile("plugin.serverstatus");
+	CreateConVar("sm_serverstatus_version", PLUGIN_VERSION, "Plugin version", FCVAR_DONTRECORD|FCVAR_NOTIFY);
+	c_dns = CreateConVar("sm_serverstatus_dns", "", "Send the server IP as a domain name (eg: tf2.example.com) instead", FCVAR_PROTECTED);
+	c_delay = CreateConVar("sm_serverstatus_delay", "10.0", "Delay between webhook messages to prevent spam.", FCVAR_NONE, true, 1.0, false);
+	c_remove1 = CreateConVar("sm_serverstatus_remove", "", "Remove this part from servername", FCVAR_NONE);
+	c_remove2 = CreateConVar("sm_serverstatus_remove2", "", "Remove this part from servername", FCVAR_NONE);
 
-	AutoExecConfig_CreateConVar("sm_serverstatus_version", PLUGIN_VERSION, "Plugin version", FCVAR_DONTRECORD|FCVAR_NOTIFY);
-	c_dns = AutoExecConfig_CreateConVar("sm_serverstatus_dns", "", "Send the server IP as a domain name (eg: tf2.example.com) instead", FCVAR_NONE);
-	c_delay = AutoExecConfig_CreateConVar("sm_serverstatus_delay", "10.0", "Delay between webhook messages to prevent spam.", FCVAR_NONE, true, 1.0, false);
-	c_remove1 = AutoExecConfig_CreateConVar("sm_serverstatus_remove", "", "Remove this part from servername", FCVAR_NONE);
-	c_remove2 = AutoExecConfig_CreateConVar("sm_serverstatus_remove2", "", "Remove this part from servername", FCVAR_NONE);
-
-	AutoExecConfig_ExecuteFile();
-	AutoExecConfig_CleanFile();
+	AutoExecConfig(true, "plugin.serverstatus");
 
 	RegAdminCmd("sm_seed", ConCmd_Seed, 0, "Sends a seed request for this server.");
 	RegAdminCmd("sm_demorequest", ConCmd_DemoRequest, 0, "Sends a SourceTV demo request notification.");
