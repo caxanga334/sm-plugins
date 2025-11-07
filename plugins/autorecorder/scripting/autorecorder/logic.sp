@@ -375,6 +375,14 @@ public void OnMapStart()
 {
     char path[PLATFORM_MAX_PATH];
     GetCurrentMap(path, sizeof(path));
+    char buffer[PLATFORM_MAX_PATH];
+
+    // Get clean map name (workshop)
+    if (GetMapDisplayName(path, buffer, sizeof(buffer)))
+    {
+        strcopy(path, sizeof(path), buffer);
+    }
+
     Util_UnqualifiedFileName(g_szLevelName, sizeof(g_szLevelName), path);
     
     // RequestFrame would deal with server not processing frames
