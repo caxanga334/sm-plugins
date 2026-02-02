@@ -128,6 +128,7 @@ jobs:
           rsync -rv ${{ github.workspace }}/multicolors/addons/sourcemod/scripting/include/* ${{ env.TPINCLUDES_PATH }}/
           rsync -rv ${{ github.workspace }}/shqkeplugins/.deps/include/* ${{ env.TPINCLUDES_PATH }}/
           rsync -rv ${{ github.workspace }}/sbpp/game/addons/sourcemod/scripting/include/* ${{ env.TPINCLUDES_PATH }}/
+          rsync -rv ${{ github.workspace }}/sourcefiles/plugins/spraymanager/scripting/include/* ${{ env.TPINCLUDES_PATH }}/
           mkdir -p ${{ env.TPINCLUDES_PATH }}/stocksoup/
           rsync -rv ${{ github.workspace }}/stocksoup/* ${{ env.TPINCLUDES_PATH }}/stocksoup/
           ls -lah ${{ env.TPINCLUDES_PATH }}/
@@ -143,6 +144,7 @@ jobs:
           rsync -rv ${{ github.workspace }}/sourcefiles/plugins/tf_bots_mvm_fixes/scripting/* ${{ env.BUILD_PATH }}/
           rsync -rv ${{ github.workspace }}/sourcefiles/plugins/cannounce/scripting/* ${{ env.BUILD_PATH }}/
           rsync -rv ${{ github.workspace }}/sourcefiles/plugins/gpluck/scripting/* ${{ env.BUILD_PATH }}/
+          rsync -rv ${{ github.workspace }}/sourcefiles/plugins/spraymanager/scripting/* ${{ env.BUILD_PATH }}/
           cp ${{ github.workspace }}/sourcefiles/source/connectlog.sp ${{ env.BUILD_PATH }}/
           cp ${{ github.workspace }}/sourcefiles/source/l4d_antiearlyvote.sp ${{ env.BUILD_PATH }}/
           cp ${{ github.workspace }}/sourcefiles/source/sessionbans.sp ${{ env.BUILD_PATH }}/

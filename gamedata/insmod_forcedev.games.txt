@@ -1,0 +1,31 @@
+"Games"
+{
+	"insurgency"
+	{
+		"Signatures"
+		{
+			"UTIL_FindSteamIDType"
+			{
+				"library"		"server"
+				"windows"		"\x8B\x4C\x24\x2A\x56\xE8\x2A\x2A\x2A\x2A\x8B\xF0\x85\xF6\x75\x2A\x33\xC0"
+				"linux"			"@_Z20UTIL_FindSteamIDTypeP10CINSPlayer"
+			}
+		}
+		"Functions"
+		{
+			"UTIL_FindSteamIDType"
+			{
+				"signature"		"UTIL_FindSteamIDType"
+				"callconv"		"cdecl"
+				"return"		"int"
+				"arguments"
+				{
+					"player"
+					{
+						"type"	"cbaseentity"
+					}
+				}
+			}
+		}
+	}
+}

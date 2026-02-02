@@ -380,6 +380,13 @@ Action Command_LookUpAttachment(int client, int args)
 	else
 	{
 		ReplyToCommand(client, "Found attachment index %i", attachment);
+		
+		float origin[3];
+		float angles[3];
+		
+		GetEntityAttachment(entity, attachment, origin, angles);
+		
+		ReplyToCommand(client, "Position %f %f %f Angles %f %f %f", origin[0], origin[1], origin[2], angles[0], angles[1], angles[2]);
 	}
 
 	return Plugin_Handled;
