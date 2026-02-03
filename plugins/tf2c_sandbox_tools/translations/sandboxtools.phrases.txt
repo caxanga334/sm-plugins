@@ -1,0 +1,43 @@
+"Phrases"
+{
+	"SandboxMenuInfo"
+	{
+		"en"			"Sandbox menu is available. Type /sandboxmenu to open it!"
+		"pt"			"Menu sandbox está disponível. Digite /sandboxmenu para abrir!"
+	}
+	"SandboxMenuNotAvailable"
+	{
+		"en"			"The sandbox menu is not available for this map."
+		"pt"			"O menu de Sandbox não está disponível para esse mapa."
+	}
+	"SandboxMenuTitle"
+	{
+		"en"			"Sandbox Menu"
+		"pt"			"Menu de Sandbox"
+	}
+	"SBA_Regenerate"
+	{
+		"en"			"Regenerate Health/Ammo"
+		"pt"			"Regenerar Vida/Munição"
+	}
+	"SBA_Noclip"
+	{
+		"en"			"Toggle Noclip"
+		"pt"			"Alternar Noclip"
+	}
+	"SBA_Size"
+	{
+		"en"			"Toggle Size"
+		"pt"			"Alternar Tamanho"
+	}
+	"SBA_Respawn"
+	{
+		"en"			"Respawn"
+		"pt"			"Respawn"
+	}
+	"SBA_Civilian"
+	{
+		"en"			"Become the Civilian"
+		"pt"			"Virar o Civilian"
+	}
+}
