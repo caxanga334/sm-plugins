@@ -21,7 +21,7 @@ stock void AddSpacer(Embed &embed)
 	embed.AddField(fieldspacer);
 }
 
-void FormatMessage_L4D_NativeVote(const char[] issue, const char[] option, char[] outissue, int outissue_max, char[] outoption, int outoption_max)
+void FormatMessage_NativeVote(const char[] issue, const char[] option, char[] outissue, int outissue_max, char[] outoption, int outoption_max)
 {
 	if (strcmp(issue, "ChangeDifficulty", false) == 0)
 	{
@@ -80,8 +80,42 @@ void FormatMessage_L4D_NativeVote(const char[] issue, const char[] option, char[
 		strcopy(outissue, outissue_max, "Change All Talk");
 		strcopy(outoption, outoption_max, "");
 	}
+	else if (strcmp(issue, "ScrambleTeams", false) == 0)
+	{
+		strcopy(outissue, outissue_max, "Scramble Teams");
+		strcopy(outoption, outoption_max, "");
+	}
+	else if (strcmp(issue, "ChangeCivilian", false) == 0)
+	{
+		strcopy(outissue, outissue_max, "Change VIP");
+
+		int userid = StringToInt(option);
+
+		if (userid > 0)
+		{
+			int target = GetClientOfUserId(userid);
+
+			if (target > 0 && IsClientInGame(target))
+			{
+				char SID[MAX_AUTHID_LENGTH];
+				
+				if (!GetClientAuthId(target, AuthId_SteamID64, SID, sizeof(SID)))
+				{
+					SID = "";
+				}
+
+				FormatEx(outoption, outoption_max, "Target: %N (%s)", target, SID);
+			}
+		}
+		else
+		{
+			FormatEx(outoption, outoption_max, "UserID: %s", option);
+		}
+	}
 	else
 	{
+		strcopy(outissue, outissue_max, issue);
+		strcopy(outoption, outoption_max, option);
 		LogError("Unhandled vote issue: %s option: %s", issue, option);
 	}
 }

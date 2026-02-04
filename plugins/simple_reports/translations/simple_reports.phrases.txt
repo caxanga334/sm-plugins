@@ -1,0 +1,61 @@
+"Phrases"
+{
+	"Error_NoAuth"
+	{
+		"en"			"You must be authenticated with Steam to report players."
+		"pt"			"Você precisa estár autenticado com a Steam para denunciar jogadores."
+	}
+	"ReportMenu_PlayersTitle"
+	{
+		"en"			"Select a player."
+		"pt"			"Selecione um jogador."
+	}
+	"ReportMenu_ReasonsTitle"
+	{
+		"en"			"Select a reason."
+		"pt"			"Selecione um motivo."
+	}
+	"Msg_ReportSent"
+	{
+		"#format"		"{1:N}"
+		"en"			"Your report of {1} was recorded."
+		"pt"			"Sua denuncia de {1} foi gravada."
+	}
+	"Msg_Admin_Reported"
+	{
+		/* caller, target, reason */
+		"#format"		"{1:N},{2:N},{3:t}"
+		"en"			"{1} reported {2} for {3}."
+		"pt"			"{1} denunciou {2} por {3}."
+	}
+	"RR_Cheating"
+	{
+		"en"			"Using cheats/hacks."
+		"pt"			"Usando cheats/hacks."
+	}
+	"RR_Griefing"
+	{
+		"en"			"Griefing."
+		"pt"			"Griefing."
+	}
+	"RR_BadBehavior"
+	{
+		"en"			"Bad behavior."
+		"pt"			"Comportamento inadequado."
+	}
+	"RR_CommsAbuse"
+	{
+		"en"			"Communications abuse."
+		"pt"			"Comunicação abusiva."
+	}
+	"RR_BadSpray"
+	{
+		"en"			"Bad spray."
+		"pt"			"Spray inadequado."
+	}
+	"RR_Other"
+	{
+		"en"			"Other."
+		"pt"			"Outro."
+	}
+}

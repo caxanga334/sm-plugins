@@ -4,7 +4,6 @@
 #pragma newdecls required
 #pragma semicolon 1
 
-
 public Plugin myinfo =
 {
 	name = "[TF2C] Item Schema Precache",
@@ -21,11 +20,6 @@ void LoadFile(const char[] path)
 		PrecacheGeneric(path, true);
 		AddFileToDownloadsTable(path);
 	}
-}
-
-public void OnPluginStart()
-{
-
 }
 
 public void OnMapStart()

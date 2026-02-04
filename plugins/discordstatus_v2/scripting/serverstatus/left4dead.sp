@@ -31,7 +31,7 @@ public void L4D_OnFirstSurvivorLeftSafeArea_Post(int client)
 
 #endif
 
-Action L4D_OnCallVote(int client, const char[] command, int argc)
+Action CommandListener_OnCallVote(int client, const char[] command, int argc)
 {
 
 	if (cfg_NativeVotes.enabled && IsClientInGame(client) && argc >= 1)
@@ -49,7 +49,7 @@ Action L4D_OnCallVote(int client, const char[] command, int argc)
 			option = "";
 		}
 
-		SendMessage_L4D_OnNativeVote(client, vote, option);
+		SendMessage_OnNativeVote(client, vote, option);
 	}
 
 	return Plugin_Continue;

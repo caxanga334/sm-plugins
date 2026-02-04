@@ -18,7 +18,7 @@
 #pragma newdecls required
 #pragma semicolon 1
 
-#define PLUGIN_VERSION "1.2.1"
+#define PLUGIN_VERSION "1.2.2"
 
 bool g_started; // Has the server started?
 bool g_hasip;
@@ -134,13 +134,12 @@ public void OnPluginStart()
 	if (FindSendPropInfo("CTFPlayer", "m_vecOrigin") > 0)
 	{
 		HookEvent("mvm_begin_wave", EV_TF2_OnMvMWaveStart);
-		// yeah it says L4D but the callvote command format is the same for both
-		AddCommandListener(L4D_OnCallVote, "callvote");
+		AddCommandListener(CommandListener_OnCallVote, "callvote");
 	}
 
 	if (g_engine == Engine_Left4Dead || g_engine == Engine_Left4Dead2)
 	{
-		AddCommandListener(L4D_OnCallVote, "callvote");
+		AddCommandListener(CommandListener_OnCallVote, "callvote");
 	}
 
 	Config_Load();
