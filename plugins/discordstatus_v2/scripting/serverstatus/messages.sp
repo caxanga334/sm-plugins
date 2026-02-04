@@ -479,6 +479,8 @@ void SendMessage_OnCallAdminReportHandled(int client, int id)
 	delete webhook;
 }
 
+#endif
+
 void SendMessage_OnSeedRequest(int requestingClient)
 {
 	char mapname[64];
@@ -550,8 +552,6 @@ void SendMessage_OnSeedRequest(int requestingClient)
 
 	delete webhook;
 }
-
-#endif
 
 #if defined _sourcebanspp_included
 
@@ -824,7 +824,7 @@ void SendMessage_L4D_OnNativeVote(int client, const char[] issue, const char[] o
 
 	webhook.AddEmbed(embed1); 
 
-	Config_GetWebHookURL("SourceBans", cfg_NativeVotes.key, s_webhook_url, sizeof(s_webhook_url));
+	Config_GetWebHookURL("NativeVotes", cfg_NativeVotes.key, s_webhook_url, sizeof(s_webhook_url));
 	webhook.Execute(s_webhook_url, OnWebHookExecuted);
 
 	delete webhook;

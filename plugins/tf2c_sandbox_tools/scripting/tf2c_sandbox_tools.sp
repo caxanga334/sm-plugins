@@ -15,7 +15,7 @@ public Plugin myinfo =
 	name = "[TF2C] Sandbox Tools",
 	author = "caxanga334",
 	description = "Provides sandbox utilities for players.",
-	version = "1.0.0",
+	version = "1.0.1",
 	url = "https://github.com/caxanga334/sm-plugins"
 };
 

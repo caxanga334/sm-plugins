@@ -5,7 +5,6 @@ enum SandboxAction
 	SANDBOX_ACTION_NOCLIP,
 	SANDBOX_ACTION_SIZE,
 	SANDBOX_ACTION_RESPAWN,
-	SANDBOX_ACTION_CIVILIAN,
 	MAX_SANDBOX_ACTIONS
 }
 
@@ -14,7 +13,6 @@ static char s_SBActionsDisplay[][] = {
 	"SBA_Noclip",
 	"SBA_Size",
 	"SBA_Respawn",
-	"SBA_Civilian",
 };
 
 void Vscript_Regenerate(int client)
@@ -27,13 +25,6 @@ void Vscript_Respawn(int client)
 {
 	SetVariantString("self.ForceRegenerateAndRespawn()");
 	AcceptEntityInput(client, "RunScriptCode", client, client);
-}
-
-void Vscript_Civilian(int client)
-{
-	SetVariantString("self.SetPlayerClass(Constants.ETFClass.TF_CLASS_CIVILIAN)");
-	AcceptEntityInput(client, "RunScriptCode", client, client);
-	RequestFrame(Frame_Respawn, view_as<any>(GetClientSerial(client)));
 }
 
 void Frame_Respawn(any data)
@@ -101,10 +92,6 @@ void DoSandboxAction(int client, SandboxAction action)
 	case SANDBOX_ACTION_RESPAWN:
 	{
 		Vscript_Respawn(client);
-	}
-	case SANDBOX_ACTION_CIVILIAN:
-	{
-		Vscript_Civilian(client);
 	}
 	}
 }

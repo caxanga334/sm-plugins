@@ -35,9 +35,4 @@
 		"en"			"Respawn"
 		"pt"			"Respawn"
 	}
-	"SBA_Civilian"
-	{
-		"en"			"Become the Civilian"
-		"pt"			"Virar o Civilian"
-	}
 }
