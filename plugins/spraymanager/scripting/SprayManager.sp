@@ -28,7 +28,7 @@ public Plugin myinfo =
 	name		= "Spray Manager",
 	description	= "Help manage player sprays.",
 	author		= "Obus, maxime1907, .Rushaway, caxanga334",
-	version		= "3.3.0",
+	version		= "3.3.1",
 	url			= "https://github.com/caxanga334/sm-plugins"
 }
 
@@ -95,7 +95,7 @@ public void OnPluginStart()
 
 	InitializeSQL();
 
-	HookEvent("teamplay_round_win", Event_RoundEnd);
+	HookGameEvents();
 }
 
 public void OnPluginEnd()
@@ -226,7 +226,7 @@ public void OnClientDisconnect(int client)
 
 void Event_RoundEnd(Event event, const char[] name, bool dontBroadcast)
 {
-	
+	OnRoundEnded(10.0);
 }
 
 void OnRoundEnded(float fDelay)
@@ -597,6 +597,19 @@ void InitializeSQL()
 		SQL_TConnect(OnSQLConnected, "spraymanager");
 	else
 		SetFailState("Could not find \"spraymanager\" entry in databases.cfg.");
+}
+
+void HookGameEvents()
+{
+	/* TF2 or TF2 based mods */
+	if (FindSendPropInfo("CTFPlayer", "m_vecOrigin") > 0)
+	{
+		HookEvent("teamplay_round_win", Event_RoundEnd);
+	}
+	else if (FindSendPropInfo("CDODPlayer", "m_vecOrigin") > 0)
+	{
+		HookEvent("dod_round_win", Event_RoundEnd);
+	}
 }
 
 Transaction CreateTablesTransaction()
