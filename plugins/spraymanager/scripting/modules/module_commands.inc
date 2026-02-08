@@ -572,9 +572,10 @@ public Action Command_RemoveSpray(int client, int argc)
 
 public Action Command_ForceNSFW(int client, int argc)
 {
-	if (!client)
+	if (!client && argc <= 0)
 	{
 		ReplyToCommand(client, "[SprayManager] Cannot use command from server console.");
+		ReplyToCommand(client, "Usage: sm_forcensfw <target>")
 		return Plugin_Handled;
 	}
 
@@ -613,7 +614,7 @@ public Action Command_ForceNSFW(int client, int argc)
 
 public Action Command_ForceSFW(int client, int argc)
 {
-	if (!client)
+	if (!client && argc <= 0)
 	{
 		ReplyToCommand(client, "[SprayManager] Cannot use command from server console.");
 		return Plugin_Handled;

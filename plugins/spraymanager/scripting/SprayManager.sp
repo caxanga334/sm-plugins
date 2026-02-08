@@ -28,7 +28,7 @@ public Plugin myinfo =
 	name		= "Spray Manager",
 	description	= "Help manage player sprays.",
 	author		= "Obus, maxime1907, .Rushaway, caxanga334",
-	version		= "3.3.1",
+	version		= "3.4.0",
 	url			= "https://github.com/caxanga334/sm-plugins"
 }
 
