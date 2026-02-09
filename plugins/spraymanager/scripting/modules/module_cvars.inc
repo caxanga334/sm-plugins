@@ -14,7 +14,7 @@ public void CreateConVars()
 
 	HookConVarChange(g_cvarHookedDecalFrequency, ConVarChanged_DecalFrequency);
 
-	g_cvarUseProximityCheck = CreateConVar("sm_spraymanager_blockoverspraying", "1", "Blocks people from overspraying each other", FCVAR_NOTIFY);
+	g_cvarUseProximityCheck = CreateConVar("sm_spraymanager_blockoverspraying", "1", "Blocks people from overspraying each other", FCVAR_NONE);
 
 	g_cvarSendSpraysToConnectingClients = CreateConVar("sm_spraymanager_sendspraystoconnectingclients", "1", "Try to send active sprays to connecting clients");
 
@@ -22,13 +22,15 @@ public void CreateConVars()
 
 	g_cvarMaxSprayLifetime = CreateConVar("sm_spraymanager_maxspraylifetime", "2", "If not using persistent sprays, remove sprays after their global lifetime (in rounds) exceeds this number");
 
-	g_cvarSprayBanLength = CreateConVar("sm_spraymanager_spraybanlength", "0", "How long to ban a player from spraying for", FCVAR_NOTIFY);
+	g_cvarSprayBanLength = CreateConVar("sm_spraymanager_spraybanlength", "0", "How long to ban a player from spraying for", FCVAR_NONE);
 
 	g_cvarDefaultBehavior = CreateConVar("sm_spraymanager_defaultbehavior", "1", "Default behavior for sprays (0 = Block spray until client passed all verifications | 1 = Allow spray)", FCVAR_NOTIFY);
 
-	g_cvarFramesToSkip = CreateConVar("sm_spraymanager_framestoskip", "10", "Number of frames to skip before trace a player spray", FCVAR_NOTIFY, true, 0.0, true, 66.0);
+	g_cvarFramesToSkip = CreateConVar("sm_spraymanager_framestoskip", "10", "Number of frames to skip before trace a player spray", FCVAR_NONE, true, 0.0, true, 66.0);
 	g_cvarFramesToSkip.AddChangeHook(ConVarChanged_FramesToSkip);
 	g_iFramesToSkip = g_cvarFramesToSkip.IntValue;
+
+	g_cvarBlockNoAuth = CreateConVar("sm_spraymanager_blockwithoutauth", "1", "Should sprays be blocked for clients without Steam auth?", FCVAR_NONE, true, 0.0, true, 1.0);
 }
 
 public void ConVarChanged_EnableSpray(ConVar cvar, const char[] sOldValue, const char[] sNewValue)

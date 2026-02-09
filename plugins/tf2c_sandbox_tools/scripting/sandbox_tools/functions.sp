@@ -27,16 +27,6 @@ void Vscript_Respawn(int client)
 	AcceptEntityInput(client, "RunScriptCode", client, client);
 }
 
-void Frame_Respawn(any data)
-{
-	int client = GetClientFromSerial(view_as<int>(data));
-
-	if (client != 0)
-	{
-		Vscript_Respawn(client);
-	}
-}
-
 void Vscript_ToggleNoclip(int client)
 {
 	MoveType mt = GetEntityMoveType(client);

@@ -1,5 +1,10 @@
 "Phrases"
 {
+	"SandboxAdminToggleOn"
+	{
+		"en"			"Sandbox menu was enabled by an admin. Type /sandboxmenu to open it!"
+		"pt"			"Menu sandbox foi ativado por um administrador. Digite /sandboxmenu para abrir!"
+	}
 	"SandboxMenuInfo"
 	{
 		"en"			"Sandbox menu is available. Type /sandboxmenu to open it!"

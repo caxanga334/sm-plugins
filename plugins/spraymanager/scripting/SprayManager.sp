@@ -28,7 +28,7 @@ public Plugin myinfo =
 	name		= "Spray Manager",
 	description	= "Help manage player sprays.",
 	author		= "Obus, maxime1907, .Rushaway, caxanga334",
-	version		= "3.4.0",
+	version		= "3.4.1",
 	url			= "https://github.com/caxanga334/sm-plugins"
 }
 
@@ -174,6 +174,7 @@ public void OnClientPostAdminCheck(int client)
 		OnClientCookiesCached(client);
 	UpdatePlayerInfo(client);
 	g_bSprayCheckComplete[client] = false;
+	g_bAuthenticated[client] = true;
 	UpdateSprayHashInfo(client);
 	UpdateNSFWInfo(client);
 
@@ -222,6 +223,7 @@ public void OnClientDisconnect(int client)
 	}
 
 	ClearPlayerInfo(client);
+	g_bAuthenticated[client] = false;
 }
 
 void Event_RoundEnd(Event event, const char[] name, bool dontBroadcast)
@@ -260,6 +262,13 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse)
 		return Plugin_Continue;
 	}
 
+	if (g_cvarBlockNoAuth.BoolValue && !g_bAuthenticated[client])
+	{
+		CPrintToChat(client, "{green}[SprayManager] {white}Your client is currently not authenticated with Steam.");
+		impulse = 0;
+		return Plugin_Changed;
+	}
+
 	if (CheckCommandAccess(client, "sm_spray", ADMFLAG_GENERIC))
 	{
 		if (!g_bSprayBanned[client] && !g_bSprayHashBanned[client])
@@ -295,6 +304,12 @@ public Action HookDecal(const char[] sTEName, const int[] iClients, int iNumClie
 		if (g_iAllowSpray == client)
 			g_iAllowSpray = 0;
 
+		return Plugin_Handled;
+	}
+
+	if (g_cvarBlockNoAuth.BoolValue && !g_bAuthenticated[client])
+	{
+		CPrintToChat(client, "{green}[SprayManager] {white}Your client is currently not authenticated with Steam.");
 		return Plugin_Handled;
 	}
 

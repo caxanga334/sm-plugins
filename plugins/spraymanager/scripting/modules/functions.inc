@@ -36,6 +36,7 @@ ConVar g_cvarAuthorizedFlags = null;
 ConVar g_cvarSprayBanLength = null;
 ConVar g_cvarDefaultBehavior = null;
 ConVar g_cvarFramesToSkip = null;
+ConVar g_cvarBlockNoAuth = null;
 
 int g_iNSFWDecalIndex[3];
 int g_iHiddenDecalIndex;
@@ -75,6 +76,7 @@ int g_iAuthorizedFlags[32] = { -1, ...};
 int g_iSprayCheckAttempts[MAXPLAYERS + 1];
 
 bool g_bEnableSprays = true;
+bool g_bAuthenticated[MAXPLAYERS + 1];
 bool g_bSprayCheckComplete[MAXPLAYERS + 1];
 bool g_bWantsToSeeNSFWSprays[MAXPLAYERS + 1];
 bool g_bHasNSFWSpray[MAXPLAYERS + 1];

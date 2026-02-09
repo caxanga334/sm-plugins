@@ -15,7 +15,7 @@ public Plugin myinfo =
 	name = "[TF2C] Sandbox Tools",
 	author = "caxanga334",
 	description = "Provides sandbox utilities for players.",
-	version = "1.0.1",
+	version = "1.0.2",
 	url = "https://github.com/caxanga334/sm-plugins"
 };
 
@@ -86,6 +86,7 @@ public void OnPluginStart()
 	delete parser;
 
 	RegAdminCmd("sm_sandboxmenu", Command_ShowSandboxMenu, 0, "Opens the sandbox menu");
+	RegAdminCmd("sm_sandbox_toggle", Command_SandboxToggle, ADMFLAG_CONFIG, "Toggles sandbox mode.");
 
 	LoadTranslations("sandboxtools.phrases");
 }
@@ -115,6 +116,20 @@ Action Command_ShowSandboxMenu(int client, int args)
 
 	SendSandboxMenu(client);
 
+	return Plugin_Handled;
+}
+
+Action Command_SandboxToggle(int client, int args)
+{
+	if (!g_bEnabled)
+	{
+		PrintToChatAll("%t", "SandboxAdminToggleOn");
+		g_bEnabled = true;
+		return Plugin_Handled;
+	}
+
+	ReplyToCommand(client, "Sandbox menu disabled!");
+	g_bEnabled = false;
 	return Plugin_Handled;
 }
 
