@@ -1,0 +1,17 @@
+"Games"
+{
+	"hl1mp"
+	{
+		"Offsets"
+		{
+			/* These are vtable offsets */
+			"CBaseEntity::WorldSpaceCenter"
+			{
+				"windows"			"152"
+				"windows64"			"152"
+				"linux"				"153"
+				"linux64"			"153"
+			}
+		}
+	}
+}
