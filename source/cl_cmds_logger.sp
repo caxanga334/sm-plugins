@@ -73,6 +73,12 @@ Action Command_ToggleLogging(int client, int args)
 
 Action Command_ToggleButtonLogging(int client, int args)
 {
+	if (!client)
+	{
+		ReplyToCommand(client, "This command cannot be used by the server console.");
+		return Plugin_Handled;
+	}
+
 	g_bLogButtons[client] = !g_bLogButtons[client];
 	ReplyToCommand(client, "Button logging is %s.", g_bLogButtons[client] ? "ENABLED" : "DISABLED");
 	return Plugin_Handled;
@@ -146,6 +152,11 @@ public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float
 	if (impulse > 0)
 	{
 		LogToFile(g_logFile, "%L sent impulse %i", client, impulse);
+	}
+
+	if (weapon != 0)
+	{
+		LogToFile(g_logFile, "%L sent weapon %i subtype %i", client, weapon, subtype);
 	}
 
 	if (g_bLogButtons[client] && buttons != 0)
