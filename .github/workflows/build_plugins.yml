@@ -28,8 +28,7 @@ jobs:
           - buildjobs: sourcemod-1.13
             os_version: ubuntu-latest
             identifier: 'Sourcemod Dev'
-            # int64 not supported for now, target a pre int64 SM version
-            sm-version: '1.13.7299'
+            sm-version: '1.13.x'
             package-name: 'sm-dev'
     env:
       SOURCEFILES_PATH: ${{ github.workspace }}/sourcefiles
@@ -164,6 +163,15 @@ jobs:
           cp ${{ github.workspace }}/sourcefiles/source/tf2c_enforce_time_limits.sp ${{ env.BUILD_PATH }}/
           cp ${{ github.workspace }}/sourcefiles/source/tf2c_schema_download.sp ${{ env.BUILD_PATH }}/
           cp ${{ github.workspace }}/sourcefiles/source/tf2c_simple_kick_immunity.sp ${{ env.BUILD_PATH }}/
+
+      - name: Remove Plugins Incompatible With ${{ matrix.sm-version }}
+        if: ${{ matrix.sm-version == '1.13.x' }}
+        working-directory: ${{ env.BUILD_PATH }}
+        run: |
+          rm l4d_*
+          rm l4d2_*
+          rm discord_serverstatus.sp
+          rm gp_luck_redux.sp
 
       - name: Compile Plugins
         working-directory: ${{ env.BUILD_PATH }}

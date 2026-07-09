@@ -33,6 +33,7 @@ public void OnPluginStart()
 	RegAdminCmd("sm_dev_sdktools", Command_GenericSDKToolsTests, ADMFLAG_ROOT, "Generic SDKTools tests.");
 	RegAdminCmd("sm_dev_burnme", Command_IgniteSelf, ADMFLAG_ROOT, "Test the ignite gamedata.");
 	RegAdminCmd("sm_dev_forcesuicide", Command_ForceSuicide, ADMFLAG_ROOT, "Tests the force suicide gamedata.");
+	RegAdminCmd("sm_dev_createentity", Command_TestCreateEntity, ADMFLAG_ROOT, "Tests entity creation.");
 }
 
 void Hook_ClientSpawnPost(int entity)
@@ -614,4 +615,43 @@ Action Command_ForceSuicide(int client, int args)
 	ReplyToCommand(cl, "ForceSuicide");
 #endif
 	return Plugin_Handled;
+}
+
+Action Command_TestCreateEntity(int client, int args)
+{
+	int entity = CreateEntityByName("info_target");
+
+	if (entity == INVALID_ENT_REFERENCE)
+	{
+		ReplyToCommand(client, "CreateEntityByName (info_target) failed!");
+		return Plugin_Handled;
+	}
+
+	float origin[3] = { 0.0, 0.0, 0.0 };
+	DispatchKeyValueVector(entity, "origin", origin);
+	DispatchKeyValue(entity, "targetname", "sm_dev_create_test");
+	DispatchKeyValueFloat(entity, "gravity", 1.0); // doesn't exists on info_target, just here to test if DispatchKeyValueFloat works
+
+	if (!DispatchSpawn(entity))
+	{
+		ReplyToCommand(client, "DispatchSpawn failed!");
+		return Plugin_Handled;
+	}
+
+	ActivateEntity(entity);
+
+	// clean up later
+	CreateTimer(120.0, Timer_DeleteEntity, view_as<any>(EntIndexToEntRef(entity)), TIMER_FLAG_NO_MAPCHANGE);
+
+	return Plugin_Handled;
+}
+
+void Timer_DeleteEntity(Handle timer, any data)
+{
+	int entity = EntRefToEntIndex(view_as<int>(data));
+
+	if (entity != INVALID_ENT_REFERENCE)
+	{
+		RemoveEntity(entity);
+	}
 }
