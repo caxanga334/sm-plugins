@@ -172,6 +172,8 @@ jobs:
           rm l4d2_*.sp
           rm discord_serverstatus.sp
           rm gp_luck_redux.sp
+          rm SprayManager.sp
+          rm tf_mvm_credits.sp
 
       - name: Compile Plugins
         working-directory: ${{ env.BUILD_PATH }}
