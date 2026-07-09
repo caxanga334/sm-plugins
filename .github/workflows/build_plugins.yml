@@ -168,8 +168,8 @@ jobs:
         if: ${{ matrix.sm-version == '1.13.x' }}
         working-directory: ${{ env.BUILD_PATH }}
         run: |
-          rm l4d_*
-          rm l4d2_*
+          rm l4d_*.sp
+          rm l4d2_*.sp
           rm discord_serverstatus.sp
           rm gp_luck_redux.sp
 
