@@ -149,6 +149,7 @@ jobs:
           rsync -rv ${{ github.workspace }}/sourcefiles/plugins/spraymanager/scripting/* ${{ env.BUILD_PATH }}/
           rsync -rv ${{ github.workspace }}/sourcefiles/plugins/tf2c_sandbox_tools/scripting/* ${{ env.BUILD_PATH }}/
           rsync -rv ${{ github.workspace }}/sourcefiles/plugins/simple_reports/scripting/* ${{ env.BUILD_PATH }}/
+          rsync -rv ${{ github.workspace }}/sourcefiles/plugins/hl1mp_fixes/scripting/* ${{ env.BUILD_PATH }}/
           cp ${{ github.workspace }}/sourcefiles/source/connectlog.sp ${{ env.BUILD_PATH }}/
           cp ${{ github.workspace }}/sourcefiles/source/l4d_antiearlyvote.sp ${{ env.BUILD_PATH }}/
           cp ${{ github.workspace }}/sourcefiles/source/sessionbans.sp ${{ env.BUILD_PATH }}/
@@ -164,7 +165,7 @@ jobs:
           cp ${{ github.workspace }}/sourcefiles/source/tf2c_schema_download.sp ${{ env.BUILD_PATH }}/
           cp ${{ github.workspace }}/sourcefiles/source/tf2c_simple_kick_immunity.sp ${{ env.BUILD_PATH }}/
 
-      - name: Remove Plugins Incompatible With ${{ matrix.sm-version }}
+      - name: Remove Plugins Incompatible With SourceMod Dev
         if: ${{ matrix.sm-version == '1.13.x' }}
         working-directory: ${{ env.BUILD_PATH }}
         run: |
@@ -174,6 +175,12 @@ jobs:
           rm gp_luck_redux.sp
           rm SprayManager.sp
           rm tf_mvm_credits.sp
+
+      - name: Remove Plugins Incompatible With SourceMod Stable
+        if: ${{ matrix.sm-version == '1.12.x' }}
+        working-directory: ${{ env.BUILD_PATH }}
+        run: |
+          rm hl1mp_fixes.sp
 
       - name: Compile Plugins
         working-directory: ${{ env.BUILD_PATH }}
@@ -203,6 +210,7 @@ jobs:
           rsync -rv ${{ github.workspace }}/sourcefiles/plugins/tf2c_sandbox_tools/configs/* ${{ env.CONFIGS_PATH }}/
           rsync -rv ${{ github.workspace }}/sourcefiles/plugins/tf2c_sandbox_tools/translations/* ${{ env.LOC_PATH }}/
           rsync -rv ${{ github.workspace }}/sourcefiles/plugins/simple_reports/translations/* ${{ env.LOC_PATH }}/
+          rsync -rv ${{ github.workspace }}/sourcefiles/plugins/hl1mp_fixes/gamedata/* ${{ env.GAMEDATA_PATH }}/
 
       - name: Fetch Short SHA
         uses: benjlevesque/short-sha@v4.0
