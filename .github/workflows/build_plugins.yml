@@ -54,7 +54,7 @@ jobs:
           mkdir -p ${{ env.LOC_PATH }}
 
       - name: Fetch Plugins Sources
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v7
         with:
           path: sourcefiles
 
@@ -80,44 +80,45 @@ jobs:
           ls -lah
 
       - name: Fetch REST in SourcePawn
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v7
         with:
-          repository: ErikMinekus/sm-ripext
+          repository: caxanga334/sm-ripext
+          ref: 'fix/mark-natives-as-optional'
           path: ripext
 
       - name: Fetch Left 4 DHooks Direct
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v7
         with:
           repository: SilvDev/Left4DHooks
           path: left4dhooks
   
       - name: Fetch SMLIB
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v7
         with:
           repository: bcserv/smlib
           path: smlib
           ref: transitional_syntax
 
       - name: Fetch MultiColors
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v7
         with:
           repository: Bara/Multi-Colors
           path: multicolors
 
       - name: Fetch shqke
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v7
         with:
           repository: shqke/sp_public
           path: shqkeplugins
 
       - name: Fetch SourceBans++
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v7
         with:
           repository: sbpp/sourcebans-pp
           path: sbpp
 
       - name: Fetch Stocksoup
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v7
         with:
           repository: nosoop/stocksoup
           path: stocksoup
@@ -150,6 +151,7 @@ jobs:
           rsync -rv ${{ github.workspace }}/sourcefiles/plugins/tf2c_sandbox_tools/scripting/* ${{ env.BUILD_PATH }}/
           rsync -rv ${{ github.workspace }}/sourcefiles/plugins/simple_reports/scripting/* ${{ env.BUILD_PATH }}/
           rsync -rv ${{ github.workspace }}/sourcefiles/plugins/hl1mp_fixes/scripting/* ${{ env.BUILD_PATH }}/
+          rsync -rv ${{ github.workspace }}/sourcefiles/plugins/insmicfixes/scripting/* ${{ env.BUILD_PATH }}/
           cp ${{ github.workspace }}/sourcefiles/source/connectlog.sp ${{ env.BUILD_PATH }}/
           cp ${{ github.workspace }}/sourcefiles/source/l4d_antiearlyvote.sp ${{ env.BUILD_PATH }}/
           cp ${{ github.workspace }}/sourcefiles/source/sessionbans.sp ${{ env.BUILD_PATH }}/
@@ -217,7 +219,7 @@ jobs:
         id: short-sha
 
       - name: Upload Compiled Plugins Artifact
-        uses: actions/upload-artifact@v7.0.1
+        uses: actions/upload-artifact@v7
         with:
           name: plugins-${{ matrix.package-name }}-${{ steps.short-sha.outputs.sha }}
           path: |
