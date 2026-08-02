@@ -1,0 +1,31 @@
+"Games"
+{
+	"#default"
+	{
+		"Signatures"
+		{
+			"CBaseEntity::SetAbsOrigin"
+			{
+				"library"		"server"
+				"linux"			"@_ZN11CBaseEntity12SetAbsOriginERK6Vector"
+			}
+		}
+		"Functions"
+		{
+			"CBaseEntity::SetAbsOrigin"
+			{
+				"signature"		"CBaseEntity::SetAbsOrigin"
+				"callconv"		"thiscall"
+                "this"          "entity"
+				"return"		"void"
+				"arguments"
+				{
+					"position"
+					{
+						"type"	"vectorptr"
+					}
+				}
+			}
+		}
+	}
+}

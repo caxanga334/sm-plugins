@@ -1,0 +1,31 @@
+"Games"
+{
+	"#default"
+	{
+		"Signatures"
+		{
+			/* Windows finding tips:
+			 * Behind a unique VPROF node but that string generally doesn't show in ghidra.
+			 * Called twice with the same parameters in CBasePlayer::PhysicsSimulate
+			*/
+
+			"CBasePlayer::UpdateVPhysicsPosition"
+			{
+				"library"		"server"
+				"linux"			"@_ZN11CBasePlayer22UpdateVPhysicsPositionERK6VectorS2_f"
+				"linux64"		"@_ZN11CBasePlayer22UpdateVPhysicsPositionERK6VectorS2_f"
+			}
+		}
+	}
+	"zps"
+	{
+		"Signatures"
+		{
+			"CBasePlayer::UpdateVPhysicsPosition"
+			{
+				"library"		"server"
+				"windows"		"\x55\x8B\xEC\x83\xEC\x08\x53\x8B\xD9\x57\x8A\x83"
+			}
+		}
+	}
+}
