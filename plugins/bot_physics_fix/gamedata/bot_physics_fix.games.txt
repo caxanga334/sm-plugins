@@ -16,6 +16,18 @@
 				"linux64"		"@_ZN11CBasePlayer22UpdateVPhysicsPositionERK6VectorS2_f"
 			}
 		}
+
+		"Offsets"
+		{
+			/* Offset to m_pPhysicsController member variable. Relative to the offset of m_oldOrigin (available in datamaps) */
+			"CBasePlayer::m_pPhysicsController"
+			{
+				"windows"			"-12"
+				"windows64"			"-24"
+				"linux"				"-12"
+				"linux64"			"-24"
+			}
+		}
 	}
 	"zps"
 	{

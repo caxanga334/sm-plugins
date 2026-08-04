@@ -167,6 +167,7 @@ jobs:
           cp ${{ github.workspace }}/sourcefiles/source/tf2c_enforce_time_limits.sp ${{ env.BUILD_PATH }}/
           cp ${{ github.workspace }}/sourcefiles/source/tf2c_schema_download.sp ${{ env.BUILD_PATH }}/
           cp ${{ github.workspace }}/sourcefiles/source/tf2c_simple_kick_immunity.sp ${{ env.BUILD_PATH }}/
+          cp ${{ github.workspace }}/sourcefiles/source/mapend_exec.sp ${{ env.BUILD_PATH }}/
 
       - name: Remove Plugins Incompatible With SourceMod Dev
         if: ${{ matrix.sm-version == '1.13.x' }}
