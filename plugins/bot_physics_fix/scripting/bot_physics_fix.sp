@@ -11,7 +11,7 @@ public Plugin myinfo =
 	name = "Bot Physics Fix",
 	author = "caxanga334",
 	description = "Fixes bot physics bounding box going out of sync.",
-	version = "1.1.0",
+	version = "1.1.1",
 	url = "https://github.com/caxanga334/sm-plugins"
 };
 
@@ -19,6 +19,7 @@ Handle g_updatevphysicscall = null;
 int g_m_pPhysicsController_offset;
 Address g_pPhysicsController;
 bool g_PhysicsControllerOffsetSet;
+int g_ignoreTeams[32];
 
 public void OnPluginStart()
 {
@@ -57,6 +58,23 @@ public void OnPluginStart()
 	{
 		SetFailState("CBasePlayer::UpdateVPhysicsPosition SDKCall setup failed!");
 	}
+
+	IntArraySet(g_ignoreTeams, sizeof(g_ignoreTeams), -1);
+
+	char value[256];
+	
+	if (gd.GetKeyValue("IgnoreTeams", value, sizeof(value)))
+	{
+		char buffer[32][4];
+		int len = ExplodeString(value, ",", buffer, sizeof(buffer), sizeof(buffer[]));
+
+		for (int i = 0; i < len; i++)
+		{
+			g_ignoreTeams[i] = StringToInt(buffer[i]);
+		}
+	}
+
+	delete gd;
 }
 
 void SetupPhysicsControllerOffset(int client)
@@ -82,9 +100,12 @@ void SetupPhysicsControllerOffset(int client)
 	g_PhysicsControllerOffsetSet = true;
 }
 
-void Frame_Test(any data)
+void IntArraySet(int[] arr, const int size, const int value)
 {
-	HasPhysicsController(view_as<int>(data));
+	for (int i = 0; i < size; i++)
+	{
+		arr[i] = value;
+	}
 }
 
 public void OnClientPutInServer(int client)
@@ -93,9 +114,6 @@ public void OnClientPutInServer(int client)
 
 	if (IsFakeClient(client))
 	{
-		HasPhysicsController(client);
-		RequestFrame(Frame_Test, view_as<any>(client));
-
 		// This sdkcall requires a valid physics object and OnClientPutInServer is too early, wait a bit before hooking.
 		CreateTimer(5.0, Timer_HookBot, view_as<any>(GetClientSerial(client)), TIMER_FLAG_NO_MAPCHANGE);
 	}
@@ -110,6 +128,26 @@ void Timer_HookBot(Handle timer, any data)
 		// PhysicsSimulate would be the correct function that requires gamedata and dhooks.
 		SDKHook(bot, SDKHook_PostThink, BotPostThink);
 	}
+}
+
+bool IsIgnoredTeam(int client)
+{
+	int team = GetClientTeam(client);
+
+	for (int i = 0; i < sizeof(g_ignoreTeams); i++)
+	{
+		if (g_ignoreTeams[i] < 0)
+		{
+			return false;
+		}
+
+		if (g_ignoreTeams[i] == team)
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 
 bool HasPhysicsController(int client)
@@ -143,6 +181,11 @@ void BotPostThink(int client)
 	}
 
 	if (!HasPhysicsController(client))
+	{
+		return;
+	}
+
+	if (IsIgnoredTeam(client))
 	{
 		return;
 	}

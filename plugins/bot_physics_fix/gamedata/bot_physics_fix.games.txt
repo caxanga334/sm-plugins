@@ -2,6 +2,12 @@
 {
 	"#default"
 	{
+		"Keys"
+		{
+			/* Comma delimited team indexes to ignore running the fix. */
+			"IgnoreTeams"		"0,1"
+		}
+
 		"Signatures"
 		{
 			/* Windows finding tips:
