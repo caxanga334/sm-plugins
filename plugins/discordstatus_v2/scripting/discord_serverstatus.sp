@@ -18,7 +18,7 @@
 #pragma newdecls required
 #pragma semicolon 1
 
-#define PLUGIN_VERSION "1.2.2"
+#define PLUGIN_VERSION "1.3.0"
 
 bool g_started; // Has the server started?
 bool g_hasip;
@@ -94,6 +94,7 @@ methodmap CPlayer
 #include "serverstatus/calladmin.sp"
 #include "serverstatus/sourcebans.sp"
 #include "serverstatus/steampawn.sp"
+#include "serverstatus/steamworks.sp"
 
 public Plugin myinfo =
 {

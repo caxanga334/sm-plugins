@@ -68,7 +68,7 @@ jobs:
       - name: Fetch Third-Party Includes (WGET)
         working-directory: ${{ env.TPINCLUDES_PATH }}
         run: |
-          wget https://raw.githubusercontent.com/KyleSanderson/SteamWorks/master/Pawn/includes/SteamWorks.inc -O steamworks.inc
+          wget https://raw.githubusercontent.com/alliedmodders/SM-SteamWorks/refs/heads/master/Pawn/includes/SteamWorks.inc -O steamworks.inc
           wget https://raw.githubusercontent.com/Sarrus1/DiscordWebhookAPI/master/include/discordWebhookAPI.inc -O discordWebhookAPI.inc
           wget https://raw.githubusercontent.com/Impact123/AutoExecConfig/development/autoexecconfig.inc -O autoexecconfig.inc
           wget https://raw.githubusercontent.com/peace-maker/sourcetvmanager/master/sourcetvmanager.inc -O sourcetvmanager.inc

@@ -160,6 +160,18 @@ bool BuildServerIPAddr(char[] buffer, int size)
 #if defined _SteamWorks_Included
 	if (g_steamworks)
 	{
+
+#if defined _smlib_server_included
+		int fakeip;
+		int fakeport;
+		
+		if (SteamWorks_GetFakeIP(fakeip, fakeport))
+		{
+			LongToIP(fakeip, buffer, size);
+			return true;
+		}
+#endif // defined _smlib_server_included
+
 		int ipaddr[4];
 
 		if (SteamWorks_GetPublicIP(ipaddr))
@@ -184,6 +196,19 @@ bool BuildServerIPAddr(char[] buffer, int size)
 
 void GetServerHostPort(int& port)
 {
+#if defined _SteamWorks_Included
+	if (g_steamworks)
+	{
+		int fakeip;
+		int fakeport;
+		
+		if (SteamWorks_GetFakeIP(fakeip, fakeport))
+		{
+			port = fakeport;
+			return;
+		}
+	}
+#endif // defined _SteamWorks_Included
 
 #if defined __steampawn_included
 	if (g_steampawn)
