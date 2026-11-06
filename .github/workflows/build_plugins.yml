@@ -169,6 +169,7 @@ jobs:
           cp ${{ github.workspace }}/sourcefiles/source/tf2c_simple_kick_immunity.sp ${{ env.BUILD_PATH }}/
           cp ${{ github.workspace }}/sourcefiles/source/mapend_exec.sp ${{ env.BUILD_PATH }}/
           cp ${{ github.workspace }}/sourcefiles/source/nmrih_admin_tools.sp ${{ env.BUILD_PATH }}/
+          cp ${{ github.workspace }}/sourcefiles/source/tf_mvm_endmission_mapvote.sp ${{ env.BUILD_PATH }}/
 
       - name: Remove Plugins Incompatible With SourceMod Dev
         if: ${{ matrix.sm-version == '1.13.x' }}
